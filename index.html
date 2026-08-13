@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOLPRO | Executive Master V5.1</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
+
+        :root {
+            --sol-lime: #a4c639;
+            --sol-lime-dk: #86a62d;
+            --ink: #0a0e1a;
+            --slate-900: #0c1526;
+            --slate-800: #182238;
+            --slate-700: #3c4a63;
+            --slate-500: #64748b;
+            --slate-200: #e2e8f0;
+            --slate-100: #f3f5f8;
+            --bg: #f7f8fa;
+            --border: #e3e7ed;
+            --danger: #e0483e;
+            --danger-bg: #fdeceb;
+            --success: #1f9d63;
+            --success-bg: #e9f8f0;
+            --warn: #d3960f;
+            --warn-bg: #fdf3e0;
+            --radius: 10px;
+            --radius-sm: 6px;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; margin: 0;
+            overflow: hidden; display: flex; flex-direction: column; height: 100vh; user-select: none;
+        }
+
+        .accent-line { height: 3px; background: linear-gradient(90deg, var(--sol-lime), #6fae1f, var(--slate-900) 140%); flex-shrink: 0; }
+
+        .hud { height: 84px; background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 16px; box-shadow: 0 2px 12px rgba(10,14,26,0.05); z-index: 3000; flex-shrink: 0; }
+        .brand-container { display: flex; flex-direction: column; flex-shrink: 0; }
+        .logo { font-family: 'Orbitron'; font-size: 24px; font-weight: 900; color: var(--ink); line-height: 1; letter-spacing: 0.5px; }
+        .logo span { color: var(--sol-lime-dk); }
+        .tagline { font-size: 8px; letter-spacing: 3px; color: #9aa3af; font-weight: 700; margin-top: 5px; }
+
+        .kpi-board { display: flex; gap: 8px; border-left: 1px solid var(--border); padding-left: 16px; flex-shrink: 0; }
+        .kpi-card { background: var(--slate-100); padding: 6px 14px; border-radius: var(--radius-sm); min-width: 110px; border: 1px solid var(--border); position: relative; overflow: hidden; transition: border-color .3s, box-shadow .3s; }
+        .kpi-card.warn { border-color: var(--warn); box-shadow: 0 0 0 3px var(--warn-bg); }
+        .kpi-card.critical { border-color: var(--danger); box-shadow: 0 0 0 3px var(--danger-bg); }
+        .kpi-lbl { font-size: 8px; font-weight: 800; text-transform: uppercase; color: var(--slate-700); display: flex; align-items: center; gap: 4px; }
+        .kpi-live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--sol-lime); box-shadow: 0 0 0 0 rgba(164,198,57,.6); animation: pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0% { box-shadow: 0 0 0 0 rgba(164,198,57,.55); } 70% { box-shadow: 0 0 0 6px rgba(164,198,57,0); } 100% { box-shadow: 0 0 0 0 rgba(164,198,57,0); } }
+        .kpi-val { font-family: var(--font-mono); font-size: 18px; font-weight: 800; display: block; }
+        .kpi-val small { font-size: 11px; font-weight: 500; margin-left: 2px; }
+        .kpi-bar-track { height: 3px; width: 100%; background: var(--slate-200); border-radius: 3px; margin-top: 4px; overflow: hidden; }
+        .kpi-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--sol-lime-dk), var(--sol-lime)); transition: width .6s ease; border-radius: 3px; }
+
+        .palette-container { display: flex; align-items: center; flex-grow: 1; overflow-x: auto; gap: 6px; padding: 5px 2px; scrollbar-width: thin; }
+        .palette-container::-webkit-scrollbar { height: 6px; }
+        .palette-container::-webkit-scrollbar-thumb { background: var(--slate-200); border-radius: 3px; }
+        .palette-item { padding: 7px 14px; border-radius: 30px; font-size: 11px; font-weight: 800; cursor: pointer; border: 2px solid var(--border); background: #fff; white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: transform .15s, border-color .15s, box-shadow .15s; }
+        .palette-item:hover { transform: translateY(-1px); }
+        .palette-item.active { border-color: var(--ink); transform: scale(1.05); box-shadow: 0 3px 8px rgba(10,14,26,.15); }
+        .palette-item .chip-days { opacity: .65; font-weight: 700; font-family: var(--font-mono); font-size: 10px; }
+        .palette-item.tool-item { padding: 7px 12px; font-size: 10px; border-radius: var(--radius-sm); flex-shrink: 0; }
+        .sys-eraser { border-color: #cbd5e1; color: var(--slate-700); } .sys-eraser.active { border-color: var(--ink); background: var(--slate-100); }
+        .sys-urlaub { background: repeating-linear-gradient(45deg, #e2e8f0, #e2e8f0 8px, #cbd5e1 8px, #cbd5e1 16px) !important; border-color: #94a3b8 !important; color: #0f172a; }
+        .sys-urlaub.active { border-color: #0f172a !important; }
+        .palette-separator { width: 1px; height: 26px; background: var(--border); margin: 0 6px; flex-shrink: 0; }
+        .btn-add { width: 32px; height: 32px; border-radius: 50%; background: var(--sol-lime); border: none; font-size: 18px; font-weight: 900; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--ink); transition: transform .15s, background .15s; }
+        .btn-add:hover { background: var(--sol-lime-dk); transform: rotate(90deg); }
+
+        .controls { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+        .btn { background: #fff; border: 1px solid var(--border); padding: 9px 13px; font-size: 10px; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); text-transform: uppercase; letter-spacing: .3px; transition: background .15s, border-color .15s, color .15s; color: var(--ink); }
+        .btn:hover { background: var(--slate-100); border-color: var(--slate-700); }
+        .btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+        .btn.mode-switch { background: var(--success-bg); color: var(--success); border-color: #a7e2c3; }
+        .btn.mode-switch.readonly { background: var(--danger-bg); color: var(--danger); border-color: #f3b7b2; }
+        .btn.btn-danger { background: #fff; border-color: var(--border); color: var(--slate-700); }
+        .btn.btn-danger:hover { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+        .seg-group { display: flex; gap: 4px; border-left: 1px solid var(--border); border-right: 1px solid var(--border); padding: 0 10px; }
+
+        .autosave-indicator { display: flex; align-items: center; gap: 6px; font-size: 9px; font-weight: 800; color: var(--slate-500); text-transform: uppercase; letter-spacing: .4px; padding: 0 6px; white-space: nowrap; cursor: default; }
+        .autosave-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); flex-shrink: 0; transition: background .2s; }
+        .autosave-indicator.pending .autosave-dot { background: var(--warn); animation: pulse-dot 1.5s infinite; }
+        .autosave-indicator.pending #autosaveText { color: var(--warn); }
+
+        .menu-wrap { position: relative; }
+        .menu-wrap > .btn { position: relative; }
+        .menu-wrap > .btn.has-pending::after { content: ''; position: absolute; top: -4px; right: -4px; width: 9px; height: 9px; border-radius: 50%; background: var(--warn); border: 2px solid #fff; }
+        .dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid var(--border); box-shadow: 0 12px 28px rgba(10,14,26,0.16); border-radius: var(--radius); padding: 6px; width: 210px; z-index: 4000; }
+        .dropdown-menu.open { display: block; animation: menu-in .12s ease-out; }
+        @keyframes menu-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+        .dropdown-menu button { display: flex; align-items: center; gap: 8px; width: 100%; border: none; background: none; text-align: left; padding: 9px 10px; font-size: 12px; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); color: var(--ink); }
+        .dropdown-menu button:hover { background: var(--slate-100); }
+        .dropdown-menu .menu-caption { font-size: 9px; text-transform: uppercase; letter-spacing: .5px; color: var(--slate-500); font-weight: 800; padding: 6px 10px 2px; }
+        .dropdown-menu hr { border: none; border-top: 1px solid var(--border); margin: 5px 0; }
+
+        .readonly-banner { display: none; background: var(--danger-bg); color: var(--danger); font-size: 11px; font-weight: 800; text-align: center; padding: 5px; letter-spacing: .5px; border-bottom: 1px solid #f3b7b2; flex-shrink: 0; }
+        body.read-only-mode .readonly-banner { display: block; }
+        body.read-only-mode .project-cell { cursor: not-allowed !important; }
+        body.read-only-mode .toggle-btn { cursor: not-allowed; opacity: .4; }
+
+        .viewport { flex: 1; overflow: auto; position: relative; }
+        table { border-collapse: collapse; table-layout: fixed; width: max-content; }
+        th, td { border: 1px solid var(--border); text-align: center; }
+        #gridHead th { position: sticky; top: 0; background: #f1f5f9; font-size: 10px; font-weight: 800; color: var(--slate-700); z-index: 100; }
+        #gridHead tr:nth-child(1) th { height: 30px; background: var(--slate-900); color: var(--sol-lime); }
+        #gridHead tr:nth-child(2) th { height: 26px; top: 30px; background: #fff; }
+        #gridHead tr:nth-child(3) th { height: 46px; top: 56px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .fixed-corner { background: var(--slate-900) !important; position: sticky; left: 0; z-index: 110; }
+        td:first-child { position: sticky; left: 0; z-index: 80; background: #fff; width: 150px !important; text-align: left; padding-left: 15px; font-weight: 800; border-right: 3px solid var(--slate-900); }
+        .monday-start { border-left: 4px solid var(--slate-700) !important; }
+
+        .worker-controls { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+        .toggle-btn { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--slate-200); background: #fff; cursor: pointer; flex-shrink: 0; position: relative; transition: border-color .15s, background .15s; }
+        .toggle-btn::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--success); }
+        .worker-row.is-offline .toggle-btn { border-color: var(--danger); background: var(--danger-bg); }
+        .worker-row.is-offline .toggle-btn::after { content: '✕'; color: var(--danger); }
+        .worker-row.is-offline td:not(:first-child) { background: repeating-linear-gradient(45deg, #f8fafc, #f8fafc 8px, #eef1f5 8px, #eef1f5 16px); }
+        .worker-row.is-offline td:first-child { color: var(--slate-500); }
+
+        .project-cell { height: 55px; cursor: crosshair; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px; line-height: 1.1; transition: outline-color .1s; }
+        .grid-sys-vacation { background: repeating-linear-gradient(45deg, #f8fafc, #f8fafc 8px, #cbd5e1 8px, #cbd5e1 16px) !important; color: #475569 !important; font-style: italic; font-size: 10px; }
+        .selecting { background-color: rgba(164,198,57, 0.4) !important; outline: 2px dashed var(--ink); outline-offset: -2px; }
+        .day-num { font-family: var(--font-mono); font-size: 17px; font-weight: 800; } .day-short { font-size: 8px; font-weight: 700; text-transform: uppercase; color: var(--slate-500); }
+        .view-woche th[id^="th-"], .view-woche .project-cell, .view-woche td[id^="COUNT_"] { width: 160px; }
+        .view-monat th[id^="th-"], .view-monat .project-cell, .view-monat td[id^="COUNT_"] { width: 75px; }
+        .view-jahr th[id^="th-"], .view-jahr .project-cell, .view-jahr td[id^="COUNT_"] { width: 32px; }
+        .view-jahr .project-cell { font-size: 0px !important; }
+        .stat-row td { background: var(--slate-900) !important; color: #fff; font-weight: 800; padding: 8px; font-family: var(--font-mono); }
+        .stat-row td:first-child { background: #000 !important; color: var(--sol-lime) !important; font-family: 'Inter'; }
+
+        body.spotlight-active .project-cell { opacity: .18; transition: opacity .2s; }
+        body.spotlight-active .project-cell.spotlight-highlight { opacity: 1; outline: 2px solid var(--ink); outline-offset: -2px; z-index: 5; position: relative; }
+
+        .overlay { position: fixed; inset: 0; background: rgba(10,14,26,0.55); backdrop-filter: blur(2px); z-index: 5000; display: none; }
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(.97); opacity: 0; background: #fff; padding: 24px; border-radius: 14px; display: none; z-index: 5001; width: 300px; box-shadow: 0 20px 50px rgba(10,14,26,0.35); transition: transform .15s ease-out, opacity .15s ease-out; }
+        .modal.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        .modal h2 { margin: 0 0 16px 0; font-size: 15px; font-weight: 800; border-bottom: 2px solid var(--sol-lime); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close { cursor: pointer; font-size: 14px; color: var(--slate-500); font-weight: 400; }
+        .modal label { font-size: 10px; font-weight: 800; color: var(--slate-500); text-transform: uppercase; letter-spacing: .4px; display: block; margin-top: 12px; }
+        .modal input[type="text"], .modal input[type="number"] { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-weight: 700; margin-top: 5px; font-family: 'Inter'; font-size: 13px; }
+        .modal input[type="text"]:focus, .modal input[type="number"]:focus { outline: 2px solid var(--sol-lime); outline-offset: 1px; }
+        .m-btns { display: flex; gap: 8px; margin-top: 20px; } .m-btn { flex: 1; padding: 10px; border: none; font-weight: 700; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; }
+        .m-save { background: var(--ink); color: #fff; } .m-save:hover { background: var(--slate-800); }
+        .m-cancel { background: var(--slate-100); color: var(--slate-700); } .m-cancel:hover { background: var(--slate-200); }
+        .m-delete { background: var(--danger-bg); color: var(--danger); margin-top: 10px; width: 100%; }
+        .m-delete:hover { background: #fadedb; }
+
+        #actionGridCtx { display: none; position: fixed; z-index: 9000; background: #fff; border: 1px solid var(--border); box-shadow: 0 12px 28px rgba(10,14,26,0.2); border-radius: var(--radius); padding: 5px; width: 230px; }
+        #actionGridCtx button { display: block; width: 100%; border: none; background: none; text-align: left; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); color: var(--ink); }
+        #actionGridCtx button:hover { background: var(--slate-100); }
+        #actionGridCtx button.danger-text { color: var(--danger); }
+        #actionGridCtx hr { border: none; border-top: 1px solid var(--border); margin: 5px 0; }
+        #palCtxMenu { display: none; position: fixed; z-index: 8000; background: #fff; border: 1px solid var(--border); box-shadow: 0 12px 28px rgba(10,14,26,0.18); border-radius: var(--radius); padding: 5px; width: 200px; }
+        #palCtxMenu button { display: block; width: 100%; border: none; background: none; text-align: left; padding: 10px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm); }
+        #palCtxMenu button:hover { background: var(--slate-100); }
+
+        .toast-stack { position: fixed; bottom: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+        .toast { display: flex; align-items: center; gap: 9px; background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; box-shadow: 0 10px 25px rgba(10,14,26,0.3); font-family: var(--font-mono); opacity: 0; transform: translateY(8px); transition: opacity .25s, transform .25s; max-width: 320px; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--sol-lime); }
+        .toast-success .toast-dot { background: var(--success); }
+        .toast-error .toast-dot { background: var(--danger); }
+        .toast-warn .toast-dot { background: var(--warn); }
+    </style>
+</head>
+<body class="view-monat" id="appBody">
+
+<div class="accent-line"></div>
+<div class="readonly-banner">🔒 NUR-LESE-MODUS — PLANUNG GESPERRT</div>
+
+<div class="hud">
+    <div class="brand-container"><div class="logo">SOL<span>PRO</span></div><div class="tagline">EXECUTIVE SUITE</div></div>
+    <div class="kpi-board">
+        <div class="kpi-card" id="kpiGBlock">
+            <span class="kpi-lbl"><span class="kpi-live-dot"></span>CAP %</span>
+            <span class="kpi-val" id="kpiCapRate">0%</span>
+            <div class="kpi-bar-track"><div class="kpi-bar" id="kpiBarLine"></div></div>
+        </div>
+        <div class="kpi-card"><span class="kpi-lbl">NETTO TAGE</span><span class="kpi-val" id="kpiTotalDays">0 T</span><div class="kpi-bar-track"><div class="kpi-bar" style="width:100%"></div></div></div>
+        <div class="kpi-card"><span class="kpi-lbl">AUSFALL</span><span class="kpi-val" id="kpiLostDays" style="color:var(--danger)">0 T</span><div class="kpi-bar-track"><div class="kpi-bar" style="width:100%;background:var(--slate-200)"></div></div></div>
+        <div class="kpi-card" id="kpiKwpBlock">
+            <span class="kpi-lbl">VOLUMEN</span>
+            <span class="kpi-val" id="kpiTotalKwp">0 <small>kWp</small></span>
+            <div class="kpi-bar-track"><div class="kpi-bar" style="width:100%; background:var(--ink)"></div></div>
+        </div>
+    </div>
+    <div class="palette-container" id="paletteUI"></div>
+    <div class="controls">
+        <div class="autosave-indicator" id="autosaveIndicator" title="Änderungen werden automatisch im Browser gespeichert. Für eine externe Sicherung bitte Export nutzen.">
+            <span class="autosave-dot" id="autosaveDot"></span><span id="autosaveText">Gespeichert</span>
+        </div>
+        <button class="btn mode-switch planning" id="lockStateBtn" onclick="toggleSystemLock()">✏️ Planen</button>
+        <div class="seg-group">
+            <button class="btn" onclick="setView('woche', this)">W</button>
+            <button class="btn active" onclick="setView('monat', this)">M</button>
+            <button class="btn" onclick="setView('jahr', this)">J</button>
+        </div>
+        <div class="menu-wrap">
+            <button class="btn" id="exportMenuBtn" onclick="toggleMenu('exportMenu', event)">⬇ Export ▾</button>
+            <div class="dropdown-menu" id="exportMenu">
+                <div class="menu-caption">Bericht</div>
+                <button onclick="exportToExcel()">📊 Excel-Bericht (.xlsx)</button>
+                <hr>
+                <div class="menu-caption">Sicherung</div>
+                <button onclick="exportDataJSON()">💾 JSON-Backup (.json)</button>
+            </div>
+        </div>
+        <div class="menu-wrap">
+            <button class="btn" onclick="toggleMenu('importMenu', event)">⬆ Import ▾</button>
+            <div class="dropdown-menu" id="importMenu">
+                <button onclick="triggerImport('xlsx')">📊 Excel laden (.xlsx)</button>
+                <button onclick="triggerImport('json')">💾 JSON-Backup laden</button>
+            </div>
+        </div>
+        <input type="file" id="fileInputJSON" style="display:none" onchange="importDataJSON(event)" accept=".json">
+        <input type="file" id="fileInputXLSX" style="display:none" onchange="importDataExcel(event)" accept=".xlsx,.xls">
+        <button class="btn btn-danger" title="Reset" onclick="nuclearSystemReset()">💣</button>
+    </div>
+</div>
+
+<div class="viewport" id="scrollPort"><table id="theTable"><thead id="gridHead"></thead><tbody id="gridBody"></tbody></table></div>
+
+<div id="actionGridCtx"></div>
+<div class="overlay" id="p_overlay" onclick="closePaletteModal()"></div>
+<div class="modal" id="paletteModal">
+    <h2 id="pModalTitle">Projekt <span class="modal-close" onclick="closePaletteModal()">✕</span></h2>
+    <label>Name</label><input type="text" id="palNameInput" placeholder="z. B. Baustelle Nord">
+    <label>Leistung (kWp)</label><input type="number" id="palKwpInput" placeholder="z. B. 100">
+    <div id="palColorArea" class="color-edit-zone"><label>Farbe</label><input type="color" id="palColorInput" style="height:40px;width:100%;border:1px solid var(--border);border-radius:6px;margin-top:5px;"></div>
+    <input type="hidden" id="palEditId">
+    <div class="m-btns"><button class="m-btn m-save" onclick="savePaletteItem()">Sichern</button><button class="m-btn m-cancel" onclick="closePaletteModal()">Zurück</button></div>
+    <button class="m-btn m-delete" id="palDelBtn" onclick="deletePaletteItem()" style="display:none;">Löschen</button>
+</div>
+<div id="palCtxMenu"><button onclick="editPaletteContextMenu()">⚙️ Farbe/Name ändern</button></div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script>
+    let projects = [], plannerGrid = {}, deactivatedBuses = [];
+    let activeProjectId = "ERASER", selectedCells = [], isDrawing = false, contextCtxMenuPID = null, selectedCellDomID = null, highlightTimer = null, isAppLockedForEditing = false;
+    const baseFlottenListe = ["SOL 2", "SOL 3", "SOL 4", "SOL 12", "SOL 16"];
+    const managementFarben = ["#1e3a8a","#0284c7","#059669","#ca8a04","#b91c1c","#6d28d9","#0f766e","#a21caf","#4f46e5","#b45309","#4338ca","#064e3b"];
+
+    function init() {
+        const thead = document.getElementById('gridHead'); const tbody = document.getElementById('gridBody');
+        let currentDay = new Date(2026, 7, 17); const endDate = new Date(2026, 11, 31); const dateArray = [];
+        while(currentDay <= endDate) { if(currentDay.getDay()!==0 && currentDay.getDay()!==6) dateArray.push(new Date(currentDay)); currentDay.setDate(currentDay.getDate()+1); }
+        let trMonat = `<tr><th rowspan="3" class="fixed-corner"><div class="logo">SOL<span>PRO</span></div></th>`;
+        let trKW = `<tr>`, trTage = `<tr>`;
+        let lastM=-1, mSpans=[], lastKW=-1, kwSpans=[];
+        dateArray.forEach(d => {
+            let m=d.getMonth(), kw=getKalenderWocheMath(d);
+            if(m!==lastM){ mSpans.push({label:d.toLocaleString('de-DE',{month:'long'}).toUpperCase(), count:1}); lastM=m; } else mSpans[mSpans.length-1].count++;
+            if(kw!==lastKW){ kwSpans.push({label:'KW '+kw, count:1}); lastKW=kw; } else kwSpans[kwSpans.length-1].count++;
+        });
+        mSpans.forEach(ms => trMonat += `<th colspan="${ms.count}">${ms.label}</th>`);
+        kwSpans.forEach(ks => trKW += `<th colspan="${ks.count}">${ks.label}</th>`);
+        dateArray.forEach(d => {
+            let iso = d.toISOString().split('T')[0];
+            trTage += `<th id="th-${iso}" class="${d.getDay()===1?'monday-start':''}"><div class="day-num">${d.getDate()}</div><div class="day-short">${d.toLocaleString('de-DE',{weekday:'short'})}</div></th>`;
+        });
+        thead.innerHTML = trMonat + `</tr>` + trKW + `</tr>` + trTage + `</tr>`;
+        baseFlottenListe.forEach(w => {
+            let sf = w.replace(/\s+/g,'_');
+            let rw = `<tr id="row_${sf}" class="worker-row is-active"><td><div class="worker-controls"><span>${w}</span><button title="Ausfall" onclick="toggleBusState('${sf}')" class="toggle-btn"></button></div></td>`;
+            dateArray.forEach(d => {
+                let iso = d.toISOString().split('T')[0];
+                rw += `<td id="CELL_${sf}_${iso}" class="project-cell${(d.getDay()===1?' monday-start':'')}" data-date-ts="${d.getTime()}"></td>`;
+            });
+            tbody.insertAdjacentHTML('beforeend', rw + `</tr>`);
+        });
+        let fRow = `<tr class="stat-row"><td>LEISTUNG</td>`;
+        dateArray.forEach(d => fRow += `<td id="COUNT_${d.toISOString().split('T')[0]}">0</td>`);
+        tbody.insertAdjacentHTML('beforeend', fRow + `</tr>`);
+        loadDataFromBrowser(); renderProjectsToTopPalette(); setupMouseDragPainting(); setupGlobalUiHandlers();
+        updateAutosaveIndicator();
+        window.addEventListener('beforeunload', e => {
+            if(hatUngesicherteAenderungen()) { e.preventDefault(); e.returnValue = ''; return ''; }
+        });
+    }
+
+    function toggleSystemLock() {
+        isAppLockedForEditing = !isAppLockedForEditing; let btn = document.getElementById('lockStateBtn');
+        if(isAppLockedForEditing){ document.body.classList.add('read-only-mode'); btn.className='btn mode-switch readonly'; btn.innerText='🔒 Nur Lesen'; }
+        else { document.body.classList.remove('read-only-mode'); btn.className='btn mode-switch planning'; btn.innerText='✏️ Planen'; }
+    }
+
+    function toggleBusState(sid) {
+       if(isAppLockedForEditing) return showToast('Zuerst Sperre lösen', 'warn');
+       if(deactivatedBuses.includes(sid)) { deactivatedBuses=deactivatedBuses.filter(v=>v!==sid); document.getElementById('row_'+sid).classList.replace('is-offline','is-active'); }
+       else { deactivatedBuses.push(sid); document.getElementById('row_'+sid).classList.replace('is-active','is-offline'); }
+       syncLocalSystemSpeichern(); fullGridRepaintUI_Logic();
+    }
+
+    function setupMouseDragPainting() {
+        document.addEventListener('mousedown', e => {
+            if (e.target.classList.contains('project-cell') && e.button === 2) {
+                if(isAppLockedForEditing) return; e.preventDefault(); selectedCellDomID = e.target.id;
+                bautHtmlFurDasActionContextMenu(); let cm=document.getElementById('actionGridCtx'); cm.style.display="block"; cm.style.left=e.clientX+"px"; cm.style.top=e.clientY+"px"; return;
+            }
+            if (e.target.classList.contains('project-cell') && e.button === 0) {
+                if(isAppLockedForEditing || !activeProjectId) return;
+                isDrawing = true; selectedCells = [e.target.id]; e.target.classList.add('selecting');
+            }
+        });
+        document.addEventListener('mouseover', e => { if(isDrawing && e.target.classList.contains('project-cell') && !selectedCells.includes(e.target.id)) { selectedCells.push(e.target.id); e.target.classList.add('selecting'); } });
+        document.addEventListener('mouseup', e => { if(isDrawing && e.button === 0 && selectedCells.length > 0) { verarbeiteMalerZugAufGrid(); } document.querySelectorAll('.selecting').forEach(nd => nd.classList.remove('selecting')); isDrawing = false; });
+        document.addEventListener('contextmenu', e => { if (e.target.classList.contains('project-cell')) e.preventDefault(); });
+    }
+
+    function setupGlobalUiHandlers() {
+        document.addEventListener('click', e => {
+            if(!e.target.closest('.menu-wrap')) closeMenus();
+            if(!e.target.closest('#actionGridCtx')) document.getElementById('actionGridCtx').style.display = 'none';
+            if(!e.target.closest('#palCtxMenu') && !e.target.closest('.palette-item')) document.getElementById('palCtxMenu').style.display = 'none';
+        });
+        document.addEventListener('keydown', e => { if(e.key === 'Escape') { closeMenus(); closePaletteModal(); document.getElementById('actionGridCtx').style.display='none'; document.getElementById('palCtxMenu').style.display='none'; } });
+    }
+
+    function verarbeiteMalerZugAufGrid() {
+        selectedCells.forEach(cid => {
+             if(activeProjectId === "ERASER") delete plannerGrid[cid];
+             else if(activeProjectId === "SYS_VACATION") plannerGrid[cid] = "SYS_VACATION";
+             else plannerGrid[cid] = activeProjectId;
+        });
+        syncLocalSystemSpeichern(); fullGridRepaintUI_Logic(); renderProjectsToTopPalette(); selectedCells = [];
+    }
+
+    function bautHtmlFurDasActionContextMenu() {
+        let ActionPanel = document.getElementById('actionGridCtx');
+        let prj = projects.find(p => p.id === activeProjectId);
+        let content = `
+            ${(activeProjectId !== 'ERASER' && activeProjectId !== 'SYS_VACATION' && prj)
+            ? `<button onclick="fireAction('FILL_PROJECT')"><span>🚀</span> <b style="color:${prj.color};">Woche ${prj.name} zuweisen</b></button><hr>` : ''}
+            <button onclick="fireAction('FILL_URLAUB')"><span>🌴</span> Ganze KW auf Urlaub</button>
+            <hr>
+            <button onclick="fireAction('DELETE_WEEK')" class="danger-text"><span>🔥</span> Woche löschen</button>
+            <button onclick="fireAction('DELETE_CELL')" class="danger-text"><span>🗑️</span> Tag löschen</button>
+        `;
+        ActionPanel.innerHTML = content;
+    }
+
+    function fireAction(cmd) {
+        document.getElementById('actionGridCtx').style.display = 'none';
+        if(!selectedCellDomID) return;
+        if(cmd === 'DELETE_CELL') { delete plannerGrid[selectedCellDomID]; syncLocalSystemSpeichern(); fullGridRepaintUI_Logic(); renderProjectsToTopPalette(); return; }
+        let parts = selectedCellDomID.split('_');
+        let targetDateStr = parts.pop(); parts.shift();
+        let targetBusID = parts.join('_');
+        let targetKW = getKalenderWocheMath(new Date(targetDateStr));
+        document.querySelectorAll(`.project-cell`).forEach(cell => {
+            if(cell.id.includes(targetBusID)) {
+                let cellKW = getKalenderWocheMath(new Date(Number(cell.getAttribute('data-date-ts'))));
+                if(cellKW === targetKW) {
+                    if(cmd === 'DELETE_WEEK') delete plannerGrid[cell.id];
+                    if(cmd === 'FILL_URLAUB') plannerGrid[cell.id] = "SYS_VACATION";
+                    if(cmd === 'FILL_PROJECT' && activeProjectId) plannerGrid[cell.id] = activeProjectId;
+                }
+            }
+        });
+        syncLocalSystemSpeichern(); fullGridRepaintUI_Logic(); renderProjectsToTopPalette();
+    }
+
+    function renderProjectsToTopPalette() {
+        let container = document.getElementById('paletteUI');
+        container.innerHTML = `<button class="btn-add" onclick="oeffneProjectCreatorModal()">+</button>`;
+        projects.forEach(p => {
+            let counts = Object.keys(plannerGrid).filter(k => plannerGrid[k] === p.id).length;
+            let el = document.createElement('div');
+            el.className = `palette-item ${activeProjectId === p.id ? 'active' : ''}`;
+            el.style.backgroundColor = p.color; el.style.color = getLesbareTextfarbe(p.color);
+            el.innerHTML = `<b>${p.name}</b> <span class="chip-days">${counts} T</span>`;
+            el.onclick = () => { activeProjectId = p.id; renderProjectsToTopPalette(); };
+            el.onmouseenter = () => { highlightTimer = setTimeout(()=>{ document.body.classList.add('spotlight-active'); Object.keys(plannerGrid).forEach(k=>{ if(plannerGrid[k]===p.id) document.getElementById(k)?.classList.add('spotlight-highlight'); }); }, 200); };
+            el.onmouseleave = () => { clearTimeout(highlightTimer); document.body.classList.remove('spotlight-active'); document.querySelectorAll('.spotlight-highlight').forEach(n=>n.classList.remove('spotlight-highlight')); };
+            el.oncontextmenu = (e) => { e.preventDefault(); e.stopPropagation(); if(isAppLockedForEditing) return; document.getElementById('palCtxMenu').style.display="block"; document.getElementById('palCtxMenu').style.left=e.clientX+"px"; document.getElementById('palCtxMenu').style.top=e.clientY+"px"; contextCtxMenuPID = p.id; };
+            container.appendChild(el);
+        });
+        container.insertAdjacentHTML('beforeend', '<div class="palette-separator"></div>');
+        [{ id: 'ERASER', label: '🧼 Radierer', cls: 'sys-eraser' }, { id: 'SYS_VACATION', label: '🌴 Urlaub', cls: 'sys-urlaub' }].forEach(t => {
+            let el = document.createElement('div'); el.className = `palette-item tool-item ${t.cls} ${(activeProjectId === t.id ? 'active' : '')}`; el.innerText = t.label; el.onclick = () => { activeProjectId = t.id; renderProjectsToTopPalette(); };
+            container.appendChild(el);
+        });
+    }
+
+    function oeffneProjectCreatorModal() {
+        if(isAppLockedForEditing) return showToast('Zuerst Sperre lösen', 'warn');
+        document.getElementById('pModalTitle').firstChild.textContent = "Neues Projekt "; document.getElementById('palEditId').value = ""; document.getElementById('palNameInput').value = ""; document.getElementById('palKwpInput').value = ""; document.getElementById('palColorArea').style.display = 'none'; document.getElementById('palDelBtn').style.display = 'none'; openPaletteModal();
+    }
+    function editPaletteContextMenu() {
+        document.getElementById('palCtxMenu').style.display="none"; let p = projects.find(x => x.id === contextCtxMenuPID); if(!p) return;
+        document.getElementById('pModalTitle').firstChild.textContent = "Projekt ändern "; document.getElementById('palEditId').value = p.id; document.getElementById('palNameInput').value = p.name;
+        document.getElementById('palKwpInput').value = p.kwp || 0;
+        document.getElementById('palColorArea').style.display = 'block'; document.getElementById('palColorInput').value = p.color; document.getElementById('palDelBtn').style.display = "block"; openPaletteModal();
+    }
+    function openPaletteModal() { document.getElementById('p_overlay').style.display="block"; const m=document.getElementById('paletteModal'); m.style.display="block"; requestAnimationFrame(()=>m.classList.add('show')); document.getElementById('palNameInput').focus(); }
+    function closePaletteModal() { const m=document.getElementById('paletteModal'); m.classList.remove('show'); document.getElementById('p_overlay').style.display="none"; setTimeout(()=>{ m.style.display="none"; }, 150); }
+    function savePaletteItem() {
+        let name = document.getElementById('palNameInput').value.trim(); 
+        let kwp = parseFloat(document.getElementById('palKwpInput').value) || 0;
+        let id = document.getElementById('palEditId').value;
+        if(!name) return showToast('Bitte einen Namen eingeben', 'error');
+        if(id) { let p=projects.find(x=>x.id===id); p.name=name; p.color=document.getElementById('palColorInput').value; p.kwp=kwp; showToast('Projekt aktualisiert', 'success'); }
+        else { let c = managementFarben[Math.floor(Math.random()*managementFarben.length)]; projects.push({id: 'P-'+Date.now(), name: name, color: c, kwp: kwp}); activeProjectId = projects[projects.length-1].id; showToast('Projekt angelegt', 'success'); }
+        closePaletteModal(); fullGridRepaintUI_Logic(); syncLocalSystemSpeichern(); renderProjectsToTopPalette();
+    }
+    function deletePaletteItem() {
+        let id = document.getElementById('palEditId').value; projects = projects.filter(x=>x.id!==id);
+        Object.keys(plannerGrid).forEach(k=>{ if(plannerGrid[k]===id){ let el=document.getElementById(k); if(el){el.innerText="";el.style.background="";} delete plannerGrid[k]; }});
+        activeProjectId = 'ERASER'; closePaletteModal(); fullGridRepaintUI_Logic(); syncLocalSystemSpeichern(); renderProjectsToTopPalette(); showToast('Projekt gelöscht', 'success');
+    }
+
+    function syncLocalSystemSpeichern() {
+        localStorage.setItem("SOLPRO_EXEC_DB_5", JSON.stringify({ dbP: projects, dbGrid: plannerGrid, dbOff: deactivatedBuses }));
+        localStorage.setItem("SOLPRO_LAST_CHANGE_TS", String(Date.now()));
+        evalDashboardMathemations(); updateAutosaveIndicator();
+    }
+
+    function hatUngesicherteAenderungen() {
+        const changeTs = Number(localStorage.getItem("SOLPRO_LAST_CHANGE_TS") || 0);
+        const backupTs = Number(localStorage.getItem("SOLPRO_LAST_BACKUP_TS") || 0);
+        const hasData = projects.length > 0 || Object.keys(plannerGrid).length > 0 || deactivatedBuses.length > 0;
+        return hasData && changeTs > backupTs;
+    }
+    function markiereAlsGesichert() { localStorage.setItem("SOLPRO_LAST_BACKUP_TS", String(Date.now())); updateAutosaveIndicator(); }
+    function updateAutosaveIndicator() {
+        const ind = document.getElementById('autosaveIndicator'); if(!ind) return;
+        const pending = hatUngesicherteAenderungen();
+        ind.classList.toggle('pending', pending);
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2,'0'), mm = String(now.getMinutes()).padStart(2,'0');
+        document.getElementById('autosaveText').innerText = pending ? `Autosave · Backup ausstehend` : `Autosave · ${hh}:${mm}`;
+        document.getElementById('exportMenuBtn')?.classList.toggle('has-pending', pending);
+    }
+    function loadDataFromBrowser() {
+        let raw = localStorage.getItem("SOLPRO_EXEC_DB_5");
+        if(raw){ try { let data = JSON.parse(raw); projects = data.dbP || []; plannerGrid = data.dbGrid || {}; deactivatedBuses = data.dbOff || []; deactivatedBuses.forEach(b=> document.getElementById('row_'+b)?.classList.replace('is-active', 'is-offline')); fullGridRepaintUI_Logic(); } catch(e){} }
+    }
+    function fullGridRepaintUI_Logic() {
+        document.querySelectorAll('.project-cell').forEach(c => { c.style.backgroundColor=""; c.style.color=""; c.innerText=""; c.title=""; c.classList.remove('grid-sys-vacation'); });
+        Object.keys(plannerGrid).forEach(k => {
+            let p = projects.find(x=>x.id===plannerGrid[k]); let cell = document.getElementById(k);
+            if(!cell) { delete plannerGrid[k]; return; }
+            if(plannerGrid[k] === "SYS_VACATION") { cell.classList.add('grid-sys-vacation'); cell.innerText="AUSFALL"; cell.title="Urlaub/Wartung"; return; }
+            if(p) { cell.style.backgroundColor=p.color; cell.style.color=getLesbareTextfarbe(p.color); cell.innerText=p.name; cell.title=p.name; }
+            else delete plannerGrid[k];
+        }); evalDashboardMathemations();
+    }
+
+    function evalDashboardMathemations() {
+        let netWork=0, lost=0, maxPossible=0;
+        let activeBuses = baseFlottenListe.length - deactivatedBuses.length;
+        document.querySelectorAll('[id^="COUNT_"]').forEach(f => {
+            let dt = f.id.replace('COUNT_','');
+            let dayLost=0, dayWork=0;
+            Object.keys(plannerGrid).forEach(k => { if(k.includes(dt) && !deactivatedBuses.some(b=>k.includes(b))) { if(plannerGrid[k] === "SYS_VACATION") dayLost++; else dayWork++; } });
+            let capThisDay = activeBuses - dayLost; netWork += dayWork; lost += dayLost; maxPossible += (capThisDay > 0 ? capThisDay : 0);
+            if(capThisDay <= 0) { f.innerText="-"; f.style.color='gray'; }
+            else { f.innerText = dayWork + " / " + capThisDay; f.style.color = dayWork >= capThisDay ? '#f87171' : '#34d399'; }
+        });
+        let rate = maxPossible > 0 ? Math.round((netWork/maxPossible)*100) : 0;
+        document.getElementById('kpiCapRate').innerHTML = rate + "<span>%</span>";
+        let bar = document.getElementById('kpiBarLine'); bar.style.width = rate + "%";
+        document.getElementById('kpiGBlock').className = 'kpi-card ' + (rate >= 85 ? 'critical' : (rate >= 50 ? 'warn' : ''));
+        document.getElementById('kpiTotalDays').innerHTML = netWork + " <span>T</span>";
+        document.getElementById('kpiLostDays').innerHTML = lost + " <span>T</span>";
+
+        // kWp Volumen Summe
+        let totalKwp = 0;
+        let uniqueProjectIds = new Set(Object.values(plannerGrid));
+        uniqueProjectIds.forEach(pid => {
+            if(pid !== "SYS_VACATION") {
+                let p = projects.find(x => x.id === pid);
+                if(p) totalKwp += (p.kwp || 0);
+            }
+        });
+        document.getElementById('kpiTotalKwp').innerHTML = totalKwp + " <small>kWp</small>";
+    }
+
+    function toggleMenu(id, evt) { if(evt) evt.stopPropagation(); const el=document.getElementById(id); const wasOpen = el.classList.contains('open'); closeMenus(); if(!wasOpen) el.classList.add('open'); }
+    function closeMenus() { document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open')); }
+    function triggerImport(type) { closeMenus(); if(type==='json') document.getElementById('fileInputJSON').click(); else document.getElementById('fileInputXLSX').click(); }
+
+    function showToast(msg, type) {
+        type = type || 'info';
+        const stack = document.getElementById('toastStack');
+        const t = document.createElement('div'); t.className = `toast toast-${type}`;
+        t.innerHTML = `<span class="toast-dot"></span><span>${msg}</span>`;
+        stack.appendChild(t);
+        requestAnimationFrame(()=>t.classList.add('show'));
+        setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 300); }, 4200);
+    }
+
+    function exportDataJSON() {
+        closeMenus();
+        let data = localStorage.getItem("SOLPRO_EXEC_DB_5") || '{"dbP":[],"dbGrid":{},"dbOff":[]}';
+        let stamp = new Date().toISOString().split('T')[0];
+        let link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([data], {type: "application/json"})); link.download = `SOLPRO_BACKUP_${stamp}.json`; link.click();
+        markiereAlsGesichert();
+        showToast('JSON-Backup exportiert', 'success');
+    }
+    function importDataJSON(e) {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = res => {
+            try {
+                let parsed = JSON.parse(res.target.result);
+                if(!parsed || !Array.isArray(parsed.dbP) || typeof parsed.dbGrid !== 'object' || !Array.isArray(parsed.dbOff)) throw new Error('Ungültige Struktur');
+                if(!confirm(`Backup enthält ${parsed.dbP.length} Projekte und ${Object.keys(parsed.dbGrid).length} Planungs-Einträge.\nDie aktuelle Planung wird ersetzt. Fortfahren?`)) { e.target.value=''; return; }
+                localStorage.setItem("SOLPRO_EXEC_DB_5", res.target.result);
+                localStorage.setItem("SOLPRO_LAST_CHANGE_TS", String(Date.now()));
+                localStorage.setItem("SOLPRO_LAST_BACKUP_TS", String(Date.now()));
+                showToast('Backup geladen – Seite wird neu geladen…', 'success');
+                setTimeout(()=>window.location.reload(), 700);
+            } catch(err) { showToast('Ungültige JSON-Datei', 'error'); }
+            e.target.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    function exportToExcel() {
+        closeMenus();
+        if(typeof XLSX === 'undefined') { showToast('Excel-Bibliothek nicht verfügbar', 'error'); return; }
+        const wsProjekte = XLSX.utils.json_to_sheet(projects.map(p => ({ ID: p.id, Name: p.name, Leistung: p.kwp, Farbe: p.color })));
+        const planRows = [];
+        Object.keys(plannerGrid).forEach(k => {
+            const val = plannerGrid[k];
+            const parts = k.split('_'); parts.shift();
+            const date = parts.pop();
+            const busSlug = parts.join('_');
+            const isVac = val === 'SYS_VACATION';
+            const proj = isVac ? null : projects.find(p => p.id === val);
+            planRows.push({ Fahrzeug: busSlug.replace(/_/g,' '), Datum: date, Typ: isVac ? 'URLAUB' : 'PROJEKT', ProjektID: isVac ? '' : val, Projekt: isVac ? 'AUSFALL' : (proj ? proj.name : 'Unbekannt'), kWp: isVac ? 0 : (proj ? proj.kwp : 0) });
+        });
+        planRows.sort((a,b) => a.Fahrzeug.localeCompare(b.Fahrzeug) || a.Datum.localeCompare(b.Datum));
+        const wsPlan = XLSX.utils.json_to_sheet(planRows);
+        const wsAusfall = XLSX.utils.json_to_sheet(deactivatedBuses.map(b => ({ Fahrzeug: b.replace(/_/g,' ') })));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, wsProjekte, 'Projekte');
+        XLSX.utils.book_append_sheet(wb, wsPlan, 'Planung');
+        XLSX.utils.book_append_sheet(wb, wsAusfall, 'Ausfall_Fahrzeuge');
+        const stamp = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(wb, `SOLPRO_Bericht_${stamp}.xlsx`);
+        markiereAlsGesichert();
+        showToast('Excel-Bericht exportiert', 'success');
+    }
+
+    function normalizeExcelDate(val) {
+        if(val instanceof Date) { const y=val.getFullYear(), m=String(val.getMonth()+1).padStart(2,'0'), d=String(val.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
+        if(typeof val === 'number' && window.XLSX && XLSX.SSF) { const dc = XLSX.SSF.parse_date_code(val); if(dc) return `${dc.y}-${String(dc.m).padStart(2,'0')}-${String(dc.d).padStart(2,'0')}`; }
+        return String(val).trim().split('T')[0];
+    }
+
+    function importDataExcel(e) {
+        const file = e.target.files[0]; if(!file) return;
+        if(typeof XLSX === 'undefined') { showToast('Excel-Bibliothek nicht verfügbar', 'error'); e.target.value=''; return; }
+        const reader = new FileReader();
+        reader.onload = res => {
+            try {
+                const wb = XLSX.read(res.target.result, { type: 'binary', cellDates: true });
+                const projSheet = wb.Sheets['Projekte'];
+                const planSheet = wb.Sheets['Planung'];
+                if(!projSheet || !planSheet) throw new Error('Tabellenblätter "Projekte" und "Planung" erforderlich');
+                const projRows = XLSX.utils.sheet_to_json(projSheet);
+                const planRows = XLSX.utils.sheet_to_json(planSheet);
+                const ausfallSheet = wb.Sheets['Ausfall_Fahrzeuge'];
+                const ausfallRows = ausfallSheet ? XLSX.utils.sheet_to_json(ausfallSheet) : [];
+
+                if(!confirm(`Import gefunden: ${projRows.length} Projekte, ${planRows.length} Planungs-Einträge.\nDie aktuelle Planung wird ersetzt. Fortfahren?`)) { e.target.value=''; return; }
+
+                const newProjects = projRows.filter(r => r.ID && r.Name).map(r => ({ id: String(r.ID), name: String(r.Name), color: r.Farbe || managementFarben[Math.floor(Math.random()*managementFarben.length)], kwp: r.Leistung || 0 }));
+                const newGrid = {}; let skipped = 0;
+                planRows.forEach(r => {
+                    if(!r.Fahrzeug || !r.Datum) { skipped++; return; }
+                    const busSlug = String(r.Fahrzeug).trim().replace(/\s+/g,'_');
+                    const dateStr = normalizeExcelDate(r.Datum);
+                    const cellId = `CELL_${busSlug}_${dateStr}`;
+                    if(!document.getElementById(cellId)) { skipped++; return; }
+                    const typ = String(r.Typ || '').toUpperCase();
+                    if(typ.includes('URLAUB')) newGrid[cellId] = 'SYS_VACATION';
+                    else if(r.ProjektID) newGrid[cellId] = String(r.ProjektID);
+                    else skipped++;
+                });
+                const newOff = ausfallRows.map(r => r.Fahrzeug ? String(r.Fahrzeug).trim().replace(/\s+/g,'_') : null).filter(Boolean);
+
+                localStorage.setItem("SOLPRO_EXEC_DB_5", JSON.stringify({ dbP: newProjects, dbGrid: newGrid, dbOff: newOff }));
+                localStorage.setItem("SOLPRO_LAST_CHANGE_TS", String(Date.now()));
+                localStorage.setItem("SOLPRO_LAST_BACKUP_TS", String(Date.now()));
+                showToast(`Excel importiert${skipped ? ` (${skipped} Zeilen übersprungen)` : ''} – Seite wird neu geladen…`, skipped ? 'warn' : 'success');
+                setTimeout(()=>window.location.reload(), 900);
+            } catch(err) {
+                showToast('Fehler beim Excel-Import: ' + err.message, 'error');
+            }
+            e.target.value = '';
+        };
+        reader.readAsBinaryString(file);
+    }
+
+    function setView(m, b){ document.body.className=`view-${m}${isAppLockedForEditing ? ' read-only-mode' : ''}`; document.querySelectorAll('.controls .btn:not(.mode-switch)').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }
+    function getKalenderWocheMath(d){ let x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()+4-(x.getDay()||7)); return Math.ceil((((x-new Date(x.getFullYear(),0,1))/86400000)+1)/7); }
+    function getLesbareTextfarbe(h){ h=h.replace('#',''); return (((parseInt(h.substr(0,2),16)*299)+(parseInt(h.substr(2,2),16)*587)+(parseInt(h.substr(4,2),16)*114))/1000)>=128?'#111':'#fff'; }
+    function nuclearSystemReset() { if(isAppLockedForEditing) return; if(confirm("ALARM! Alles löschen?")) if(prompt("LÖSCHEN")==="LÖSCHEN") { localStorage.removeItem("SOLPRO_EXEC_DB_5"); window.location.reload(); } }
+    init();
+</script>
+</body>
+</html>
