@@ -3,167 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOLPRO | Executive V7.0 Dashboard</title>
+    <title>SOLPRO | Executive Fintech Suite V8.0</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
 
         :root {
-            --sol-lime: #a4c639; --sol-lime-dk: #86a62d; --ink: #0a0e1a;
-            --slate-900: #0c1526; --slate-800: #182238; --slate-700: #3c4a63;
-            --slate-500: #64748b; --slate-200: #e2e8f0; --slate-100: #f3f5f8;
-            --bg: #f0f2f5; --border: #d1d5db; --danger: #e0483e; --danger-bg: #fdeceb;
-            --success: #1f9d63; --success-bg: #e9f8f0; --warn: #d3960f; --warn-bg: #fdf3e0;
-            --radius: 12px; --radius-sm: 6px; --font-mono: 'JetBrains Mono', monospace;
-            --glass: rgba(255, 255, 255, 0.7);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-        }
-        *, *::before, *::after { box-sizing: border-box; }
-        body {
-            background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; margin: 0;
-            overflow: hidden; display: flex; flex-direction: column; height: 100vh; user-select: none;
+            --bg-dark: #070a11;
+            --panel-bg: #0d1322;
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --panel-border-glow: rgba(164, 198, 57, 0.25);
+            --sol-lime: #a4c639;
+            --sol-lime-glow: rgba(164, 198, 57, 0.4);
+            --cyan-accent: #38bdf8;
+            --text-main: #f1f5f9;
+            --text-muted: #64748b;
+            --text-dim: #94a3b8;
+            --danger: #f43f5e;
+            --danger-bg: rgba(244, 63, 94, 0.12);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.12);
+            --warn: #f59e0b;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Inter', -apple-system, blinkmacsystemfont, sans-serif;
         }
 
-        /* --- AUTH & LOGIN --- */
+        *, *::before, *::after { box-sizing: border-box; }
+        
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+        /* AUTH OVERLAY */
         .auth-overlay {
-            position: fixed; inset: 0; background: var(--slate-900); z-index: 10000;
-            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px);
+            position: fixed; inset: 0; background: rgba(7, 10, 17, 0.92); z-index: 10000;
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(20px);
         }
         .auth-card {
-            background: #fff; padding: 40px; border-radius: 20px; width: 400px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5); text-align: center;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            padding: 44px; border-radius: var(--radius-lg); width: 400px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 40px rgba(164, 198, 57, 0.05); text-align: center;
         }
-        .auth-card h2 { font-family: 'Orbitron'; margin-bottom: 20px; color: var(--slate-900); font-size: 28px; }
+        .auth-card h2 { font-family: 'Orbitron'; margin-bottom: 24px; color: #fff; font-size: 26px; letter-spacing: 1px; }
+        .auth-card h2 span { color: var(--sol-lime); }
+        .auth-card label { display: block; text-align: left; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; margin-top: 16px; }
         .auth-card input { 
-            width: 100%; padding: 14px; margin: 10px 0; border: 1px solid var(--border); 
-            border-radius: var(--radius-sm); font-size: 15px; 
+            width: 100%; padding: 14px 16px; margin-top: 6px; background: rgba(0,0,0,0.4); 
+            border: 1px solid var(--panel-border); border-radius: var(--radius-md); color: #fff; font-size: 14px; font-family: var(--font-sans);
+            transition: all 0.2s;
         }
+        .auth-card input:focus { outline: none; border-color: var(--sol-lime); box-shadow: 0 0 12px var(--sol-lime-glow); }
         .auth-card button { 
-            width: 100%; padding: 16px; margin-top: 20px; background: var(--sol-lime); border: none; 
-            font-weight: 900; cursor: pointer; border-radius: var(--radius-sm); color: var(--ink);
-            text-transform: uppercase; transition: 0.3s;
+            width: 100%; padding: 15px; margin-top: 28px; background: var(--sol-lime); border: none; 
+            font-weight: 800; cursor: pointer; border-radius: var(--radius-md); color: #000; font-size: 13px;
+            text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
         }
-        .auth-card button:hover { background: var(--sol-lime-dk); transform: scale(1.02); }
+        .auth-card button:hover { background: #b8dc3f; transform: translateY(-1px); box-shadow: 0 6px 20px var(--sol-lime-glow); }
 
-        /* --- HUD & Layout --- */
-        .accent-line { height: 4px; background: linear-gradient(90deg, var(--sol-lime), #6fae1f, var(--slate-900) 140%); flex-shrink: 0; }
-        .hud { height: 84px; background: var(--glass); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); 
-               display: flex; align-items: center; padding: 0 20px; gap: 20px; z-index: 3000; flex-shrink: 0; }
+        /* HUD TOP NAVBAR */
+        .accent-line { height: 2px; background: linear-gradient(90deg, var(--sol-lime), var(--cyan-accent), transparent); flex-shrink: 0; }
+        .hud { 
+            height: 76px; background: rgba(13, 19, 34, 0.85); backdrop-filter: blur(16px); 
+            border-bottom: 1px solid var(--panel-border); display: flex; align-items: center; 
+            padding: 0 24px; gap: 20px; z-index: 3000; flex-shrink: 0; 
+        }
         .brand-container { display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo { font-family: 'Orbitron'; font-size: 26px; font-weight: 900; color: var(--ink); line-height: 1; }
-        .logo span { color: var(--sol-lime-dk); }
-        .tagline { font-size: 8px; letter-spacing: 3px; color: var(--slate-500); font-weight: 700; margin-top: 5px; }
+        .logo { font-family: 'Orbitron'; font-size: 22px; font-weight: 900; color: #fff; line-height: 1; letter-spacing: 1px; }
+        .logo span { color: var(--sol-lime); }
+        .tagline { font-size: 8px; letter-spacing: 3px; color: var(--text-muted); font-weight: 700; margin-top: 4px; }
 
-        .kpi-board { display: flex; gap: 10px; border-left: 1px solid var(--border); padding-left: 20px; flex-shrink: 0; }
-        .kpi-card { background: #fff; padding: 8px 16px; border-radius: var(--radius-sm); min-width: 120px; 
-                    border: 1px solid var(--border); transition: 0.3s; cursor: default; }
-        .kpi-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
-        .kpi-lbl { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--slate-500); }
-        .kpi-val { font-family: var(--font-mono); font-size: 20px; font-weight: 800; display: block; }
+        .kpi-board { display: flex; gap: 12px; border-left: 1px solid var(--panel-border); padding-left: 20px; flex-shrink: 0; }
+        .kpi-card { 
+            background: rgba(255,255,255,0.02); padding: 8px 16px; border-radius: var(--radius-md); min-width: 110px; 
+            border: 1px solid var(--panel-border); transition: all 0.2s; 
+        }
+        .kpi-card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+        .kpi-lbl { font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
+        .kpi-val { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: #fff; margin-top: 2px; display: block; }
+        .kpi-bar-track { height: 3px; width: 100%; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+        .kpi-bar { height: 100%; width: 0%; background: var(--sol-lime); transition: width .5s ease; }
 
-        .palette-container { display: flex; align-items: center; flex-grow: 1; overflow-x: auto; gap: 8px; padding: 5px 2px; }
-        .palette-item { padding: 8px 16px; border-radius: 30px; font-size: 12px; font-weight: 700; cursor: pointer; 
-                        border: 2px solid transparent; background: #fff; white-space: nowrap; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .palette-item.active { border-color: var(--ink); transform: scale(1.05); box-shadow: var(--shadow); }
-        .btn-add { width: 34px; height: 34px; border-radius: 50%; background: var(--sol-lime); border: none; 
-                   font-size: 20px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink); }
+        .palette-container { display: flex; align-items: center; flex-grow: 1; overflow-x: auto; gap: 8px; padding: 4px; }
+        .palette-item { 
+            padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; 
+            border: 1px solid var(--panel-border); background: rgba(255,255,255,0.03); white-space: nowrap; 
+            display: flex; align-items: center; gap: 8px; transition: all 0.2s; color: #fff;
+        }
+        .palette-item:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
+        .palette-item.active { border-color: var(--sol-lime); box-shadow: 0 0 15px var(--sol-lime-glow); }
+        .btn-add { 
+            width: 32px; height: 32px; border-radius: 50%; background: var(--sol-lime); border: none; 
+            font-size: 18px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #000; transition: all 0.2s; 
+        }
+        .btn-add:hover { transform: rotate(90deg) scale(1.1); box-shadow: 0 0 15px var(--sol-lime-glow); }
 
-        .controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
-        .btn { background: #fff; border: 1px solid var(--border); padding: 10px 15px; font-size: 11px; 
-               font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); text-transform: uppercase; transition: 0.2s; }
-        .btn:hover { background: var(--slate-100); }
-        .btn.active { background: var(--ink); color: #fff; }
-        .btn.mode-switch { background: var(--success-bg); color: var(--success); border-color: #a7e2c3; }
+        .controls { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+        .btn { 
+            background: rgba(255,255,255,0.04); border: 1px solid var(--panel-border); padding: 9px 14px; font-size: 11px; 
+            font-weight: 700; cursor: pointer; border-radius: var(--radius-md); text-transform: uppercase; color: var(--text-main); transition: all 0.2s; letter-spacing: 0.5px;
+        }
+        .btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+        .btn.active { background: #fff; color: #000; border-color: #fff; }
+        .btn.mode-switch { background: var(--success-bg); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+        .btn.readonly { background: var(--danger-bg); color: var(--danger); border-color: rgba(244, 63, 94, 0.3); }
+        .btn-danger { color: var(--danger); }
+        .btn-danger:hover { background: var(--danger-bg); border-color: var(--danger); }
 
-        /* --- MAIN CONTENT AREA --- */
+        .seg-group { display: flex; gap: 2px; background: rgba(0,0,0,0.4); padding: 3px; border-radius: var(--radius-md); border: 1px solid var(--panel-border); }
+
+        /* MAIN LAYOUT */
         .main-wrapper { display: flex; flex: 1; overflow: hidden; }
-        .viewport { flex: 1; overflow: auto; position: relative; padding: 10px; }
+        .viewport { flex: 1; overflow: auto; position: relative; padding: 16px; }
+
+        /* MATRIX TABLE GRID */
+        table { border-collapse: separate; border-spacing: 0; width: max-content; background: var(--panel-bg); border-radius: var(--radius-lg); border: 1px solid var(--panel-border); overflow: hidden; }
+        th, td { border-bottom: 1px solid var(--panel-border); border-right: 1px solid var(--panel-border); text-align: center; }
+        #gridHead th { position: sticky; top: 0; background: #0f172a; font-size: 10px; font-weight: 800; color: var(--text-dim); z-index: 100; text-transform: uppercase; letter-spacing: 1px; }
+        #gridHead tr:nth-child(1) th { height: 32px; background: #090e17; color: var(--sol-lime); border-bottom: 1px solid var(--panel-border); }
+        td:first-child { position: sticky; left: 0; z-index: 80; background: #0f172a; width: 160px !important; text-align: left; padding-left: 18px; font-weight: 700; border-right: 2px solid var(--cyan-accent); color: #fff; font-size: 12px; }
         
-        /* --- THE SIDEBAR (CONTROL CENTER) --- */
+        .project-cell { height: 52px; cursor: crosshair; font-size: 10px; font-weight: 800; text-transform: uppercase; transition: all 0.1s; color: #fff; }
+        .project-cell:hover { filter: brightness(1.25); outline: 1px solid rgba(255,255,255,0.4); z-index: 10; }
+        .monday-start { border-left: 2px solid var(--cyan-accent) !important; }
+        .day-num { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: #fff; }
+        .day-short { font-size: 8px; color: var(--text-muted); font-weight: 700; }
+
+        .stat-row td { background: #090e17 !important; color: #fff; font-weight: 800; padding: 10px; font-family: var(--font-mono); font-size: 11px; }
+        .stat-row td:first-child { color: var(--sol-lime) !important; font-family: var(--font-sans); }
+
+        /* CONTROL CENTER SIDEBAR */
         .sidebar { 
-            width: 320px; background: #fff; border-left: 1px solid var(--border); 
-            display: flex; flex-direction: column; transition: 0.3s; z-index: 2000;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.03);
+            width: 340px; background: var(--panel-bg); border-left: 1px solid var(--panel-border); 
+            display: flex; flex-direction: column; z-index: 2000;
         }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .sidebar-header h3 { margin: 0; font-family: 'Orbitron'; font-size: 14px; color: var(--slate-900); }
-        .sidebar-content { flex: 1; overflow-y: auto; padding: 20px; }
-        
-        /* --- TO-DO LIST STYLE --- */
+        .sidebar-header { padding: 20px 24px; border-bottom: 1px solid var(--panel-border); display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-header h3 { margin: 0; font-family: 'Orbitron'; font-size: 13px; color: #fff; letter-spacing: 1px; }
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 24px; }
+
+        /* TO-DO SYSTEM */
         .todo-input-group { display: flex; gap: 8px; margin-bottom: 20px; }
-        .todo-input-group input { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; }
-        .todo-input-group button { background: var(--sol-lime); border: none; padding: 0 15px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 800; }
-        
-        .todo-item { 
-            display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--slate-100); 
-            border-radius: var(--radius-sm); margin-bottom: 8px; transition: 0.2s; border-left: 4px solid var(--sol-lime);
+        .todo-input-group input { 
+            flex: 1; padding: 11px 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); 
+            border-radius: var(--radius-md); font-size: 12px; color: #fff; font-family: var(--font-sans);
         }
-        .todo-item:hover { background: var(--slate-200); transform: translateX(-5px); }
-        .todo-item.done { opacity: 0.6; border-left-color: var(--slate-500); }
+        .todo-input-group input:focus { outline: none; border-color: var(--sol-lime); }
+        .todo-input-group button { background: var(--sol-lime); border: none; padding: 0 16px; border-radius: var(--radius-md); cursor: pointer; font-weight: 800; color: #000; }
+
+        .todo-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(255,255,255,0.02); 
+            border: 1px solid var(--panel-border); border-radius: var(--radius-md); margin-bottom: 8px; transition: all 0.2s; border-left: 3px solid var(--sol-lime);
+        }
+        .todo-item:hover { background: rgba(255,255,255,0.05); transform: translateX(-3px); }
+        .todo-item.done { opacity: 0.4; border-left-color: var(--text-muted); }
         .todo-item.done span { text-decoration: line-through; }
-        .todo-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--sol-lime); }
-        .todo-item span { flex: 1; font-size: 13px; font-weight: 500; }
-        .todo-item .del-todo { color: var(--danger); cursor: pointer; font-weight: 800; font-size: 14px; }
+        .todo-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--sol-lime); }
+        .todo-item span { flex: 1; font-size: 12px; font-weight: 500; color: var(--text-main); }
+        .todo-item .del-todo { color: var(--danger); cursor: pointer; font-weight: 800; font-size: 12px; opacity: 0.6; transition: opacity 0.2s; }
+        .todo-item .del-todo:hover { opacity: 1; }
 
-        /* GRID TABLE */
-        table { border-collapse: collapse; table-layout: fixed; width: max-content; background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-        th, td { border: 1px solid var(--border); text-align: center; }
-        #gridHead th { position: sticky; top: 0; background: #f1f5f9; font-size: 10px; font-weight: 800; color: var(--slate-700); z-index: 100; }
-        #gridHead tr:nth-child(1) th { height: 30px; background: var(--slate-900); color: var(--sol-lime); }
-        td:first-child { position: sticky; left: 0; z-index: 80; background: #fff; width: 150px !important; text-align: left; padding-left: 15px; font-weight: 800; border-right: 3px solid var(--slate-900); }
-        .project-cell { height: 55px; cursor: crosshair; font-size: 10px; font-weight: 800; text-transform: uppercase; transition: 0.1s; }
-        .project-cell:hover { filter: brightness(0.9); }
-
-        /* MODALS & OVERLAYS */
-        .overlay { position: fixed; inset: 0; background: rgba(10,14,26,0.55); backdrop-filter: blur(5px); z-index: 5000; display: none; }
-        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(.9); opacity: 0; background: #fff; padding: 30px; border-radius: 20px; display: none; z-index: 5001; width: 420px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); transition: 0.3s; }
+        /* MODALS & PANELS */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(10px); z-index: 5000; display: none; }
+        .modal { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(.95); opacity: 0; 
+            background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 32px; border-radius: var(--radius-lg); 
+            display: none; z-index: 5001; width: 420px; box-shadow: 0 30px 60px rgba(0,0,0,0.8); transition: all 0.2s ease-out; 
+        }
         .modal.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        .modal h2 { margin-top: 0; font-family: 'Orbitron'; font-size: 18px; border-bottom: 3px solid var(--sol-lime); padding-bottom: 15px; margin-bottom: 20px; }
-        .modal label { display: block; font-size: 11px; font-weight: 800; color: var(--slate-500); text-transform: uppercase; margin-top: 15px; }
-        .modal input, .modal select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-top: 5px; font-family: 'Inter'; }
-        .m-btns { display: flex; gap: 12px; margin-top: 25px; }
-        .m-btn { flex: 1; padding: 12px; border: none; font-weight: 800; border-radius: var(--radius-sm); cursor: pointer; transition: 0.2s; }
-        .m-save { background: var(--ink); color: #fff; }
-        .m-cancel { background: var(--slate-100); color: var(--slate-700); }
+        .modal h2 { margin-top: 0; font-family: 'Orbitron'; font-size: 16px; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px; color: #fff; letter-spacing: 1px; }
+        .modal label { display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 16px; }
+        .modal input, .modal select { 
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--panel-border); 
+            border-radius: var(--radius-md); margin-top: 6px; color: #fff; font-family: var(--font-sans); font-size: 13px;
+        }
+        .m-btns { display: flex; gap: 10px; margin-top: 28px; }
+        .m-btn { flex: 1; padding: 12px; border: none; font-weight: 800; border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s; font-size: 12px; text-transform: uppercase; }
+        .m-save { background: var(--sol-lime); color: #000; }
+        .m-save:hover { background: #b8dc3f; }
+        .m-cancel { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--panel-border); }
 
-        .toast-stack { position: fixed; bottom: 25px; right: 25px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(20px); transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .user-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--panel-border); }
+        .user-row span { font-size: 12px; font-weight: 600; color: #fff; }
+        .user-row select { padding: 6px; background: #000; color: #fff; border: 1px solid var(--panel-border); border-radius: 4px; font-size: 11px; }
+
+        .toast-stack { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { 
+            background: var(--panel-bg); color: #fff; border: 1px solid var(--panel-border); padding: 12px 20px; 
+            border-radius: var(--radius-md); font-size: 12px; font-weight: 600; opacity: 0; transform: translateY(15px); transition: all 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
         .toast.show { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
 
-<!-- AUTH SYSTEM -->
+<!-- AUTH OVERLAY -->
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
-        <h2>SOL<span>PRO</span> LOGIN</h2>
-        <label>E-Mail</label>
+        <h2>SOL<span>PRO</span></h2>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:-15px; margin-bottom:25px;">EXECUTIVE FINTECH SUITE</p>
+        <label>E-Mail Adresse</label>
         <input type="email" id="loginEmail" placeholder="name@firma.de">
         <label>Passwort</label>
         <input type="password" id="loginPass" placeholder="••••••••">
-        <button id="loginBtn" onclick="handleLogin()">Einloggen</button>
-        <div id="authStatus" class="status-msg" style="margin-top:15px; font-size:12px;"></div>
+        <button id="loginBtn" onclick="handleLogin()">Authentifizieren</button>
+        <div id="authStatus" style="margin-top:16px; font-size:12px; font-weight:600;"></div>
     </div>
 </div>
 
 <div class="accent-line"></div>
+
+<!-- TOP NAV HUD -->
 <div class="hud">
     <div class="brand-container">
         <div class="logo">SOL<span>PRO</span></div>
-        <div class="tagline">EXECUTIVE SUITE</div>
+        <div class="tagline">FINTECH EDITION</div>
     </div>
     
     <div class="kpi-board">
-        <div class="kpi-card"><span class="kpi-lbl">CAP %</span><span class="kpi-val" id="kpiCapRate">0%</span><div class="kpi-bar-track"><div class="kpi-bar" id="kpiBarLine"></div></div></div>
-        <div class="kpi-card"><span class="kpi-lbl">Tage</span><span class="kpi-val" id="kpiTotalDays">0 T</span></div>
-        <div class="kpi-card"><span class="kpi-lbl">kWp</span><span class="kpi-val" id="kpiTotalKwp">0 <small>kWp</small></span></div>
+        <div class="kpi-card"><span class="kpi-lbl">Kapazität</span><span class="kpi-val" id="kpiCapRate">0%</span><div class="kpi-bar-track"><div class="kpi-bar" id="kpiBarLine"></div></div></div>
+        <div class="kpi-card"><span class="kpi-lbl">Netto Tage</span><span class="kpi-val" id="kpiTotalDays">0 T</span></div>
+        <div class="kpi-card"><span class="kpi-lbl">Volumen</span><span class="kpi-val" id="kpiTotalKwp">0 <small style="font-size:10px;">kWp</small></span></div>
     </div>
 
     <div class="palette-container" id="paletteUI"></div>
 
     <div class="controls">
-        <button class="btn" id="userBtn" style="display:none" onclick="openUserManagement()">⚙️ Nutzer</button>
+        <button class="btn" id="userBtn" style="display:none" onclick="openUserManagement()">⚙️ Admin</button>
         <button class="btn" onclick="refreshAllData()">🔄 Sync</button>
         <button class="btn mode-switch planning" id="lockStateBtn" onclick="toggleSystemLock()">✏️ Planen</button>
         <div class="seg-group">
@@ -171,64 +255,66 @@
             <button class="btn active" onclick="setView('monat', this)">M</button>
             <button class="btn" onclick="setView('jahr', this)">J</button>
         </div>
-        <button class="btn btn-danger" onclick="handleLogout()">🚪 Logout</button>
+        <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
     </div>
 </div>
 
+<!-- MAIN VIEWPORT -->
 <div class="main-wrapper">
     <div class="viewport" id="scrollPort">
         <table id="theTable"><thead id="gridHead"></thead><tbody id="gridBody"></tbody></table>
     </div>
     
-    <!-- THE CONTROL CENTER SIDEBAR -->
-    <div class="sidebar" id="mainSidebar">
+    <!-- FINTECH CONTROL CENTER SIDEBAR -->
+    <div class="sidebar">
         <div class="sidebar-header">
             <h3>Control Center</h3>
+            <span style="font-size:10px; color:var(--sol-lime); font-weight:800; background:rgba(164,198,57,0.1); padding:3px 8px; border-radius:10px;">LIVE</span>
         </div>
         <div class="sidebar-content">
-            <div style="margin-bottom: 30px;">
-                <h4 style="font-family:'Orbitron'; font-size:12px; text-transform:uppercase; color:var(--slate-500); margin-bottom:15px;">🎯 To-Do Liste</h4>
+            <div style="margin-bottom: 28px;">
+                <h4 style="font-family:'Orbitron'; font-size:11px; text-transform:uppercase; color:var(--text-muted); margin-bottom:14px; letter-spacing:1px;">🎯 Aufgaben & To-Dos</h4>
                 <div class="todo-input-group">
-                    <input type="text" id="todoInput" placeholder="Neue Aufgabe...">
+                    <input type="text" id="todoInput" placeholder="Neue Aufgabe eintragen...">
                     <button onclick="addTodo()">+</button>
                 </div>
-                <div id="todoList">
-                    <!-- To-Dos werden hier generiert -->
-                </div>
+                <div id="todoList"></div>
             </div>
-            <hr style="border:none; border-top:1px solid var(--border); margin:20px 0;">
+            
+            <hr style="border:none; border-top:1px solid var(--panel-border); margin:24px 0;">
+            
             <div>
-                <h4 style="font-family:'Orbitron'; font-size:12px; text-transform:uppercase; color:var(--slate-500); margin-bottom:15px;">ℹ️ System Info</h4>
-                <div style="font-size:11px; color:var(--slate-700); line-height:1.6;">
-                    Rolle: <b id="userRoleDisp">...</b><br>
-                    User: <span id="userEmailDisp">...</span><br>
-                    Status: <span style="color:var(--success); font-weight:800;">Connected to Cloud</span>
+                <h4 style="font-family:'Orbitron'; font-size:11px; text-transform:uppercase; color:var(--text-muted); margin-bottom:14px; letter-spacing:1px;">System Status</h4>
+                <div style="font-size:11px; color:var(--text-dim); line-height:1.8; font-family:var(--font-mono);">
+                    Rolle: <b id="userRoleDisp" style="color:#fff;">...</b><br>
+                    Account: <span id="userEmailDisp" style="color:#fff;">...</span><br>
+                    Database: <span style="color:var(--success);">Encrypted SQL</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div id="actionGridCtx" style="display:none; position:fixed; z-index:9000; background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:10px; width:220px; box-shadow:var(--shadow);"></div>
+<div id="actionGridCtx" style="display:none; position:fixed; z-index:9000; background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:var(--radius-md); padding:8px; width:220px; box-shadow:0 10px 30px rgba(0,0,0,0.5);"></div>
 <div class="overlay" id="p_overlay" onclick="closeModals()"></div>
 
-<!-- Modals -->
+<!-- MODALS -->
 <div class="modal" id="paletteModal">
-    <h2 id="pModalTitle">Projekt Details</h2>
-    <label>Name</label><input type="text" id="palNameInput">
-    <label>kWp</label><input type="number" id="palKwpInput">
-    <label>Farbe</label><input type="color" id="palColorInput" style="height:40px">
+    <h2 id="pModalTitle">Projekt Konfiguration</h2>
+    <label>Projekt Name</label><input type="text" id="palNameInput">
+    <label>Leistung (kWp)</label><input type="number" id="palKwpInput">
+    <label>Farbe</label><input type="color" id="palColorInput" style="height:44px;">
     <input type="hidden" id="palEditId">
     <div class="m-btns">
-        <button class="m-btn m-save" onclick="savePaletteItem()">Sichern</button>
+        <button class="m-btn m-save" onclick="savePaletteItem()">Speichern</button>
         <button class="m-btn m-cancel" onclick="closeModals()">Abbrechen</button>
     </div>
-    <button class="m-btn m-delete" id="palDelBtn" onclick="deletePaletteItem()" style="display:none; width:100%; margin-top:10px; background:var(--danger-bg); color:var(--danger);">Projekt löschen</button>
+    <button class="m-btn" id="palDelBtn" onclick="deletePaletteItem()" style="display:none; width:100%; margin-top:12px; background:var(--danger-bg); color:var(--danger); border:1px solid var(--danger);">Projekt Löschen</button>
 </div>
 
 <div class="modal" id="userModal">
-    <h2>Nutzerverwaltung (Admin)</h2>
-    <div id="userList" style="max-height:300px; overflow-y:auto;"></div>
+    <h2>Nutzerverwaltung</h2>
+    <div id="userList" style="max-height:280px; overflow-y:auto; margin-top:12px;"></div>
     <div class="m-btns">
         <button class="m-btn m-cancel" onclick="closeModals()">Schließen</button>
     </div>
@@ -238,7 +324,7 @@
 
 <script>
     /* ==========================================
-       SUPABASE CONFIG
+       SUPABASE CORE SETUP
        ========================================== */
     const SUPABASE_URL = "https://iuxklqcpexoziqxrohwa.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VteOTQ6g28z9Dvo-QUG8jw_hehaZpWu";
@@ -260,9 +346,8 @@
         const status = document.getElementById('authStatus');
         const btn = document.getElementById('loginBtn');
 
-        if(!email || !password) return (status.innerText = "Bitte alle Felder ausfüllen");
-        btn.innerText = "Lade...";
-        btn.disabled = true;
+        if(!email || !password) return (status.innerText = "Bitte Felder ausfüllen");
+        btn.innerText = "Verbinde..."; btn.disabled = true;
 
         try {
             const { data, error } = await solproSupa.auth.signInWithPassword({ email, password });
@@ -275,16 +360,14 @@
             status.innerText = "❌ Fehler: " + e.message;
             status.style.color = "var(--danger)";
         } finally {
-            btn.innerText = "Einloggen";
-            btn.disabled = false;
+            btn.innerText = "Authentifizieren"; btn.disabled = false;
         }
     }
 
     async function fetchUserRole() {
-        const { data, error } = await solproSupa.from('profiles').select('role').eq('id', currentUser.id).single();
-        if (data) {
-            userRole = data.role;
-        } else {
+        const { data } = await solproSupa.from('profiles').select('role').eq('id', currentUser.id).single();
+        if (data) userRole = data.role;
+        else {
             await solproSupa.from('profiles').insert([{ id: currentUser.id, email: currentUser.email, role: 'viewer' }]);
             userRole = 'viewer';
         }
@@ -293,13 +376,10 @@
         if(userRole === 'admin') document.getElementById('userBtn').style.display = 'block';
     }
 
-    function handleLogout() {
-        solproSupa.auth.signOut();
-        window.location.reload();
-    }
+    function handleLogout() { solproSupa.auth.signOut(); window.location.reload(); }
 
     // ==========================================
-    // TO-DO LOGIC
+    // TO-DO ENGINE
     // ==========================================
     async function loadTodos() {
         const { data } = await solproSupa.from('todos').select('*').eq('user_id', currentUser.id).order('id', { ascending: false });
@@ -313,16 +393,11 @@
         if(!task) return;
 
         const { data, error } = await solproSupa.from('todos').insert([{ 
-            task: task, 
-            user_id: currentUser.id, 
-            is_completed: false 
+            task: task, user_id: currentUser.id, is_completed: false 
         }]).select().single();
 
         if(error) return showToast("Fehler beim Speichern", "error");
-        
-        input.value = "";
-        todos.unshift(data);
-        renderTodos();
+        input.value = ""; todos.unshift(data); renderTodos();
     }
 
     async function toggleTodo(id, currentStatus) {
@@ -351,11 +426,10 @@
     }
 
     // ==========================================
-    // PERMISSIONS
+    // PERMISSIONS GUARD
     // ==========================================
     const canPlan = () => (userRole === 'admin' || userRole === 'editor');
     const canDelete = () => (userRole === 'admin');
-    const canManageUsers = () => (userRole === 'admin');
 
     // ==========================================
     // APP CORE
@@ -373,7 +447,6 @@
             document.body.classList.add('read-only-mode');
             document.getElementById('lockStateBtn').className = 'btn mode-switch readonly';
             document.getElementById('lockStateBtn').innerText = '🔒 Nur Lesen';
-            document.getElementById('readonlyBanner').style.display = 'block';
         }
     }
 
@@ -389,8 +462,8 @@
             
             fullGridRepaintUI_Logic();
             renderProjectsToTopPalette();
-            showToast("Cloud-Synchronisation erfolgreich", "success");
-        } catch (e) { showToast("Sync-Fehler: " + e.message, "error"); }
+            showToast("System Synchronisiert", "success");
+        } catch (e) { showToast("Sync Fehler: " + e.message, "error"); }
     }
 
     function buildGrid() {
@@ -415,7 +488,7 @@
         thead.innerHTML = trMonat + `</tr>` + trKW + `</tr>` + trTage + `</tr>`;
         baseFlottenListe.forEach(w => {
             let sf = w.replace(/\s+/g,'_');
-            let rw = `<tr id="row_${sf}" class="worker-row is-active"><td><div class="worker-controls"><span>${w}</span><button title="Ausfall" onclick="toggleBusState('${sf}')" class="toggle-btn"></button></div></td>`;
+            let rw = `<tr id="row_${sf}" class="worker-row is-active"><td><div class="worker-controls"><span>${w}</span></div></td>`;
             dateArray.forEach(d => {
                 let iso = d.toISOString().split('T')[0];
                 rw += `<td id="CELL_${sf}_${iso}" class="project-cell${(d.getDay()===1?' monday-start':'')}" data-date-ts="${d.getTime()}"></td>`;
@@ -425,16 +498,6 @@
         let fRow = `<tr class="stat-row"><td>LEISTUNG</td>`;
         dateArray.forEach(d => fRow += `<td id="COUNT_${d.toISOString().split('T')[0]}">0</td>`);
         tbody.insertAdjacentHTML('beforeend', fRow + `</tr>`);
-    }
-
-    async function toggleBusState(sid) {
-        if(!canPlan()) return showToast("Keine Berechtigung!", "error");
-        if(isAppLockedForEditing) return showToast('Zuerst Sperre lösen', 'warn');
-        const isNowOffline = !deactivatedBuses.includes(sid);
-        if(isNowOffline) { deactivatedBuses.push(sid); document.getElementById('row_'+sid).classList.replace('is-active','is-offline'); }
-        else { deactivatedBuses=deactivatedBuses.filter(v=>v!==sid); document.getElementById('row_'+sid).classList.replace('is-offline','is-active'); }
-        await solproSupa.from('fleet_status').upsert({ bus_id: sid, is_offline: isNowOffline });
-        fullGridRepaintUI_Logic();
     }
 
     function setupMouseDragPainting() {
@@ -470,20 +533,18 @@
             let el = document.createElement('div');
             el.className = `palette-item ${activeProjectId === p.id ? 'active' : ''}`;
             el.style.backgroundColor = p.color; el.style.color = getLesbareTextfarbe(p.color);
-            el.innerHTML = `<b>${p.name}</b> <span class="chip-days">${counts} T</span>`;
+            el.innerHTML = `<b>${p.name}</b> <span style="opacity:0.7;">${counts}T</span>`;
             el.onclick = () => { activeProjectId = p.id; renderProjectsToTopPalette(); };
             container.appendChild(el);
         });
-        container.insertAdjacentHTML('beforeend', '<div class="palette-separator"></div>');
-        [{ id: 'ERASER', label: '🧼 Radierer', cls: 'sys-eraser' }, { id: 'SYS_VACATION', label: '🌴 Urlaub', cls: 'sys-urlaub' }].forEach(t => {
-            let el = document.createElement('div'); el.className = `palette-item tool-item ${t.cls} ${(activeProjectId === t.id ? 'active' : '')}`; el.innerText = t.label; el.onclick = () => { activeProjectId = t.id; renderProjectsToTopPalette(); };
+        [{ id: 'ERASER', label: '🧼 Radierer' }, { id: 'SYS_VACATION', label: '🌴 Ausfall' }].forEach(t => {
+            let el = document.createElement('div'); el.className = `palette-item ${(activeProjectId === t.id ? 'active' : '')}`; el.innerText = t.label; el.onclick = () => { activeProjectId = t.id; renderProjectsToTopPalette(); };
             container.appendChild(el);
         });
     }
 
     function oeffneProjectCreatorModal() {
         if(!canPlan()) return showToast('Keine Berechtigung!', 'error');
-        if(isAppLockedForEditing) return showToast('Zuerst Sperre lösen', 'warn');
         document.getElementById('pModalTitle').innerText = "Neues Projekt"; document.getElementById('palEditId').value = ""; document.getElementById('palNameInput').value = ""; document.getElementById('palKwpInput').value = ""; 
         openPaletteModal();
     }
@@ -507,7 +568,7 @@
     }
 
     async function openUserManagement() {
-        if(!canManageUsers()) return;
+        if(userRole !== 'admin') return;
         const { data: users } = await solproSupa.from('profiles').select('*');
         const userListDiv = document.getElementById('userList');
         userListDiv.innerHTML = '';
@@ -556,7 +617,7 @@
         Object.keys(plannerGrid).forEach(k => {
             let p = projects.find(x=>x.id===plannerGrid[k]); let cell = document.getElementById(k);
             if(!cell) return;
-            if(plannerGrid[k] === "SYS_VACATION") { cell.style.background="repeating-linear-gradient(45deg, #f8fafc, #f8fafc 8px, #cbd5e1 8px, #cbd5e1 16px)"; cell.innerText="AUSFALL"; return; }
+            if(plannerGrid[k] === "SYS_VACATION") { cell.style.background="repeating-linear-gradient(45deg, #1e293b, #1e293b 8px, #0f172a 8px, #0f172a 16px)"; cell.innerText="AUSFALL"; return; }
             if(p) { cell.style.backgroundColor=p.color; cell.style.color=getLesbareTextfarbe(p.color); cell.innerText=p.name; }
         });
         evalDashboardMathemations();
@@ -580,25 +641,19 @@
             let p = projects.find(x => x.id === pid);
             if(p) totalKwp += (p.kwp || 0);
         });
-        document.getElementById('kpiTotalKwp').innerHTML = totalKwp + " <small>kWp</small>";
+        document.getElementById('kpiTotalKwp').innerHTML = totalKwp + " <small style='font-size:10px;'>kWp</small>";
     }
     function getKalenderWocheMath(d){ let x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()+4-(x.getDay()||7)); return Math.ceil((((x-new Date(x.getFullYear(),0,1))/86400000)+1)/7); }
-    function getLesbareTextfarbe(h){ h=h.replace('#',''); return (((parseInt(h.substr(0,2),16)*299)+(parseInt(h.substr(2,2),16)*587)+(parseInt(h.substr(4,2),16)*114))/1000)>=128?'#111':'#fff'; }
+    function getLesbareTextfarbe(h){ h=h.replace('#',''); return (((parseInt(h.substr(0,2),16)*299)+(parseInt(h.substr(2,2),16)*587)+(parseInt(h.substr(4,2),16)*114))/1000)>=128?'#000':'#fff'; }
     function showToast(msg, type) {
         const stack = document.getElementById('toastStack');
-        const t = document.createElement('div'); t.className = `toast`; t.style.backgroundColor = type === 'success' ? 'var(--success)' : (type === 'error' ? 'var(--danger)' : 'var(--ink)');
+        const t = document.createElement('div'); t.className = `toast`; t.style.borderColor = type === 'success' ? 'var(--success)' : (type === 'error' ? 'var(--danger)' : 'var(--panel-border)');
         t.innerText = msg; stack.appendChild(t);
         requestAnimationFrame(()=>t.classList.add('show'));
         setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 300); }, 3000);
     }
     function setView(m, b){ document.body.className=`view-${m}`; document.querySelectorAll('.controls .btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }
     function closeMenus() { document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open')); }
-    function handleLogout() { supabaseClient.auth.signOut(); window.location.reload(); }
-
-    // STARTUP
-    window.addEventListener('DOMContentLoaded', () => {
-        // Login Card handles everything
-    });
 </script>
 </body>
 </html>
