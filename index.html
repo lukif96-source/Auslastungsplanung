@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOLPRO | Executive Master V5.1</title>
+    <title>SOLPRO | Executive Master V5.3 Cloud</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
@@ -190,8 +190,9 @@
     </div>
     <div class="palette-container" id="paletteUI"></div>
     <div class="controls">
-        <div class="autosave-indicator" id="autosaveIndicator" title="Änderungen werden automatisch im Browser gespeichert. Für eine externe Sicherung bitte Export nutzen.">
-            <span class="autosave-dot" id="autosaveDot"></span><span id="autosaveText">Gespeichert</span>
+        <button class="btn" title="Jetzt live synchronisieren" onclick="loadDataFromCloud()">🔄 Sync</button>
+        <div class="autosave-indicator" id="autosaveIndicator" title="Synchronisiert live mit der Cloud.">
+            <span class="autosave-dot" id="autosaveDot"></span><span id="autosaveText">Synchronisiere...</span>
         </div>
         <button class="btn mode-switch planning" id="lockStateBtn" onclick="toggleSystemLock()">✏️ Planen</button>
         <div class="seg-group">
@@ -240,12 +241,20 @@
 <div class="toast-stack" id="toastStack"></div>
 
 <script>
+    /* =========================================================================
+       CLOUD CONFIGURATION
+       ========================================================================= */
+    const BIN_ID = "6a7da746f5f4af5e2910b998"; 
+    const API_KEY = "$2a$10$El30vvubWAKPRD9PwUV6.u9fGDLFX3V9eHgJ0PmnNiIdufacoFP.m";
+    const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+    /* ========================================================================= */
+
     let projects = [], plannerGrid = {}, deactivatedBuses = [];
     let activeProjectId = "ERASER", selectedCells = [], isDrawing = false, contextCtxMenuPID = null, selectedCellDomID = null, highlightTimer = null, isAppLockedForEditing = false;
     const baseFlottenListe = ["SOL 2", "SOL 3", "SOL 4", "SOL 12", "SOL 16"];
     const managementFarben = ["#1e3a8a","#0284c7","#059669","#ca8a04","#b91c1c","#6d28d9","#0f766e","#a21caf","#4f46e5","#b45309","#4338ca","#064e3b"];
 
-    function init() {
+    async function init() {
         const thead = document.getElementById('gridHead'); const tbody = document.getElementById('gridBody');
         let currentDay = new Date(2026, 7, 17); const endDate = new Date(2026, 11, 31); const dateArray = [];
         while(currentDay <= endDate) { if(currentDay.getDay()!==0 && currentDay.getDay()!==6) dateArray.push(new Date(currentDay)); currentDay.setDate(currentDay.getDate()+1); }
@@ -276,11 +285,53 @@
         let fRow = `<tr class="stat-row"><td>LEISTUNG</td>`;
         dateArray.forEach(d => fRow += `<td id="COUNT_${d.toISOString().split('T')[0]}">0</td>`);
         tbody.insertAdjacentHTML('beforeend', fRow + `</tr>`);
-        loadDataFromBrowser(); renderProjectsToTopPalette(); setupMouseDragPainting(); setupGlobalUiHandlers();
+        
+        loadDataFromBrowser(); 
+        await loadDataFromCloud();
+        
+        renderProjectsToTopPalette(); setupMouseDragPainting(); setupGlobalUiHandlers();
         updateAutosaveIndicator();
         window.addEventListener('beforeunload', e => {
             if(hatUngesicherteAenderungen()) { e.preventDefault(); e.returnValue = ''; return ''; }
         });
+    }
+
+    async function loadDataFromCloud() {
+        try {
+            const response = await fetch(JSONBIN_URL, {
+                headers: { 'X-Master-Key': API_KEY }
+            });
+            const data = await response.json();
+            const cloudDb = data.record;
+            if(cloudDb && cloudDb.dbP) {
+                projects = cloudDb.dbP;
+                plannerGrid = cloudDb.dbGrid;
+                deactivatedBuses = cloudDb.dbOff;
+                
+                localStorage.setItem("SOLPRO_EXEC_DB_5", JSON.stringify({ dbP: projects, dbGrid: plannerGrid, dbOff: deactivatedBuses }));
+                fullGridRepaintUI_Logic();
+                renderProjectsToTopPalette();
+                showToast('Cloud-Daten synchronisiert', 'success');
+            }
+        } catch (e) {
+            console.error("Cloud Load Error:", e);
+            showToast('Cloud-Verbindung fehlgeschlagen', 'warn');
+        }
+    }
+
+    async function syncToCloud() {
+        const dataToSave = { dbP: projects, dbGrid: plannerGrid, dbOff: deactivatedBuses };
+        try {
+            await fetch(JSONBIN_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+                body: JSON.stringify(dataToSave)
+            });
+            markiereAlsGesichert();
+        } catch (e) {
+            console.error("Cloud Save Error:", e);
+            showToast('Cloud-Speicher Fehler!', 'error');
+        }
     }
 
     function toggleSystemLock() {
@@ -417,7 +468,9 @@
     function syncLocalSystemSpeichern() {
         localStorage.setItem("SOLPRO_EXEC_DB_5", JSON.stringify({ dbP: projects, dbGrid: plannerGrid, dbOff: deactivatedBuses }));
         localStorage.setItem("SOLPRO_LAST_CHANGE_TS", String(Date.now()));
-        evalDashboardMathemations(); updateAutosaveIndicator();
+        evalDashboardMathemations(); 
+        updateAutosaveIndicator();
+        syncToCloud(); // Sende Daten live in die Cloud
     }
 
     function hatUngesicherteAenderungen() {
@@ -433,7 +486,7 @@
         ind.classList.toggle('pending', pending);
         const now = new Date();
         const hh = String(now.getHours()).padStart(2,'0'), mm = String(now.getMinutes()).padStart(2,'0');
-        document.getElementById('autosaveText').innerText = pending ? `Autosave · Backup ausstehend` : `Autosave · ${hh}:${mm}`;
+        document.getElementById('autosaveText').innerText = pending ? `Synchronisiere...` : `Cloud: ${hh}:${mm}`;
         document.getElementById('exportMenuBtn')?.classList.toggle('has-pending', pending);
     }
     function loadDataFromBrowser() {
@@ -593,14 +646,14 @@
                 showToast(`Excel importiert${skipped ? ` (${skipped} Zeilen übersprungen)` : ''} – Seite wird neu geladen…`, skipped ? 'warn' : 'success');
                 setTimeout(()=>window.location.reload(), 900);
             } catch(err) {
-                showToast('Fehler beim Excel-Import: ' + err.message, 'error');
+                showToast('Ungültige JSON-Datei', 'error'); }
             }
             e.target.value = '';
         };
         reader.readAsBinaryString(file);
     }
 
-    function setView(m, b){ document.body.className=`view-${m}${isAppLockedForEditing ? ' read-only-mode' : ''}`; document.querySelectorAll('.controls .btn:not(.mode-switch)').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }
+    function setView(m, b){ document.body.className=`view-${m}${isAppLockedForEditing ? ' read-only-mode' : ''}`; document.querySelectorAll('.controls .btn:not(.mode-switch)').forEach(x=>x.classList.remove('active')); b.classList.add(); }
     function getKalenderWocheMath(d){ let x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()+4-(x.getDay()||7)); return Math.ceil((((x-new Date(x.getFullYear(),0,1))/86400000)+1)/7); }
     function getLesbareTextfarbe(h){ h=h.replace('#',''); return (((parseInt(h.substr(0,2),16)*299)+(parseInt(h.substr(2,2),16)*587)+(parseInt(h.substr(4,2),16)*114))/1000)>=128?'#111':'#fff'; }
     function nuclearSystemReset() { if(isAppLockedForEditing) return; if(confirm("ALARM! Alles löschen?")) if(prompt("LÖSCHEN")==="LÖSCHEN") { localStorage.removeItem("SOLPRO_EXEC_DB_5"); window.location.reload(); } }
