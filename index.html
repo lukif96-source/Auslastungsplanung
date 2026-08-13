@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOLPRO | Executive V6.3 User Control</title>
+    <title>SOLPRO | Executive V6.4 Enterprise</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -23,7 +23,7 @@
             overflow: hidden; display: flex; flex-direction: column; height: 100vh; user-select: none;
         }
 
-        /* LOGIN & MODALS */
+        /* AUTH OVERLAYS */
         .auth-overlay {
             position: fixed; inset: 0; background: var(--slate-900); z-index: 10000;
             display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);
@@ -42,8 +42,9 @@
             font-weight: 900; cursor: pointer; border-radius: var(--radius-sm); color: var(--ink);
             text-transform: uppercase; transition: 0.2s;
         }
+        .auth-card button:hover { background: var(--sol-lime-dk); }
 
-        /* HUD */
+        /* HUD & Layout */
         .accent-line { height: 3px; background: linear-gradient(90deg, var(--sol-lime), #6fae1f, var(--slate-900) 140%); flex-shrink: 0; }
         .hud { height: 84px; background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 16px; box-shadow: 0 2px 12px rgba(10,14,26,0.05); z-index: 3000; flex-shrink: 0; }
         .brand-container { display: flex; flex-direction: column; flex-shrink: 0; }
@@ -90,7 +91,6 @@
 
         .user-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--border); gap: 10px; }
         .user-row span { font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
-        .user-row select { padding: 4px; font-size: 11px; border-radius: 4px; }
 
         .toast-stack { position: fixed; bottom: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
         .toast { background: var(--ink); color: #fff; padding: 11px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; opacity: 0; transition: 0.3s; }
@@ -106,13 +106,13 @@
         <input type="email" id="loginEmail" placeholder="name@firma.de">
         <label>Passwort</label>
         <input type="password" id="loginPass" placeholder="••••••••">
-        <button onclick="handleLogin()">Einloggen</button>
+        <button id="loginBtn" onclick="handleLogin()">Einloggen</button>
         <div id="authStatus" class="status-msg" style="margin-top:15px; font-size:12px;"></div>
     </div>
 </div>
 
 <div class="accent-line"></div>
-<div class="readonly-banner" id="readonlyBanner">🔒 NUR-LESE-MODUS — PLANUNG GESPERRT</div>
+<div class="readonly-banner" id="readonlyBanner" style="display:none; background: var(--danger-bg); color: var(--danger); text-align:center; padding: 5px; font-size: 11px; font-weight: 800;">🔒 NUR-LESE-MODUS — PLANUNG GESPERRT</div>
 
 <div class="hud">
     <div class="brand-container"><div class="logo">SOL<span>PRO</span></div><div class="tagline">EXECUTIVE SUITE</div></div>
@@ -137,10 +137,10 @@
 
 <div class="viewport" id="scrollPort"><table id="theTable"><thead id="gridHead"></thead><tbody id="gridBody"></tbody></table></div>
 
-<!-- MODALS -->
+<div id="actionGridCtx" style="display:none; position:fixed; z-index:9000; background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:5px; width:200px;"></div>
 <div class="overlay" id="p_overlay" onclick="closeModals()"></div>
 
-<!-- Projekt Modal -->
+<!-- Modals -->
 <div class="modal" id="paletteModal">
     <h2>Projekt Details</h2>
     <label>Name</label><input type="text" id="palNameInput">
@@ -154,7 +154,6 @@
     <button class="m-btn m-delete" id="palDelBtn" onclick="deletePaletteItem()" style="display:none; width:100%; margin-top:10px; background:var(--danger-bg); color:var(--danger);">Projekt löschen</button>
 </div>
 
-<!-- Nutzer Modal -->
 <div class="modal" id="userModal">
     <h2>Nutzerverwaltung (Admin)</h2>
     <div id="userList" style="max-height:300px; overflow-y:auto;"></div>
@@ -171,10 +170,10 @@
        ========================================== */
     const SUPABASE_URL = "https://iuxklqcpexoziqxrohwa.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VteOTQ6g28z9Dvo-QUG8jw_hehaZpWu";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null;
-    let userRole = 'viewer'; // default: viewer
+    let userRole = 'viewer';
     let projects = [], plannerGrid = {}, deactivatedBuses = [];
     let activeProjectId = "ERASER", isDrawing = false, selectedCells = [], isAppLockedForEditing = false;
     const baseFlottenListe = ["SOL 2", "SOL 3", "SOL 4", "SOL 12", "SOL 16"];
@@ -187,67 +186,64 @@
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPass').value;
         const status = document.getElementById('authStatus');
+        const btn = document.getElementById('loginBtn');
+
+        if(!email || !password) return (status.innerText = "Bitte alle Felder ausfüllen");
+        
+        btn.innerText = "Lade...";
+        btn.disabled = true;
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) throw error;
 
             currentUser = data.user;
             await fetchUserRole();
             
             document.getElementById('authOverlay').style.display = 'none';
-            initApp();
+            startApp();
         } catch (e) {
             status.innerText = "❌ Fehler: " + e.message;
             status.style.color = "var(--danger)";
+        } finally {
+            btn.innerText = "Einloggen";
+            btn.disabled = false;
         }
     }
 
     async function fetchUserRole() {
-        const { data, error } = await supabase.from('profiles').select('role').eq('id', currentUser.id).single();
+        const { data, error } = await supabaseClient.from('profiles').select('role').eq('id', currentUser.id).single();
         if (data) {
             userRole = data.role;
         } else {
-            // Falls kein Profil existiert, erstelle eins als viewer
-            await supabase.from('profiles').insert([{ id: currentUser.id, email: currentUser.email, role: 'viewer' }]);
+            await supabaseClient.from('profiles').insert([{ id: currentUser.id, email: currentUser.email, role: 'viewer' }]);
             userRole = 'viewer';
         }
-        
-        // UI Anpassung basierend auf Rolle
-        if(userRole === 'admin') {
-            document.getElementById('userBtn').style.display = 'block';
-        }
+        if(userRole === 'admin') document.getElementById('userBtn').style.display = 'block';
     }
 
     function handleLogout() {
-        supabase.auth.signOut();
+        supabaseClient.auth.signOut();
         window.location.reload();
     }
 
     // ==========================================
-    // PERMISSIONS GUARD
+    // PERMISSIONS
     // ==========================================
-    function canPlan() { 
-        return (userRole === 'admin' || userRole === 'editor'); 
-    }
-    function canDelete() { 
-        return (userRole === 'admin'); 
-    }
-    function canManageUsers() { 
-        return (userRole === 'admin'); 
-    }
+    const canPlan = () => (userRole === 'admin' || userRole === 'editor');
+    const canDelete = () => (userRole === 'admin');
+    const canManageUsers = () => (userRole === 'admin');
 
     // ==========================================
-    // CORE APP LOGIC
+    // APP CORE
     // ==========================================
-    async function initApp() {
+    async function startApp() {
         buildGrid();
         await refreshAllData();
         renderProjectsToTopPalette();
         setupMouseDragPainting();
         setupGlobalUiHandlers();
         
-        // Wenn User ein viewer ist -> Automatisch Sperre aktivieren
         if(userRole === 'viewer') {
             isAppLockedForEditing = true;
             document.body.classList.add('read-only-mode');
@@ -259,12 +255,12 @@
 
     async function refreshAllData() {
         try {
-            const { data: pData } = await supabase.from('projects').select('*');
+            const { data: pData } = await supabaseClient.from('projects').select('*');
             projects = pData || [];
-            const { data: gData } = await supabase.from('planner_grid').select('*');
+            const { data: gData } = await supabaseClient.from('planner_grid').select('*');
             plannerGrid = {};
             (gData || []).forEach(row => { plannerGrid[row.cell_id] = row.project_id; });
-            const { data: fData } = await supabase.from('fleet_status').select('*');
+            const { data: fData } = await supabaseClient.from('fleet_status').select('*');
             deactivatedBuses = (fData || []).filter(row => row.is_offline).map(row => row.bus_id);
             
             fullGridRepaintUI_Logic();
@@ -307,24 +303,18 @@
         tbody.insertAdjacentHTML('beforeend', fRow + `</tr>`);
     }
 
-    function toggleBusState(sid) {
+    async function toggleBusState(sid) {
         if(!canPlan()) return showToast("Keine Berechtigung!", "error");
         if(isAppLockedForEditing) return showToast('Zuerst Sperre lösen', 'warn');
-        
         const isNowOffline = !deactivatedBuses.includes(sid);
         if(isNowOffline) { deactivatedBuses.push(sid); document.getElementById('row_'+sid).classList.replace('is-active','is-offline'); }
         else { deactivatedBuses=deactivatedBuses.filter(v=>v!==sid); document.getElementById('row_'+sid).classList.replace('is-offline','is-active'); }
-        
-        supabase.from('fleet_status').upsert({ bus_id: sid, is_offline: isNowOffline });
+        await supabaseClient.from('fleet_status').upsert({ bus_id: sid, is_offline: isNowOffline });
         fullGridRepaintUI_Logic();
     }
 
     function setupMouseDragPainting() {
         document.addEventListener('mousedown', e => {
-            if (e.target.classList.contains('project-cell') && e.button === 2) {
-                if(isAppLockedForEditing || !canPlan()) return; e.preventDefault(); selectedCellDomID = e.target.id;
-                bautHtmlFurDasActionContextMenu(); let cm=document.getElementById('actionGridCtx'); cm.style.display="block"; cm.style.left=e.clientX+"px"; cm.style.top=e.clientY+"px"; return;
-            }
             if (e.target.classList.contains('project-cell') && e.button === 0) {
                 if(isAppLockedForEditing || !canPlan()) return;
                 isDrawing = true; selectedCells = [e.target.id]; e.target.classList.add('selecting');
@@ -332,48 +322,19 @@
         });
         document.addEventListener('mouseover', e => { if(isDrawing && e.target.classList.contains('project-cell') && !selectedCells.includes(e.target.id)) { selectedCells.push(e.target.id); e.target.classList.add('selecting'); } });
         document.addEventListener('mouseup', e => { if(isDrawing && e.button === 0 && selectedCells.length > 0) { verarbeiteMalerZugAufGrid(); } document.querySelectorAll('.selecting').forEach(nd => nd.classList.remove('selecting')); isDrawing = false; });
-        document.addEventListener('contextmenu', e => { if (e.target.classList.contains('project-cell')) e.preventDefault(); });
     }
 
     async function verarbeiteMalerZugAufGrid() {
         for(let cid of selectedCells) {
             if(activeProjectId === "ERASER") {
                 delete plannerGrid[cid];
-                await supabase.from('planner_grid').delete().eq('cell_id', cid);
+                await supabaseClient.from('planner_grid').delete().eq('cell_id', cid);
             } else {
                 plannerGrid[cid] = activeProjectId;
-                await supabase.from('planner_grid').upsert({ cell_id: cid, project_id: activeProjectId });
+                await supabaseClient.from('planner_grid').upsert({ cell_id: cid, project_id: activeProjectId });
             }
         }
         fullGridRepaintUI_Logic(); renderProjectsToTopPalette(); selectedCells = [];
-    }
-
-    function bautHtmlFurDasActionContextMenu() {
-        let ActionPanel = document.getElementById('actionGridCtx');
-        let prj = projects.find(p => p.id === activeProjectId);
-        let content = `
-            ${(activeProjectId !== 'ERASER' && activeProjectId !== 'SYS_VACATION' && prj)
-            ? `<button onclick="fireAction('FILL_PROJECT')"><span>🚀</span> <b style="color:${prj.color};">Woche ${prj.name} zuweisen</b></button><hr>` : ''}
-            <button onclick="fireAction('FILL_URLAUB')"><span>🌴</span> Ganze KW auf Urlaub</button>
-            <hr>
-            ${canDelete() ? `<button onclick="fireAction('DELETE_WEEK')" class="danger-text"><span>🔥</span> Woche löschen</button>` : ''}
-            ${canDelete() ? `<button onclick="fireAction('DELETE_CELL')" class="danger-text"><span>🗑️</span> Tag löschen</button>` : ''}
-        `;
-        ActionPanel.innerHTML = content;
-    }
-
-    async function fireAction(cmd) {
-        document.getElementById('actionGridCtx').style.display = 'none';
-        if(!selectedCellDomID) return;
-        
-        if(cmd === 'DELETE_CELL') { 
-            if(!canDelete()) return showToast("Keine Berechtigung zum Löschen!", "error");
-            delete plannerGrid[selectedCellDomID]; 
-            await supabase.from('planner_grid').delete().eq('cell_id', selectedCellDomID);
-            fullGridRepaintUI_Logic(); renderProjectsToTopPalette(); return; 
-        }
-        // [Restliche FireAction Logik analog zur V6.1 mit supabase calls...]
-        // ...
     }
 
     function renderProjectsToTopPalette() {
@@ -387,7 +348,6 @@
             el.style.backgroundColor = p.color; el.style.color = getLesbareTextfarbe(p.color);
             el.innerHTML = `<b>${p.name}</b> <span class="chip-days">${counts} T</span>`;
             el.onclick = () => { activeProjectId = p.id; renderProjectsToTopPalette(); };
-            el.oncontextmenu = (e) => { e.preventDefault(); e.stopPropagation(); if(!canPlan()) return; document.getElementById('palCtxMenu').style.display="block"; document.getElementById('palCtxMenu').style.left=e.clientX+"px"; document.getElementById('palCtxMenu').style.top=e.clientY+"px"; contextCtxMenuPID = p.id; };
             container.appendChild(el);
         });
         container.insertAdjacentHTML('beforeend', '<div class="palette-separator"></div>');
@@ -400,7 +360,8 @@
     function oeffneProjectCreatorModal() {
         if(!canPlan()) return showToast('Keine Berechtigung!', 'error');
         if(isAppLockedForEditing) return showToast('Zuerst Sperre lösen', 'warn');
-        document.getElementById('pModalTitle').firstChild.textContent = "Neues Projekt "; document.getElementById('palEditId').value = ""; document.getElementById('palNameInput').value = ""; document.getElementById('palKwpInput').value = ""; document.getElementById('palColorArea').style.display = 'none'; document.getElementById('palDelBtn').style.display = 'none'; openPaletteModal();
+        document.getElementById('pModalTitle').innerText = "Neues Projekt"; document.getElementById('palEditId').value = ""; document.getElementById('palNameInput').value = ""; document.getElementById('palKwpInput').value = ""; 
+        openPaletteModal();
     }
 
     async function savePaletteItem() {
@@ -412,65 +373,42 @@
         let projData = { name, kwp, color: document.getElementById('palColorInput').value };
         if(id) {
             projData.id = id;
-            await supabase.from('projects').upsert(projData);
+            await supabaseClient.from('projects').upsert(projData);
         } else {
-            const { data } = await supabase.from('projects').insert([projData]).select().single();
+            const { data } = await supabaseClient.from('projects').insert([projData]).select().single();
             projects.push(data);
             activeProjectId = data.id;
         }
         closeModals(); await refreshAllData(); renderProjectsToTopPalette();
     }
 
-    async function deletePaletteItem() {
-        if(!canDelete()) return showToast('Nur Admin darf löschen!', 'error');
-        let id = document.getElementById('palEditId').value; 
-        await supabase.from('projects').delete().eq('id', id);
-        await supabase.from('planner_grid').delete().eq('project_id', id);
-        closeModals(); await refreshAllData(); renderProjectsToTopPalette();
-    }
-
-    // ==========================================
-    // ADMIN USER MANAGEMENT
-    // ==========================================
     async function openUserManagement() {
         if(!canManageUsers()) return;
-        
-        const { data: users } = await supabase.from('profiles').select('*');
+        const { data: users } = await supabaseClient.from('profiles').select('*');
         const userListDiv = document.getElementById('userList');
         userListDiv.innerHTML = '';
-        
         users.forEach(u => {
             const row = document.createElement('div');
-            row,className = 'user-row';
-            row.innerHTML = `
-                <span>${u.email}</span>
-                <select onchange="updateUserRole('${u.id}', this.value)">
-                    <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>Viewer</option>
-                    <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>Editor</option>
-                    <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
-                </select>
-            `;
+            row.className = 'user-row';
+            row.innerHTML = `<span>${u.email}</span><select onchange="updateUserRole('${u.id}', this.value)">
+                <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>Viewer</option>
+                <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>Editor</option>
+                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+            </select>`;
             userListDiv.appendChild(row);
         });
-        
         document.getElementById('p_overlay').style.display = 'block';
         document.getElementById('userModal').style.display = 'block';
         setTimeout(() => document.getElementById('userModal').classList.add('show'), 10);
     }
 
     async function updateUserRole(userId, newRole) {
-        await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
-        showToast(`Rolle für Nutzer aktualisiert`, "success");
+        await supabaseClient.from('profiles').update({ role: newRole }).eq('id', userId);
+        showToast(`Rolle aktualisiert`, "success");
     }
 
-    // ==========================================
-    // GENERAL HELPERS
-    // ==========================================
     function setupGlobalUiHandlers() {
-        document.addEventListener('click', e => {
-            if(!e.target.closest('.menu-wrap')) closeMenus();
-            if(!e.target.closest('#actionGridCtx')) document.getElementById('actionGridCtx').style.display = 'none';
-        });
+        document.addEventListener('click', e => { if(!e.target.closest('.menu-wrap')) closeMenus(); });
     }
     function closeModals() {
         document.querySelectorAll('.modal').forEach(m => { m.classList.remove('show'); setTimeout(()=>m.style.display='none', 200); });
@@ -486,11 +424,11 @@
         if(!canPlan()) return;
         isAppLockedForEditing = !isAppLockedForEditing; 
         let btn = document.getElementById('lockStateBtn');
-        if(isAppLockedForEditing){ document.body.classList.add('read-only-mode'); btn.className='btn mode-switch readonly'; btn.innerText='🔒 Nur Lesen'; }
-        else { document.body.classList.remove('read-only-mode'); btn.className='btn mode-switch planning'; btn.innerText='✏️ Planen'; }
+        if(isAppLockedForEditing){ document.body.classList.add('read-only-mode'); btn.className = 'btn mode-switch readonly'; btn.innerText = '🔒 Nur Lesen'; }
+        else { document.body.classList.remove('read-only-mode'); btn.className = 'btn mode-switch planning'; btn.innerText = '✏️ Planen'; }
     }
     function fullGridRepaintUI_Logic() {
-        document.querySelectorAll('.project-cell').forEach(c => { c.style.backgroundColor=""; c.style.color=""; c.innerText=""; c.title=""; });
+        document.querySelectorAll('.project-cell').forEach(c => { c.style.backgroundColor=""; c.style.color=""; c.innerText=""; });
         Object.keys(plannerGrid).forEach(k => {
             let p = projects.find(x=>x.id===plannerGrid[k]); let cell = document.getElementById(k);
             if(!cell) return;
@@ -500,7 +438,25 @@
         evalDashboardMathemations();
     }
     function evalDashboardMathemations() {
-        // [Berechnung der KPIs wie in V6.1...]
+        let netWork=0, lost=0, maxPossible=0;
+        let activeBuses = baseFlottenListe.length - deactivatedBuses.length;
+        document.querySelectorAll('[id^="COUNT_"]').forEach(f => {
+            let dt = f.id.replace('COUNT_','');
+            let dayLost=0, dayWork=0;
+            Object.keys(plannerGrid).forEach(k => { if(k.includes(dt) && !deactivatedBuses.some(b=>k.includes(b))) { if(plannerGrid[k] === "SYS_VACATION") dayLost++; else dayWork++; } });
+            let capThisDay = activeBuses - dayLost; netWork += dayWork; lost += dayLost; maxPossible += (capThisDay > 0 ? capThisDay : 0);
+            f.innerText = dayWork + " / " + (capThisDay > 0 ? capThisDay : 0);
+        });
+        let rate = maxPossible > 0 ? Math.round((netWork/maxPossible)*100) : 0;
+        document.getElementById('kpiCapRate').innerText = rate + "%";
+        document.getElementById('kpiBarLine').style.width = rate + "%";
+        document.getElementById('kpiTotalDays').innerText = netWork + " T";
+        let totalKwp = 0;
+        new Set(Object.values(plannerGrid)).forEach(pid => {
+            let p = projects.find(x => x.id === pid);
+            if(p) totalKwp += (p.kwp || 0);
+        });
+        document.getElementById('kpiTotalKwp').innerHTML = totalKwp + " <small>kWp</small>";
     }
     function getKalenderWocheMath(d){ let x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()+4-(x.getDay()||7)); return Math.ceil((((x-new Date(x.getFullYear(),0,1))/86400000)+1)/7); }
     function getLesbareTextfarbe(h){ h=h.replace('#',''); return (((parseInt(h.substr(0,2),16)*299)+(parseInt(h.substr(2,2),16)*587)+(parseInt(h.substr(4,2),16)*114))/1000)>=128?'#111':'#fff'; }
@@ -511,22 +467,14 @@
         requestAnimationFrame(()=>t.classList.add('show'));
         setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 300); }, 3000);
     }
-    function setupMouseDragPainting() {
-        document.addEventListener('mousedown', e => {
-            if (e.target.classList.contains('project-cell') && e.button === 0) {
-                if(isAppLockedForEditing || !canPlan()) return;
-                isDrawing = true; selectedCells = [e.target.id]; e.target.classList.add('selecting');
-            }
-        });
-        document.addEventListener('mouseover', e => { if(isDrawing && e.target.classList.contains('project-cell') && !selectedCells.includes(e.target.id)) { selectedCells.push(e.target.id); e.target.classList.add('selecting'); } });
-        document.addEventListener('mouseup', e => { if(isDrawing && e.button === 0 && selectedCells.length > 0) { verarbeiteMalerZugAufGrid(); } document.querySelectorAll('.selecting').forEach(nd => nd.classList.remove('selecting')); isDrawing = false; });
-    }
     function setView(m, b){ document.body.className=`view-${m}`; document.querySelectorAll('.controls .btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }
     function closeMenus() { document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open')); }
-    function toggleMenu(id, evt) { if(evt) evt.stopPropagation(); const el=document.getElementById(id); el.classList.toggle('open'); }
-    function handleLogout() { supabase.auth.signOut(); window.location.reload(); }
+    function handleLogout() { supabaseClient.auth.signOut(); window.location.reload(); }
 
-    initApp();
+    // STARTUP
+    window.addEventListener('DOMContentLoaded', () => {
+        // Die Login Card ist bereits im HTML sichtbar
+    });
 </script>
 </body>
 </html>
