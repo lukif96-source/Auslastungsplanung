@@ -1,156 +1,118 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF, charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOLPRO | Executive Terminal V10.2</title>
+    <title>SOLPRO | Terminal V10.0</title>
+    <!-- Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
 
         :root {
             --bg-base: #080a0f;
-            --bg-panel: #111827;
-            --bg-elevated: #1f2937;
-            --border: #2d3748;
-            --border-focus: #a4c639;
-            --volt: #a4c639;
-            --volt-glow: rgba(164, 198, 57, 0.2);
+            --panel-bg: #0a0e1a;
+            --panel-border: #1e293b;
+            --sol-lime: #a4c639;
+            --sol-lime-glow: rgba(164, 198, 57, 0.2);
             --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
+            --text-muted: #64748b;
             --danger: #f43f5e;
             --success: #10b981;
-            --rad: 4px;
+            --rad-md: 8px;
             --font-mono: 'JetBrains Mono', monospace;
         }
 
         *, *::before, *::after { box-sizing: border-box; }
         body {
             background: var(--bg-base); color: var(--text-main); font-family: 'Inter', sans-serif;
-            margin: 0; overflow: hidden; display: flex; flex-//direction: column; height: 100vh;
-            user-select: none; -webkit-font-smoothing: antialiased;
+            margin: 0; overflow: hidden; display: flex; flex-direction: column; height: 100vh;
         }
 
         /* AUTH GATEWAY */
-        .auth-overlay {
+        #authOverlay {
             position: fixed; inset: 0; background: #000; z-index: 10000;
-            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
         }
         .auth-card {
-            background: var(--bg-panel); border: 1px solid var(--border);
-            padding: 40px; border-radius: var(--rad); width: 380px; text-align: center;
-            box-shadow: 0 0 40px rgba(0,0,0,1);
+            background: var(--panel-bg); border: 1px solid var(--panel-border);
+            padding: 40px; border-radius: 12px; width: 380px; text-align: center;
         }
-        .auth-card h2 { font-family: 'Orbitron'; margin: 0 0 20px 0; color: #fff; font-size: 22px; letter-spacing: 1px; }
-        .auth-card h2 span { color: var(--volt); }
-        .auth-card label { display: block; text-align: left; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 15px; }
+        .auth-card h2 { font-family: 'Orbitron'; margin: 0 0 20px 0; font-size: 24px; }
         .auth-card input { 
-            width: 100%; padding: 12px; margin-top: 5px; background: #000; 
-            border: 1px solid var(--border); border-radius: var(--rad); color: #fff; font-family: var(--font-mono); font-size: 13px;
+            width: 100%; padding: 12px; margin: 10px 0; background: #000; 
+            border: 1px solid var(--panel-border); border-radius: 6px; color: #fff; font-family: var(--font-mono);
         }
         .auth-card button { 
-            width: 100%; padding: 14px; margin-top: 25px; background: var(--volt); border: none; 
-            font-weight: 800; cursor: pointer; border-radius: var(--rad); color: #000; text-transform: uppercase; font-family: var(--font-mono); transition: 0.2s;
+            width: 100%; padding: 14px; margin-top: 20px; background: var(--sol-lime); 
+            border: none; font-weight: 800; cursor: pointer; border-radius: 6px; text-transform: uppercase;
         }
-        .auth-card button:hover { background: #fff; }
 
-        /* HUD NAV */
+        /* HUD & NAV */
         .hud { 
-            height: 64px; background: var(--bg-panel); border-bottom: 1px solid var(--border); 
-            display: flex; align-items: center; padding: 0 20px; gap: 20px; z-index: 3000; flex-shrink: 0; 
+            height: 70px; background: var(--panel-bg); border-bottom: 1px solid var(--panel-border);
+            display: flex; align-items: center; padding: 0 20px; gap: 20px; flex-shrink: 0;
         }
-        .logo { font-family: 'Orbitron'; font-size: 20px; font-weight: 900; color: #fff; }
-        .logo span { color: var(--volt); }
+        .logo { font-family: 'Orbitron'; font-size: 20px; font-weight: 900; }
+        .logo span { color: var(--sol-lime); }
 
-        .kpi-board { display: flex; gap: 0; background: #000; border: 1px solid var(--border); overflow: hidden; border-radius: var(--rad); }
-        .kpi-card { padding: 6px 15px; border-right: 1px solid var(--border); min-width: 110px; }
-        .kpi-lbl { font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; }
-        .kpi-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: #fff; }
-        .kpi-val.highlight { color: var(--volt); }
+        .kpi-board { display: flex; gap: 10px; border-left: 1px solid var(--panel-border); padding-left: 20px; }
+        .kpi-card { background: rgba(255,255,255,0.03); padding: 8px 15px; border-radius: 6px; border: 1px solid var(--panel-border); min-width: 110px; }
+        .kpi-lbl { font-size: 9px; color: var(--text-muted); text-text-transform: uppercase; }
+        .kpi-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; display: block; }
 
-        .palette-container { display: flex; align-items: center; flex-grow: 1; overflow-x: auto; gap: 6px; padding: 0 10px; border-left: 1px solid var(--border); margin-left: 10px; }
-        .palette-item { 
-            padding: 5px 12px; border-radius: var(--rad); font-size: 10px; font-weight: 600; cursor: pointer; 
-            border: 1px solid var(--border); background: var(--bg-base); color: var(--text-muted); display: flex; align-items: center; gap: 8px; transition: 0.1s;
-        }
-        .palette-item.active { border-color: var(--volt); color: #fff; background: var(--volt-dim); }
-        .btn-add { width: 26px; height: 26px; border-radius: var(--rad); background: var(--border); border: none; color: #fff; cursor: pointer; font-family: var(--font-mono); }
+        .palette-container { display: flex; align-items: center; flex-grow: 1; overflow-x: auto; gap: 8px; }
+        .palette-item { padding: 6px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; border: 1px solid var(--panel-border); background: var(--bg-base); color: #fff; white-space: nowrap; }
+        .palette-item.active { border-color: var(--sol-lime); box-shadow: 0 0 10px var(--sol-lime-glow); }
 
-        .controls { display: flex; gap: 6px; align-items: center; }
-        .btn { background: #000; border: 1px solid var(--border); padding: 7px 12px; font-size: 10px; 
-               font-weight: 700; cursor: pointer; border-radius: var(--rad); color: var(--text-muted); transition: 0.1s; font-family: var(--font-mono); }
-        .btn:hover { border-color: var(--text-main); color: #fff; }
-        .btn.active { background: var(--volt); color: #000; border-color: var(--volt); }
-        .btn.primary { color: var(--volt); border-color: var(--volt); }
-        .btn.danger { color: var(--danger); }
+        /* MAIN LAYOUT */
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+        .viewport { flex: 1; overflow: auto; padding: 20px; }
+        .sidebar { width: 320px; background: var(--panel-bg); border-left: 1px solid var(--panel-border); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--panel-border); font-family: 'Orbitron'; font-size: 13px; }
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 20px; }
 
-        /* VIEW NAVIGATION */
-        .nav-tabs { display: flex; background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 0 20px; gap: 1px; }
-        .nav-tab { padding: 10px 20px; font-size: 11px; font-family: var(--font-mono); cursor: pointer; color: var(--text-muted); transition: 0.1s; }
-        .nav-tab.active { background: var(--bg-base); color: var(--volt); border-bottom: 2px solid var(--volt); }
+        /* TABS */
+        .nav-tabs { display: flex; background: var(--panel-bg); border-bottom: 1px solid var(--panel-border); padding: 0 20px; }
+        .nav-tab { padding: 12px 20px; font-size: 11px; font-family: var(--font-mono); cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+        .nav-tab.active { color: var(--sol-lime); border-bottom: 2px solid var(--sol-lime); }
 
-        /* CONTENT LAYERS */
-        .main-container { flex: 1; position: relative; overflow: hidden; }
-        .view-layer { position: absolute; inset: 0; display: none; overflow: auto; padding: 20px; }
-        .view-layer.active { display: block; }
+        /* GRID */
+        table { border-collapse: separate; border-spacing: 0; width: max-content; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: var(--rad-md); }
+        th, td { border: 1px solid var(--panel-border); padding: 10px; }
+        th { background: #000; font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+        td:first-child { position: sticky; left: 0; background: #1e293b; font-weight: 700; color: #fff; font-family: var(--font-mono); font-size: 12px; border-right: 2px solid var(--sol-lime); }
+        .project-cell { height: 40px; cursor: crosshair; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #fff; }
 
-        /* TERMINAL GRID */
-        table { border-collapse: separate; border-spacing: 0; width: max-content; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--rad); overflow: hidden; }
-        th, td { border: 1px solid var(--border); text-align: center; }
-        #gridHead th { position: sticky; top: 0; background: #0a0a0a; font-size: 9px; font-weight: 700; color: var(--text-muted); z-index: 100; text-transform: uppercase; }
-        #gridHead tr:nth-child(1) th { height: 26px; background: #000; color: var(--volt); border-bottom: 1px solid var(--border-focus); }
-        td:first-child { position: sticky; left: 0; z-index: 80; background: #0f172a; width: 150px !important; text-align: left; padding-left: 12px; font-weight: 700; border-right: 1px solid var(--border-focus); color: #fff; font-family: var(--font-mono); font-size: 11px; }
-        
-        .project-cell { height: 40px; cursor: crosshair; font-size: 9px; font-weight: 700; text-transform: uppercase; color: #fff; transition: 0s; }
-        .project-cell:hover { outline: 1px solid #fff; z-index: 10; }
-        .monday-start { border-left: 2px solid var(--volt) !important; }
-        .day-num { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: #fff; }
-        .day-short { font-size: 8px; color: var(--text-muted); }
-
-        .stat-row td { background: #0a0a0a !important; color: var(--text-//muted); font-family: var(--font-mono); font-size: 10px; }
-
-        /* TO-DO SYSTEM */
-        .task-wrapper { max-width: 800px; margin: 0 auto; }
-        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .task-header h2 { font-family: var(--font-mono); font-size: 18px; color: #fff; text-transform: uppercase; }
-        .task-input-group { display: flex; gap: 5px; margin-bottom: 20px; }
-        .task-input-group input { flex: 1; padding: 12px; background: #000; border: 1px solid var(--border); color: #fff; font-family: var(--font-mono); font-size: 13px; outline: none; }
-        .task-input-group input:focus { border-color: var(--volt); }
-        .task-input-group button { background: var(--volt); border: none; padding: 0 20px; cursor: pointer; font-weight: 800; font-family: var(--font-mono); color: #000; }
-        
-        .task-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); }
-        .task-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-panel); color: #fff; font-size: 13px; font-family: var(--font-mono); }
-        .task-item:hover { background: var(--bg-elevated); }
-        .task-item.done { opacity: 0.3; }
-        .task-item.done span { text-decoration: line-through; }
-        .task-item input[type="checkbox"] { cursor: pointer; accent-color: var(--volt); }
-        .task-item span { flex: 1; }
-        .task-item .del-task { color: var(--danger); cursor: pointer; font-size: 10px; opacity: 0.5; }
-        .task-item .del-task:hover { opacity: 1; }
-
-        /* BUS TOGGLES */
-        .bus-ctrl { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .toggle-btn { width: 16px; height: 16px; border-radius: 2px; border: 1px solid var(--border); background: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
-        .toggle-btn.active { background: var(--volt); border-color: var(--volt); color: #000; }
-        .toggle-btn.active::after { content: '✓'; font-size: 10px; font-weight: 900; }
-        .toggle-btn.inactive { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
-        .toggle-btn.inactive::after { content: '✕'; font-size: 10px; font-weight: 900; }
+        /* TODO LIST */
+        .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: var(--rad-sm); margin-bottom: 8px; border-left: 3px solid var(--sol-lime); }
+        .todo-item.done { opacity: 0.3; }
+        .todo-item input[type="checkbox"] { accent-color: var(--sol-lime); }
+        .todo-item span { flex: 1; font-size: 12px; }
 
         /* MODALS */
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 5000; display: none; backdrop-filter: blur(5px); }
-        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-panel); border: 1px solid var(--border); padding: 30px; display: none; z-index: 5001; width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,1); }
-        .modal.show { opacity: 1; }
-        .modal h2 { margin: 0 0 20px 0; font-family: var(--font-mono); font-size: 14px; color: var(--volt); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .modal label { display: block; font-size: 9px; color: var(--text-muted); text-transform: uppercase; margin-top: 15px; font-family: var(--font-mono); }
-        .modal input { width: 100%; padding: 10px; background: #000; border: 1px solid var(--border); color: #fff; font-family: var(--font-mono); margin-top: 5px; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 5000; display: none; backdrop-filter: blur(4px); }
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel-bg); border: 1px solid var(--panel-border); padding: 30px; border-radius: var(--rad-md); display: none; z-index: 5001; width: 380px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .modal.show { display: block; }
+        .modal h2 { margin-top: 0; font-size: 16px; font-family: 'Orbitron'; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .modal label { display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 15px; }
+        .modal input { width: 100%; padding: 10px; background: #000; border: 1px solid var(--border); color: #fff; border-radius: var(--rad-sm); font-family: var(--font-mono); }
         .m-btns { display: flex; gap: 10px; margin-top: 25px; }
-        .m-btn { flex: 1; padding: 10px; border: 1px solid var(--border); background: transparent; color: #fff; cursor: pointer; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; }
-        .m-btn.save { background: var(--volt); color: #000; border-color: var(--volt); font-weight: 800; }
+        .m-btn { flex: 1; padding: 10px; border: none; cursor: pointer; font-family: var(--font-mono); font-weight: 700; text-transform: uppercase; }
+        .m-save { background: var(--sol-lime); color: #000; }
+        .m-cancel { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
 
-        .toast-stack { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 5px; }
-        .toast { background: #000; border: 1px solid var(--border); color: #fff; padding: 8px 15px; font-size: 11px; font-family: var(--font-mono); opacity: 0; transition: 0.2s; }
+        .toast-stack { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: #000; border: 1px solid var(--sol-lime); color: #fff; padding: 12px 20px; border-radius: var(--rad-sm); font-size: 12px; font-family: var(--font-mono); opacity: 0; transition: 0.3s; }
         .toast.show { opacity: 1; }
+
+        /* UTILS */
+        .btn { background: var(--panel-bg); border: 1px solid var(--border); padding: 8px 12px; font-size: 10px; cursor: pointer; border-radius: var(--rad-sm); color: #fff; font-family: var(--font-mono); text-transform: uppercase; transition: 0.2s; }
+        .btn.active { background: var(--sol-lime); color: #000; }
+        .btn.primary { color: var(--sol-lime); border-color: var(--sol-lime); }
+        .btn.danger { color: var(--danger); }
     </style>
 </head>
 <body>
@@ -158,12 +120,11 @@
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
         <h2>SOL<span>PRO</span></h2>
-        <p style="font-//size:10px; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:20px;">SESSION_AUTH_REQUIRED</p>
-        <label>Operator ID</label>
-        <input type="email" id="loginEmail" placeholder="email@solpro.at">
-        <label>Passkey</label>
+        <label>OPERATOR ID</label>
+        <input type="email" id="loginEmail" placeholder="user@solpro.at">
+        <label>PASSKEY</label>
         <input type="password" id="loginPass" placeholder="••••••••">
-        <button id="loginBtn" onclick="handleLogin()">Initialize Session</button>
+        <button onclick="handleLogin()">Initialize Session</button>
         <div id="authStatus" style="margin-top:15px; font-size:10px; font-family:var(--font-mono); color:var(--danger);"></div>
     </div>
 </div>
@@ -171,17 +132,15 @@
 <div class="accent-line"></div>
 
 <div class="hud">
-    <div class="brand">
-        <div class="logo">SOL<span>PRO</span></div>
-    </div>
+    <div class="brand"><div class="logo">SOL<span>PRO</span></div><div class="tagline">EXECUTIVE SUITE</div></div>
     <div class="kpi-board">
-        <div class="kpi-card"><span class="kpi-lbl">Capacity</span><span class="kpi-val" id="kpiCapRate">0%</span></div>
-        <div class="kpi-card"><span class="kpi-lbl">Days</span><span class="kpi-val" id="kpiTotalDays">0 T</span></div>
-        <div class="kpi-card"><span class="kpi-lbl">Vol.</span><span class="kpi-val highlight" id="kpiTotalKwp">0 <small>kWp</small></span></div>
+        <div class="kpi-card"><span class="kpi-lbl">CAPACITY</span><span class="kpi-val" id="kpiCapRate">0%</span></div>
+        <div class="kpi-card"><span class="kpi-lbl">DAYS</span><span class="kpi-val" id="kpiTotalDays">0 T</span></div>
+        <div class="kpi-card"><span class="kpi-lbl">VOL.</span><span class="kpi-val highlight" id="kpiTotalKwp">0 <small>kWp</small></span></div>
     </div>
     <div class="palette-container" id="paletteUI"></div>
     <div class="controls">
-        <button class="btn" id="userBtn" style="display:none" onclick="openUserManagement()">ADMIN</button>
+        <button class="btn" id="userBtn" style="display:none" onclick="openUserManagement()">USER_MGT</button>
         <button class="btn" onclick="refreshAllData()">SYNC</button>
         <button class="btn primary" id="lockStateBtn" onclick="toggleSystemLock()">PLAN_MODE</button>
         <button class="btn danger" onclick="handleLogout()">EXIT</button>
@@ -193,44 +152,41 @@
     <div class="nav-tab" id="tab-tasks" onclick="switchView('tasks')">[ TASK_MANAGER ]</div>
 </div>
 
-<div class="main-container">
+<div class="main-wrapper">
     <div id="view-planner" class="view-layer active">
         <table id="theTable"><thead id="gridHead"></thead><tbody id="gridBody"></tbody></table>
     </div>
     <div id="view-tasks" class="view-layer">
-        <div class="task-wrapper">
-            <div class="task-header">
-                <h2 style="font-family:var(--font-mono);">Operational_Tasks</h2>
-                <div id="taskCount" style="font-family:var(--font-mono); font-size:12px; color:var(--volt);">0 Active</div>
+        <div style="max-width:700px; margin: 0 auto;">
+            <h2 style="font-family:var(--font-mono); font-size:18px; color:#fff; text-transform:uppercase; margin-bottom:20px;">TASK_LIST</h2>
+            <div class="todo-input-group" style="display:flex; gap:10px; margin-bottom:20px;">
+                <input type="text" id="todoInput" style="flex:1; padding:12px; background:#000; border:1px solid var(--border); color:#fff; font-family:var(--font-mono); font-size:13px; border-radius:var(--rad-sm);" placeholder="New command...">
+                <button onclick="addTodo()" style="padding:0 20px; background:var(--sol-lime); border:none; font-weight:800; font-family:var(--font-mono); cursor:pointer; border-radius:var(--rad-sm);">ADD</button>
             </div>
-            <div class="todo-input-group">
-                <input type="text" id="todoInput" placeholder="Add task to terminal...">
-                <button onclick="addTodo()">ADD</button>
-            </div>
-            <div id="todoList" class="task-list"></div>
+            <div id="todoList"></div>
         </div>
     </div>
 </div>
 
-<div id="actionGridCtx" style="display:none; position:fixed; z-index:9000; background:var(--bg-panel); border:1px solid var(--border-focus); border-radius:0; padding:5px; width:200px; box-shadow:0 10px 30px rgba(0,0,0,0.8);"></div>
+<div id="actionGridCtx" style="display:none; position:fixed; z-index:9000; background:var(--panel-bg); border:1px solid var(--border); border-radius:var(--rad-sm); padding:8px; width:200px; box-shadow:0 10px 30px rgba(0,0,0,0.5);"></div>
 <div class="overlay" id="p_overlay" onclick="closeModals()"></div>
 
 <div class="modal" id="paletteModal">
-    <h2 id="pModalTitle">PROJECT_CONFIG</h2>
+    <h2 id="pModalTitle">PROJ_CONFIG</h2>
     <label>IDENTIFIER</label><input type="text" id="palNameInput">
     <label>kWp_LOAD</label><input type="number" id="palKwpInput">
-    <label>COLOR_TAG</label><input type="color" id="palColorInput" style="height:40px;">
+    <label>TAG_COLOR</label><input type="color" id="palColorInput" style="height:40px">
     <input type="hidden" id="palEditId">
     <div class="m-btns">
         <button class="m-btn m-save" onclick="savePaletteItem()">COMMIT</button>
         <button class="m-btn m-cancel" onclick="closeModals()">ABORT</button>
     </div>
-    <button class="m-btn" id="palDelBtn" onclick="deletePaletteItem()" style="display:none; width:100%; margin-top:10px; background:transparent; color:var(--danger); border:1px solid var(--danger); text-align:center;">PURGE_RECORD</button>
+    <button class="m-btn" id="palDelBtn" onclick="deletePaletteItem()" style="display:none; width:100%; margin-top:10px; background:transparent; color:var(--danger); border:1px solid var(--danger); text-transform:uppercase;">PURGE</button>
 </div>
 
 <div class="modal" id="userModal">
-    <h2>USER_MGMT</h2>
-    <div id="userList" style="max-height:280px; overflow-y:auto; margin-top:10px;"></div>
+    <h2>USER_MANAGEMENT</h2>
+    <div id="userList" style="max-height:300px; overflow-y:auto; margin-top:10px;"></div>
     <div class="m-btns">
         <button class="m-btn m-cancel" onclick="closeModals()">CLOSE</button>
     </div>
@@ -239,22 +195,25 @@
 <div class="toast-stack" id="toastStack"></div>
 
 <script>
-    /* ==========================================
-       SUPABASE CORE SETUP
+/* ==========================================
+       SUPABASE CONFIG & STATE
        ========================================== */
+    // !!! BITTE HIER DEINE DATEN EINTRAGEN !!!
     const SUPABASE_URL = "https://iuxklqcpexoziqxrohwa.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VteOTQ6g28z9Dvo-QUG8jw_hehaZpWu";
+
     const solproSupa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null;
     let userRole = 'viewer';
     let projects = [], plannerGrid = {}, deactivatedBuses = [], todos = [];
     let activeProjectId = "ERASER", isDrawing = false, selectedCells = [], isAppLockedForEditing = false;
+    let contextCtxMenuPID = null, selectedCellDomID = null, highlightTimer = null;
     const baseFlottenListe = ["SOL 2", "SOL 3", "SOL 4", "SOL 12", "SOL 16"];
     const managementFarben = ["#1e3a8a","#0284c7","#059669","#ca8a04","#b91c1c","#6d28d9","#0f766e","#a21caf","#4f46e5","#b45309","#4338ca","#064e3b"];
 
     // ==========================================
-    // AUTHENTICATION
+    // AUTHENTICATION ENGINE
     // ==========================================
     async function handleLogin() {
         const email = document.getElementById('loginEmail').value;
@@ -280,89 +239,21 @@
     }
 
     async function fetchUserRole() {
-        const { data } = await solproSupa.from('profiles').select('role').eq('id', currentUser.id).single();
+        const { data, error } = await solproSupa.from('profiles').select('role').eq('id', currentUser.id).single();
         if (data) userRole = data.role;
         else {
             await solproSupa.from('profiles').insert([{ id: currentUser.id, email: currentUser.email, role: 'viewer' }]);
             userRole = 'viewer';
         }
+        document.getElementById('userRoleDisp') ? document.getElementById('userRoleDisp').innerText = userRole.toUpperCase() : null;
         if(userRole === 'admin') document.getElementById('userBtn').style.display = 'block';
     }
 
     function handleLogout() { solproSupa.auth.signOut(); window.location.reload(); }
 
     // ==========================================
-    // TO-DO ENGINE
+    // DATA CORE (CLOUD SYNC)
     // ==========================================
-    async function loadTodos() {
-        const { data } = await solproSupa.from('todos').select('*').eq('user_id', currentUser.id).order('id', { ascending: false });
-        todos = data || [];
-        renderTodos();
-    }
-
-    async function addTodo() {
-        const input = document.getElementById('todoInput');
-        const task = input.value.trim();
-        if(!task) return;
-
-        const { data, error } = await solproSupa.from('todos').insert([{ 
-            task: task, user_id: currentUser.id, is_completed: false 
-        }]).select().single();
-
-        if(error) return showToast("ERR_SAVE", "error");
-        input.value = ""; todos.unshift(data); renderTodos();
-    }
-
-    async function toggleTodo(id, currentStatus) {
-        await solproSupa.from('todos').update({ is_completed: !currentStatus }).eq('id', id);
-        await loadTodos();
-    }
-
-    async function deleteTodo(id) {
-        await solproSupa.from('todos').delete().eq('id', id);
-        await loadTodos();
-    }
-
-    function renderTodos() {
-        const list = document.getElementById('todoList');
-        list.innerHTML = '';
-        todos.forEach(t => {
-            const div = document.createElement('div');
-            div.className = `todo-item ${t.is_completed ? 'done' : ''}`;
-            div.innerHTML = `
-                <input type="checkbox" ${t.is_//completed ? 'checked' : ''} onclick="toggleTodo('${t.id}', ${t.is_completed})">
-                <span>${t.task}</span>
-                <div class="del-todo" onclick="deleteTodo('${t.id}')">DEL</div>
-            `;
-            list.appendChild(div);
-        });
-        document.getElementById('taskCount').innerText = `${todos.filter(t=>!t.is_completed).length} ACTIVE`;
-    }
-
-    // ==========================================
-    // PERMISSIONS
-    // ==========================================
-    const canPlan = () => (userRole === 'admin' || userRole === 'editor');
-    const canDelete = () => (userRole === 'admin');
-
-    // ==========================================
-    // APP CORE
-    // ==========================================
-    async function startApp() {
-        buildGrid();
-        await refreshAllData();
-        await loadTodos();
-        renderProjectsToTopPalette();
-        setupMouseDragPainting();
-        setupGlobalUiHandlers();
-        
-        if(userRole === 'viewer') {
-            isAppLockedForEditing = true;
-            document.getElementById('lockStateBtn').className = 'btn readonly';
-            document.getElementById('lockStateBtn').innerText = 'READ_ONLY';
-        }
-    }
-
     async function refreshAllData() {
         try {
             const { data: pData } = await solproSupa.from('projects').select('*');
@@ -375,16 +266,25 @@
             
             fullGridRepaintUI_Logic();
             renderProjectsToTopPalette();
-            showToast("SYS_SYNC_OK", "success");
-        } catch (e) { showToast("ERR_SYNC", "error"); }
+            showToast("CLOUD_SYNC_OK", "success");
+        } catch (e) { showToast("SYNC_ERROR", "error"); }
     }
 
+    async function loadTodos() {
+        const { data } = await solproSupa.from('todos').select('*').eq('user_id', currentUser.id).order('id', { ascending: false });
+        todos = data || [];
+        renderTodos();
+    }
+
+    // ==========================================
+    // GRID & PAINTING LOGIC
+    // ==========================================
     function buildGrid() {
         const thead = document.getElementById('gridHead'); const tbody = document.getElementById('gridBody');
         let currentDay = new Date(2026, 7, 17); const endDate = new Date(2026, 11, 31); const dateArray = [];
         while(currentDay <= endDate) { if(currentDay.getDay()!==0 && currentDay.getDay()!==6) dateArray.push(new Date(currentDay)); currentDay.setDate(currentDay.getDate()+1); }
         
-        let trMonat = `<tr><th rowspan="3" class="fixed-corner" style="border-right:1px solid var(--border-focus);"><div class="logo" style="font-size:14px;">SOL<span>PRO</span></div></th>`;
+        let trMonat = `<tr><th rowspan="3" class="fixed-corner"><div class="logo">SOL<span>PRO</span></div></th>`;
         let trKW = `<tr>`, trTage = `<tr>`;
         let lastM=-1, mSpans=[], lastKW=-1, kwSpans=[];
         dateArray.forEach(d => {
@@ -399,9 +299,10 @@
             trTage += `<th id="th-${iso}" class="${d.getDay()===1?'monday-start':''}"><div class="day-num">${d.getDate()}</div><div class="day-short">${d.toLocaleString('de-DE',{weekday:'short'})}</div></th>`;
         });
         thead.innerHTML = trMonat + `</tr>` + trKW + `</tr>` + trTage + `</tr>`;
+        
         baseFlottenListe.forEach(w => {
             let sf = w.replace(/\s+/g,'_');
-            let rw = `<tr id="row_${sf}" class="worker-row is-active"><td><div class="bus-ctrl" style="display:flex; justify-content:space-between; align-items:center;"><span>${w}</span><button class="toggle-btn ${deactivatedBuses.includes(sf)?'inactive':'active'}" onclick="toggleBusState('${sf}')"></button></div></td>`;
+            let rw = `<tr id="row_${sf}" class="worker-row is-active"><td><div class="bus-ctrl"><span>${w}</span><button class="toggle-btn ${deactivatedBuses.includes(sf)?'inactive':'active'}" onclick="toggleBusState('${sf}')"></button></div></td>`;
             dateArray.forEach(d => {
                 let iso = d.toISOString().split('T')[0];
                 rw += `<td id="CELL_${sf}_${iso}" class="project-cell${(d.getDay()===1?' monday-start':'')}" data-date-ts="${d.getTime()}"></td>`;
@@ -413,21 +314,15 @@
         tbody.insertAdjacentHTML('beforeend', fRow + `</tr>`);
     }
 
-    function toggleBusState(sid) {
-        if(!canPlan()) return showToast('ERR_AUTH', 'error');
-        if(isAppLockedForEditing) return showToast('Sperre aktiv', 'warn');
-        const isNowOffline = !deactivatedBuses.includes(sid);
-        if(isNowOffline) { deactivatedBuses.push(sid); document.getElementById('row_'+sid).classList.replace('is-active','is-offline'); }
-        else { deactivatedBuses=deactivatedBuses.filter(v=>v!==sid); document.getElementById('row_'+sid).classList.replace('is-offline','is-active'); }
-        solproSupa.from('fleet_status').upsert({ bus_id: sid, is_offline: isNowOffline });
-        fullGridRepaintUI_Logic();
-    }
-
     function setupMouseDragPainting() {
         document.addEventListener('mousedown', e => {
             if (e.target.classList.contains('project-cell') && e.button === 0) {
                 if(isAppLockedForEditing || !canPlan()) return;
                 isDrawing = true; selectedCells = [e.target.id]; e.target.classList.add('selecting'); e.target.style.outline = "1px solid #fff";
+            }
+            if (e.target.classList.contains('project-cell') && e.button === 2) {
+                if(isAppLockedForEditing || !canPlan()) return; e.preventDefault(); selectedCellDomID = e.target.id;
+                bautHtmlFurDasActionContextMenu(); let cm=document.getElementById('actionGridCtx'); cm.style.display="block"; cm.style.left=e.clientX+"px"; cm.style.top=e.clientY+"px";
             }
         });
         document.addEventListener('mouseover', e => { 
@@ -439,6 +334,7 @@
             if(isDrawing && e.button === 0 && selectedCells.length > 0) { verarbeiteMalerZugAufGrid(); } 
             document.querySelectorAll('.selecting').forEach(nd => { nd.classList.remove('selecting'); nd.style.outline=""; }); isDrawing = false; 
         });
+        document.addEventListener('contextmenu', e => { if (e.target.classList.contains('project-cell')) e.preventDefault(); });
     }
 
     async function verarbeiteMalerZugAufGrid() {
@@ -454,6 +350,18 @@
         fullGridRepaintUI_Logic(); renderProjectsToTopPalette(); selectedCells = [];
     }
 
+    async function toggleBusState(sid) {
+        if(!canPlan()) return showToast("ERR_AUTH", "error");
+        const isNowOffline = !deactivatedBuses.includes(sid);
+        if(isNowOffline) { deactivatedBuses.push(sid); document.getElementById('row_'+sid).classList.replace('is-active','is-offline'); }
+        else { deactivatedBuses=deactivatedBuses.filter(v=>v!==sid); document.getElementById('row_'+sid).classList.replace('is-offline','is-active'); }
+        await solproSupa.from('fleet_status').upsert({ bus_id: sid, is_offline: isNowOffline });
+        fullGridRepaintUI_Logic();
+    }
+
+    // ==========================================
+    // UI & PROJECT MANAGEMENT
+    // ==========================================
     function renderProjectsToTopPalette() {
         let container = document.getElementById('paletteUI');
         if(!container) return;
@@ -462,46 +370,31 @@
             let counts = Object.keys(plannerGrid).filter(k => plannerGrid[k] === p.id).length;
             let el = document.createElement('div');
             el.className = `palette-item ${activeProjectId === p.id ? 'active' : ''}`;
-            el.innerHTML = `<div class="palette-color-dot" style="background:${p.color}; width:6px; height:6px; border-radius:0;"></div><b>${p.name}</b> <span style="opacity:0.5;">${counts}T</span>`;
+            el.innerHTML = `<div class="palette-color-dot" style="background:${p.color};"></div><b>${p.name}</b> <span style="opacity:0.5;">${counts}T</span>`;
             el.onclick = () => { activeProjectId = p.id; renderProjectsToTopPalette(); };
-            // Edit on right click
-            el.oncontextmenu = (e) => { 
-                e.preventDefault(); 
-                if(!canPlan()) return;
-                document.getElementById('palEditId').value = p.id; 
-                document.getElementById('palNameInput').value = p.name; 
-                document.getElementById('palKwpInput').value = p.kwp || 0; 
-                document.getElementById('palColorInput').value = p.color; 
-                document.getElementById('palDelBtn').style.display = canDelete() ? "block" : "none"; 
-                document.getElementById('pModalTitle').innerText = "EDIT_CONFIG"; 
-                openPaletteModal(); 
-            };
+            el.oncontextmenu = (e) => { e.preventDefault(); e.stopPropagation(); if(!canPlan()) return; document.getElementById('palEditId').value = p.id; document.getElementById('palNameInput').value = p.name; document.getElementById('palKwpInput').value = p.kwp || 0; document.getElementById('palColorInput').value = p.color; document.getElementById('palDelBtn').style.display = canDelete() ? "block" : "none"; document.getElementById('pModalTitle').innerText = "EDIT_PROJECT"; openPaletteModal(); };
             container.appendChild(el);
         });
         [{ id: 'ERASER', label: 'ERASER', c: '#fff' }, { id: 'SYS_VACATION', label: 'OFFLINE', c: '#D4FF00' }].forEach(t => {
             let el = document.createElement('div'); el.className = `palette-item ${(activeProjectId === t.id ? 'active' : '')}`; 
-            el.innerHTML = `<div class="palette-color-dot" style="background:${t.c}; width:6px; height:6px; border-radius:0;"></div><b>${t.label}</b>`;
+            el.innerHTML = `<div class="palette-color-dot" style="background:${t.c};"></div><b>${t.label}</b>`;
             el.onclick = () => { activeProjectId = t.id; renderProjectsToTopPalette(); };
             container.appendChild(el);
         });
     }
 
-    function oeffneProjectCreatorModal() {
-        if(!canPlan()) return showToast('ERR_AUTH', 'error');
-        if(isAppLockedForEditing) return;
-        document.getElementById('pModalTitle').innerText = "NEW_PROJECT"; 
-        document.getElementById('palEditId').value = ""; 
-        document.getElementById('palNameInput').value = ""; 
-        document.getElementById('palKwpInput').value = ""; 
-        document.getElementById('palDelBtn').style.display = 'none';
-        openPaletteModal();
+    function openPaletteModal() {
+        document.getElementById('p_overlay').style.display = 'block';
+        const m = document.getElementById('paletteModal');
+        m.style.display = 'block';
+        setTimeout(() => m.classList.add('show'), 10);
     }
 
     async function savePaletteItem() {
         let name = document.getElementById('palNameInput').value.trim(); 
         let kwp = parseFloat(document.getElementById('palKwpInput').value) || 0;
         let id = document.getElementById('palEditId').value;
-        if(!name) return showToast('ERR_DATA_MISSING', 'error');
+        if(!name) return showToast('ERR_MISSING_NAME', 'error');
         
         let projData = { name, kwp, color: document.getElementById('palColorInput').value };
         if(id) {
@@ -523,6 +416,59 @@
         closeModals(); await refreshAllData(); renderProjectsToTopPalette();
     }
 
+    function bautHtmlFurDasActionContextMenu() {
+        let ActionPanel = document.getElementById('actionGridCtx');
+        let prj = projects.find(p => p.id === activeProjectId);
+        let content = `
+            ${(activeProjectId !== 'ERASER' && activeProjectId !== 'SYS_VACATION' && prj)
+            ? `<button onclick="fireAction('FILL_PROJECT')" style="color:${prj.color};">ASSIGN_WEEK [${prj.name}]</button><hr>` : ''}
+            <button onclick="fireAction('FILL_URLAUB')">SET_WEEK_OFFLINE</button>
+            <hr>
+            ${canDelete() ? `<button onclick="fireAction('DELETE_WEEK')" class="danger-text">PURGE_WEEK</button>` : ''}
+            ${canDelete() ? `<button onclick="fireAction('DELETE_CELL')" class="danger-text">PURGE_CELL</button>` : ''}
+        `;
+        ActionPanel.innerHTML = content;
+    }
+
+    async function fireAction(cmd) {
+        document.getElementById('actionGridCtx').style.display = 'none';
+        if(!selectedCellDomID) return;
+        if(cmd === 'DELETE_CELL') { 
+            if(!canDelete()) return showToast("ERR_NO_PERM", "error");
+            delete plannerGrid[selectedCellDomID]; 
+            await solproSupa.from('planner_grid').delete().eq('cell_id', selectedCellDomID);
+            fullGridRepaintUI_Logic(); renderProjectsToTopPalette(); return; 
+        }
+        let parts = selectedCellDomID.split('_');
+        let targetDateStr = parts.pop(); parts.shift();
+        let targetBusID = parts.join('_');
+        let targetKW = getKalenderWocheMath(new Date(targetDateStr));
+        
+        document.querySelectorAll(`.project-cell`).forEach(async cell => {
+            if(cell.id.includes(targetBusID)) {
+                let cellKW = getKalenderWocheMath(new Date(Number(cell.getAttribute('data-date-ts'))));
+                if(cellKW === targetKW) {
+                    if(cmd === 'DELETE_WEEK') { 
+                        delete plannerGrid[cell.id]; 
+                        await solproSupa.from('planner_grid').delete().eq('cell_id', cell.id);
+                    }
+                    if(cmd === 'FILL_URLAUB') { 
+                        plannerGrid[cell.id] = "SYS_VACATION"; 
+                        await solproSupa.from('planner_grid').upsert({ cell_id: cell.id, project_id: "SYS_VACATION" });
+                    }
+                    if(cmd === 'FILL_PROJECT' && activeProjectId) { 
+                        plannerGrid[cell.id] = activeProjectId; 
+                        await solproSupa.from('planner_grid').upsert({ cell_id: cell.id, project_id: activeProjectId });
+                    }
+                }
+            }
+        });
+        fullGridRepaintUI_Logic(); renderProjectsToTopPalette();
+    }
+
+    // ==========================================
+    // USER MANAGEMENT (ADMIN ONLY)
+    // ==========================================
     async function openUserManagement() {
         if(userRole !== 'admin') return;
         const { data: users } = await solproSupa.from('profiles').select('*');
@@ -531,7 +477,7 @@
         users.forEach(u => {
             const row = document.createElement('div');
             row.className = 'user-row';
-            row.innerHTML = `<span style="font-family:var(--font-mono);">${u.email}</span><select onchange="updateUserRole('${u.id}', this.value)">
+            row.innerHTML = `<span>${u.email}</span><select onchange="updateUserRole('${u.id}', this.value)">
                 <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>VIEWER</option>
                 <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>EDITOR</option>
                 <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>ADMIN</option>
@@ -545,40 +491,23 @@
 
     async function updateUserRole(userId, newRole) {
         await solproSupa.from('profiles').update({ role: newRole }).eq('id', userId);
-        showToast(`ROLE_UPDATE_OK`, "success");
+        showToast(`ROLE_UPDATED: ${newRole}`, "success");
     }
 
-    function setupGlobalUiHandlers() {
-        document.addEventListener('click', e => { if(!e.target.closest('.menu-wrap')) closeMenus(); });
-    }
-    function closeModals() {
-        document.querySelectorAll('.modal').forEach(m => { m.classList.remove('show'); setTimeout(()=>m.style.display='none', 200); });
-        document.getElementById('p_overlay').style.//display = 'none';
-    }
-    function openPaletteModal() {
-        document.getElementById('p_overlay').style.display = 'block';
-        const m = document.getElementById('paletteModal');
-        // Fix: manual show
-        m.style.display = 'block';
-        setTimeout(() => m.classList.add('show'), 10);
-    }
-    function toggleSystemLock() {
-        if(!canPlan()) return;
-        isAppLockedForEditing = !isAppLockedForEditing; 
-        let btn = document.getElementById('lockStateBtn');
-        if(isAppLockedForEditing){ btn.className = 'btn readonly'; btn.innerText = 'READ_ONLY'; }
-        else { btn.className = 'btn primary'; btn.innerText = 'PLAN_MODE'; }
-    }
+    // ==========================================
+    // UTILITIES & SYSTEM
+    // ==========================================
     function fullGridRepaintUI_Logic() {
-        document.querySelectorAll('.project-cell').forEach(c => { c.style.backgroundColor="transparent"; c.innerText=""; });
+        document.querySelectorAll('.project-cell').forEach(c => { c.style.backgroundColor=""; c.style.color=""; c.innerText=""; });
         Object.keys(plannerGrid).forEach(k => {
             let p = projects.find(x=>x.id===plannerGrid[k]); let cell = document.getElementById(k);
             if(!cell) return;
-            if(plannerGrid[k] === "SYS_VACATION") { cell.style.background="repeating-linear-gradient(45deg, #0a0a0a, #0a0a0a 8px, #000 8px, #000 16px)"; cell.innerText="OFF"; cell.style.color = "var(--text-muted)"; return; }
-            if(p) { cell.style.backgroundColor=p.color; cell.innerText=p.name; cell.style.color="#000"; }
+            if(plannerGrid[k] === "SYS_VACATION") { cell.style.background="repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 8px, #000 8px, #000 16px)"; cell.innerText="OFFLINE"; cell.style.color = "var(--text-muted)"; return; }
+            if(p) { cell.style.backgroundColor=p.color; cell.style.color="#000"; cell.innerText=p.name; }
         });
         evalDashboardMathemations();
     }
+
     function evalDashboardMathemations() {
         let netWork=0, lost=0, maxPossible=0;
         let activeBuses = baseFlottenListe.length - deactivatedBuses.length;
@@ -588,7 +517,6 @@
             Object.keys(plannerGrid).forEach(k => { if(k.includes(dt) && !deactivatedBuses.some(b=>k.includes(b))) { if(plannerGrid[k] === "SYS_VACATION") dayLost++; else dayWork++; } });
             let capThisDay = activeBuses - dayLost; netWork += dayWork; lost += dayLost; maxPossible += (capThisDay > 0 ? capThisDay : 0);
             f.innerText = dayWork + "/" + (capThisDay > 0 ? capThisDay : 0);
-            f.style.color = (capThisDay > 0 && dayWork >= capThisDay) ? "var(--volt)" : "var(--text-muted)";
         });
         let rate = maxPossible > 0 ? Math.round((netWork/maxPossible)*100) : 0;
         document.getElementById('kpiCapRate').innerText = rate + "%";
@@ -598,23 +526,107 @@
             let p = projects.find(x => x.id === pid);
             if(p) totalKwp += (p.kwp || 0);
         });
-        document.getElementById('kpiTotalKwp').innerHTML = totalKwp + " <small>KWP</small>";
+        document.getElementById('kpiTotalKwp').innerHTML = totalKwp + " <small>kWp</small>";
     }
-    function getKalenderWocheMath(d){ let x = new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()+4-(x.getDay()||7)); return Math.ceil((((x-new Date(x.getFullYear(),0,1))/86400000)+1)/7); }
+
+    function getKalenderWocheMath(d){ let x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()+4-(x.getDay()||7)); return Math.ceil((((x-new Date(x.getFullYear(),0,1))/86400000)+1)/7); }
+    function getLesbareTextfarbe(h){ return "#000"; } // Für Dunkel-Design besser schwarz auf Farbe
     function showToast(msg, type) {
         const stack = document.getElementById('toastStack');
-        const t = document.createElement('div'); t.className = `toast`; t.style.borderColor = type === 'success' ? 'var(--volt)' : 'var(--danger)';
+        const t = document.createElement('div'); t.className = `toast`; t.style.borderColor = type === 'success' ? 'var(--success)' : (type === 'error' ? 'var(--danger)' : 'var(--text-muted)');
         t.innerText = msg; stack.appendChild(t);
         requestAnimationFrame(()=>t.classList.add('show'));
         setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 300); }, 3000);
     }
-    function switchView(view) {
-        document.querySelectorAll('.view-layer').forEach(v => v.classList.remove('active'));
+
+    function setView(v, el) {
+        document.querySelectorAll('.view-layer').forEach(l => l.style.display = 'none');
+        document.getElementById(`view-${v}`).style.display = 'block';
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(`view-${view}`).classList.add('active');
-        document.getElementById(`tab-${view}`).classList.add('active');
+        el.classList.add('active');
     }
-    function handleLogout() { solproSupa.auth.signOut(); window.location.reload(); }
+
+    function closeModals() {
+        document.querySelectorAll('.modal').forEach(m => { m.classList.remove('show'); m.style.display = 'none'; });
+        document.getElementById('p_overlay').style.display = 'none';
+    }
+
+    function toggleSystemLock() {
+        if(!canPlan()) return;
+        isAppLockedForEditing = !isAppLockedForEditing; 
+        let btn = document.getElementById('lockStateBtn');
+        if(isAppLockedForEditing){ btn.className = 'btn readonly'; btn.innerText = 'READ_ONLY'; }
+        else { btn.className = 'btn primary'; btn.innerText = 'PLAN_MODE'; }
+    }
+
+    // ==========================================
+    // TO-DO ACTIONS
+    // ==========================================
+    async function addTodo() {
+        const input = document.getElementById('todoInput');
+        const task = input.value.trim();
+        if(!task) return;
+        const { data, error } = await solproSupa.from('todos').insert([{ task, user_id: currentUser.id, is_completed: false }]).select().single();
+        if(error) return showToast("ERR_TASK", "error");
+        input.value = ""; todos.unshift(data); renderTodos();
+    }
+
+    async function toggleTodo(id, status) {
+        await solproSupa.from('todos').update({ is_completed: !status }).eq('id', id);
+        await loadTodos();
+    }
+
+    async function deleteTodo(id) {
+        await solproSupa.from('todos').delete().eq('id', id);
+        await loadTodos();
+    }
+
+    function renderTodos() {
+        const list = document.getElementById('todoList');
+        list.innerHTML = '';
+        todos.forEach(t => {
+            const div = document.createElement('div');
+            div.className = `todo-item ${t.is_completed ? 'done' : ''}`;
+            div.innerHTML = `<input type="checkbox" ${t.is_completed ? 'checked' : ''} onclick="toggleTodo('${t.id}', ${t.is_completed})">
+                             <span>${t.task}</span><div class="del-todo" onclick="deleteTodo('${t.id}')">DEL</div>`;
+            list.appendChild(div);
+        });
+    }
+
+    function setupGlobalUiHandlers() {
+        document.addEventListener('click', e => {
+            if(!e.target.closest('.menu-wrap')) closeMenus();
+            if(!e.target.closest('#actionGridCtx')) document.getElementById('actionGridCtx').style.display = 'none';
+        });
+    }
+    function closeMenus() { document.querySelectorAll('.dropdown-menu').forEach(m=>m.classList.remove('open')); }
+    function refreshAllData() { refreshAllData(); } // Just a trigger
+    function nuclearSystemReset() { if(confirm("WÜNSCHST DU EINEN TOTAL_RESET?")) { localStorage.clear(); window.location.reload(); } }
+
+    // START APP
+    window.onload = () => { /* nothing here */ };
+    // (HandleLogin is called via onclick on button)
+    
+    // Start logic
+    async function startApp_wrapper() {
+        try {
+            await buildGrid();
+            await refreshAllData();
+            await loadTodos();
+            renderProjectsToTopPalette();
+            setupMouseDragPainting();
+            setupGlobalUiHandlers();
+            if(userRole === 'viewer') {
+                isAppLockedForEditing = true;
+                document.getElementById('lockStateBtn').className = 'btn readonly';
+                document.getElementById('lockStateBtn').innerText = 'READ_ONLY';
+            }
+        } catch(e) { console.error(e); }
+    }
+    
+    // Wrap init call in an async context
+    const startApp = startApp_wrapper;
+
 </script>
 </body>
 </html>
