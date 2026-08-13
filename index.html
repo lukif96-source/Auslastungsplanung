@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOLPRO | Executive Suite V11.0</title>
+    <title>SOLPRO | Allies Studio Edition V11.5</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
 
         :root {
-            --bg-main: #0b0f19;
-            --bg-panel: #111827;
-            --bg-card: #1f2937;
-            --border: rgba(255, 255, 255, 0.08);
-            --border-hover: rgba(255, 255, 255, 0.2);
-            --sol-lime: #a4c639;
-            --sol-lime-glow: rgba(164, 198, 57, 0.25);
-            --cyan: #38bdf8;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --danger: #f43f5e;
-            --danger-bg: rgba(244, 63, 94, 0.15);
-            --success: #10b981;
-            --radius-sm: 6px;
-            --radius-md: 10px;
+            --bg-canvas: #f5f2eb;      /* Allied Warm Studio Cream */
+            --bg-card: #ffffff;
+            --bg-dark: #0a0a0b;        /* Pitch Black */
+            --border-dark: #000000;
+            --border-light: #dcd6cd;
+            --sol-lime: #a4c639;       /* Signature Lime */
+            --volt-bright: #c6ff00;
+            --text-dark: #0a0a0b;
+            --text-muted: #666461;
+            --text-light: #f8fafc;
+            --danger: #e11d48;
+            --danger-bg: rgba(225, 29, 72, 0.1);
+            --success: #059669;
+            --radius-sm: 4px;
+            --radius-md: 8px;
             --font-mono: 'JetBrains Mono', monospace;
             --font-sans: 'Inter', sans-serif;
         }
@@ -32,159 +32,164 @@
         *, *::before, *::after { box-sizing: border-box; }
         
         body {
-            background: var(--bg-main);
-            color: var(--text-main);
+            background: var(--bg-canvas);
+            color: var(--text-dark);
             font-family: var(--font-sans);
             margin: 0; overflow: hidden;
             display: flex; flex-direction: column; height: 100vh;
             user-select: none;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ANMELDUNG (AUTH OVERLAY) */
+        /* ALLIES AUTH GATEWAY */
         .auth-overlay {
-            position: fixed; inset: 0; background: rgba(5, 8, 15, 0.95); z-index: 10000;
-            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(16px);
+            position: fixed; inset: 0; background: rgba(10, 10, 11, 0.96); z-index: 10000;
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px);
         }
         .auth-card {
-            background: var(--bg-panel); border: 1px solid var(--border);
-            padding: 40px; border-radius: 16px; width: 380px; text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+            background: var(--bg-canvas); border: 2px solid var(--border-dark);
+            padding: 44px; border-radius: var(--radius-md); width: 400px; text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
         }
-        .auth-card h2 { font-family: 'Orbitron'; margin: 0 0 8px 0; font-size: 24px; color: #fff; }
+        .auth-card h2 { font-family: 'Orbitron'; margin: 0 0 6px 0; font-size: 26px; color: var(--text-dark); letter-spacing: 1px; }
         .auth-card h2 span { color: var(--sol-lime); }
-        .auth-card p { font-size: 11px; color: var(--text-muted); margin-bottom: 24px; font-weight: 600; }
-        .auth-card label { display: block; text-align: left; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 14px; letter-spacing: 0.5px; }
+        .auth-card p { font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 28px; letter-spacing: 2px; text-transform: uppercase; }
+        .auth-card label { display: block; text-align: left; font-size: 10px; font-weight: 800; color: var(--text-dark); text-transform: uppercase; margin-top: 14px; letter-spacing: 0.5px; }
         .auth-card input { 
-            width: 100%; padding: 12px 14px; margin-top: 6px; background: rgba(0,0,0,0.5); 
-            border: 1px solid var(--border); border-radius: var(--radius-sm); color: #fff; font-size: 13px;
+            width: 100%; padding: 13px 15px; margin-top: 6px; background: #ffffff; 
+            border: 2px solid var(--border-dark); border-radius: var(--radius-sm); color: var(--text-dark); font-size: 13px; font-weight: 600;
         }
-        .auth-card input:focus { outline: none; border-color: var(--sol-lime); box-shadow: 0 0 10px var(--sol-lime-glow); }
+        .auth-card input:focus { outline: none; border-color: var(--sol-lime); box-shadow: 0 0 0 3px rgba(164, 198, 57, 0.3); }
         .auth-card button { 
-            width: 100%; padding: 14px; margin-top: 24px; background: var(--sol-lime); border: none; 
-            font-weight: 800; cursor: pointer; border-radius: var(--radius-sm); color: #000; font-size: 12px;
-            text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
+            width: 100%; padding: 15px; margin-top: 24px; background: var(--bg-dark); border: 2px solid var(--bg-dark); 
+            font-weight: 800; cursor: pointer; border-radius: var(--radius-sm); color: #ffffff; font-size: 12px;
+            text-transform: uppercase; letter-spacing: 1.5px; transition: 0.2s;
         }
-        .auth-card button:hover { background: #bada33; }
+        .auth-card button:hover { background: var(--sol-lime); color: #000; border-color: var(--border-dark); }
 
-        /* KOPFZEILE (HUD) */
-        .accent-line { height: 3px; background: linear-gradient(90deg, var(--sol-lime), var(--cyan), transparent); flex-shrink: 0; }
+        /* HUD TOP NAVBAR */
+        .accent-line { height: 4px; background: linear-gradient(90deg, var(--sol-lime), var(--bg-dark)); flex-shrink: 0; }
         .hud { 
-            height: 72px; background: var(--bg-panel); border-bottom: 1px solid var(--border); 
-            display: flex; align-items: center; padding: 0 20px; gap: 16px; z-index: 3000; flex-shrink: 0; 
+            height: 74px; background: var(--bg-canvas); border-bottom: 2px solid var(--border-dark); 
+            display: flex; align-items: center; padding: 0 24px; gap: 18px; z-index: 3000; flex-shrink: 0; 
         }
-        .logo { font-family: 'Orbitron'; font-size: 20px; font-weight: 900; color: #fff; }
+        .brand { display: flex; align-items: baseline; gap: 10px; }
+        .logo { font-family: 'Orbitron'; font-size: 22px; font-weight: 900; color: var(--text-dark); letter-spacing: 0.5px; }
         .logo span { color: var(--sol-lime); }
+        .studio-tag { background: var(--bg-dark); color: #ffffff; font-size: 9px; font-weight: 800; padding: 3px 7px; border-radius: 2px; font-family: var(--font-mono); letter-spacing: 1px; }
 
-        .kpi-board { display: flex; gap: 8px; border-left: 1px solid var(--border); padding-left: 16px; }
-        .kpi-card { background: var(--bg-card); padding: 6px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); min-width: 110px; }
-        .kpi-lbl { font-size: 8px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .kpi-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: #fff; margin-top: 2px; }
-        .kpi-val small { font-size: 10px; color: var(--text-muted); font-weight: 400; }
+        .kpi-board { display: flex; gap: 8px; border-left: 2px solid var(--border-dark); padding-left: 18px; }
+        .kpi-card { background: var(--bg-dark); padding: 8px 16px; border-radius: var(--radius-sm); min-width: 110px; color: #ffffff; }
+        .kpi-lbl { font-size: 8px; font-weight: 800; color: #a19d97; text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-val { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--volt-bright); margin-top: 2px; display: block; }
+        .kpi-val small { font-size: 10px; color: #a19d97; font-weight: 500; }
 
-        .palette-container { display: flex; align-items: center; flex-grow: 1; overflow-x: auto; gap: 6px; padding: 0 10px; }
+        .palette-container { display: flex; align-items: center; flex-grow: 1; overflow-x: auto; gap: 8px; padding: 0 10px; }
         .palette-item { 
-            padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; 
-            border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: #fff; 
+            padding: 7px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; cursor: pointer; 
+            border: 2px solid var(--border-dark); background: var(--bg-card); color: var(--text-dark); 
             display: flex; align-items: center; gap: 8px; white-space: nowrap; transition: 0.15s;
+            box-shadow: 2px 2px 0px var(--border-dark);
         }
-        .palette-item:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.06); }
-        .palette-item.active { border-color: var(--sol-lime); box-shadow: 0 0 12px var(--sol-lime-glow); background: var(--bg-card); }
-        .palette-color-dot { width: 8px; height: 8px; border-radius: 50%; }
-        .btn-add { width: 30px; height: 30px; border-radius: 50%; background: var(--sol-lime); border: none; font-size: 18px; font-weight: 900; cursor: pointer; color: #000; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .palette-item:hover { transform: translateY(-2px); box-shadow: 3px 3px 0px var(--border-dark); }
+        .palette-item.active { border-color: var(--border-dark); outline: 2px solid var(--sol-lime); transform: translateY(-2px); }
+        .palette-color-dot { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
+        .btn-add { width: 32px; height: 32px; border-radius: 50%; background: var(--sol-lime); border: 2px solid var(--border-dark); font-size: 20px; font-weight: 900; cursor: pointer; color: #000; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 2px 2px 0px var(--border-dark); }
+        .btn-add:hover { transform: scale(1.1); }
 
-        .controls { display: flex; gap: 6px; align-items: center; }
+        .controls { display: flex; gap: 8px; align-items: center; }
         .btn { 
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 8px 12px; 
-            font-size: 10px; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); color: #fff; 
-            text-transform: uppercase; transition: 0.2s; font-family: var(--font-mono);
+            background: var(--bg-card); border: 2px solid var(--border-dark); padding: 8px 14px; 
+            font-size: 11px; font-weight: 800; cursor: pointer; border-radius: var(--radius-sm); color: var(--text-dark); 
+            text-transform: uppercase; transition: 0.15s; font-family: var(--font-mono); box-shadow: 2px 2px 0px var(--border-dark);
         }
-        .btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
-        .btn.active { background: var(--sol-lime); color: #000; border-color: var(--sol-lime); }
-        .btn.mode-switch { background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
-        .btn.readonly { background: var(--danger-bg); color: var(--danger); border-color: rgba(244, 63, 94, 0.3); }
-        .btn.danger { color: var(--danger); border-color: rgba(244, 63, 94, 0.3); }
+        .btn:hover { background: var(--bg-dark); color: #ffffff; }
+        .btn.active { background: var(--sol-lime); color: #000; }
+        .btn.mode-switch { background: #d1fae5; color: var(--success); border-color: var(--border-dark); }
+        .btn.readonly { background: #ffe4e6; color: var(--danger); border-color: var(--border-dark); }
+        .btn.danger { color: var(--danger); }
 
-        /* TAB REITER (PLANUNG / AUFGABEN) */
-        .nav-tabs { display: flex; background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 0 20px; }
-        .nav-tab { padding: 12px 20px; font-size: 11px; font-weight: 800; cursor: pointer; color: var(--text-muted); text-transform: uppercase; transition: 0.2s; letter-spacing: 0.5px; }
-        .nav-tab:hover { color: #fff; }
-        .nav-tab.active { color: var(--sol-lime); border-bottom: 2px solid var(--sol-lime); background: rgba(164, 198, 57, 0.05); }
+        /* ALLIES TABS */
+        .nav-tabs { display: flex; background: var(--bg-canvas); border-bottom: 2px solid var(--border-dark); padding: 0 24px; gap: 4px; }
+        .nav-tab { padding: 12px 24px; font-size: 11px; font-weight: 900; cursor: pointer; color: var(--text-muted); text-transform: uppercase; transition: 0.2s; letter-spacing: 1px; font-family: var(--font-mono); }
+        .nav-tab:hover { color: var(--text-dark); }
+        .nav-tab.active { color: var(--text-dark); background: var(--bg-card); border: 2px solid var(--border-dark); border-bottom: none; border-radius: 6px 6px 0 0; margin-bottom: -2px; }
 
-        /* HAUPTBEREICH */
+        /* MAIN CONTENT AREA */
         .main-wrapper { flex: 1; display: flex; overflow: hidden; position: relative; }
-        .view-layer { position: absolute; inset: 0; display: none; overflow: auto; padding: 16px; }
+        .view-layer { position: absolute; inset: 0; display: none; overflow: auto; padding: 20px; }
         .view-layer.active { display: block; }
 
-        /* GRID TABELLE */
-        table { border-collapse: separate; border-spacing: 0; width: max-content; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
-        th, td { border: 1px solid var(--border); text-align: center; }
-        #gridHead th { position: sticky; top: 0; background: #0f172a; font-size: 10px; font-weight: 800; color: var(--text-muted); z-index: 100; text-transform: uppercase; padding: 6px; }
-        #gridHead tr:nth-child(1) th { height: 28px; background: #060911; color: var(--sol-lime); }
-        td:first-child { position: sticky; left: 0; z-index: 80; background: #1e293b; width: 160px !important; text-align: left; padding-left: 14px; font-weight: 800; border-right: 2px solid var(--cyan); color: #fff; font-size: 12px; }
+        /* STUDIO GRID TABLE */
+        table { border-collapse: separate; border-spacing: 0; width: max-content; background: var(--bg-card); border: 2px solid var(--border-dark); border-radius: var(--radius-md); overflow: hidden; box-shadow: 4px 4px 0px rgba(0,0,0,0.15); }
+        th, td { border: 1px solid var(--border-light); text-align: center; }
+        #gridHead th { position: sticky; top: 0; background: #e8e2d8; font-size: 10px; font-weight: 800; color: var(--text-dark); z-index: 100; text-transform: uppercase; padding: 6px; border-bottom: 2px solid var(--border-dark); }
+        #gridHead tr:nth-child(1) th { height: 32px; background: var(--bg-dark); color: var(--sol-lime); font-size: 11px; letter-spacing: 1px; font-family: 'Orbitron'; }
+        td:first-child { position: sticky; left: 0; z-index: 80; background: var(--bg-dark); width: 160px !important; text-align: left; padding-left: 14px; font-weight: 800; border-right: 3px solid var(--sol-lime); color: #ffffff; font-size: 12px; font-family: var(--font-mono); }
         
-        .project-cell { height: 48px; cursor: crosshair; font-size: 10px; font-weight: 800; text-transform: uppercase; transition: 0.1s; color: #fff; }
-        .project-cell:hover { filter: brightness(1.25); outline: 1px solid #fff; }
-        .monday-start { border-left: 2px solid var(--cyan) !important; }
-        .day-num { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: #fff; }
-        .day-short { font-size: 8px; color: var(--text-muted); font-weight: 600; }
+        .project-cell { height: 48px; cursor: crosshair; font-size: 11px; font-weight: 900; text-transform: uppercase; transition: filter 0.1s; letter-spacing: 0.3px; padding: 4px; }
+        .project-cell:hover { filter: brightness(1.15); outline: 2px solid var(--border-dark); z-index: 10; }
+        .monday-start { border-left: 3px solid var(--border-dark) !important; }
+        .day-num { font-family: var(--font-mono); font-size: 15px; font-weight: 800; color: var(--text-dark); }
+        .day-short { font-size: 8px; color: var(--text-muted); font-weight: 800; }
 
-        /* FLOTTEN-STEUERUNG IN DER GRID */
+        /* BUS TOGGLES */
         .bus-ctrl { display: flex; align-items: center; justify-content: space-between; padding-right: 8px; }
-        .toggle-btn { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border); background: rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .toggle-btn.active { background: var(--success); border-color: var(--success); color: #000; }
-        .toggle-btn.active::after { content: '✓'; font-size: 11px; font-weight: 900; }
-        .toggle-btn.inactive { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
-        .toggle-btn.inactive::after { content: '✕'; font-size: 11px; font-weight: 900; }
+        .toggle-btn { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ffffff; background: rgba(255,255,255,0.1); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .toggle-btn.active { background: var(--sol-lime); border-color: var(--sol-lime); color: #000; }
+        .toggle-btn.active::after { content: '✓'; font-size: 12px; font-weight: 900; }
+        .toggle-btn.inactive { background: var(--danger); border-color: var(--danger); color: #fff; }
+        .toggle-btn.inactive::after { content: '✕'; font-size: 12px; font-weight: 900; }
 
-        .stat-row td { background: #060911 !important; color: var(--text-main); font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
+        .stat-row td { background: var(--bg-dark) !important; color: #ffffff; font-family: var(--font-mono); font-size: 11px; font-weight: 800; border-top: 2px solid var(--border-dark); }
         .stat-row td:first-child { color: var(--sol-lime) !important; }
 
-        /* AUFGABEN CENTER */
-        .task-wrapper { max-width: 750px; margin: 20px auto; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-        .task-header h2 { font-family: 'Orbitron'; font-size: 18px; color: #fff; margin: 0; }
-        .todo-input-group { display: flex; gap: 8px; margin-bottom: 24px; }
+        /* ALLIES TASKS CENTER */
+        .task-wrapper { max-width: 750px; margin: 20px auto; background: var(--bg-card); border: 2px solid var(--border-dark); border-radius: var(--radius-md); padding: 32px; box-shadow: 6px 6px 0px var(--border-dark); }
+        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 2px solid var(--border-dark); padding-bottom: 14px; }
+        .task-header h2 { font-family: 'Orbitron'; font-size: 20px; color: var(--text-dark); margin: 0; letter-spacing: 1px; }
+        .todo-input-group { display: flex; gap: 10px; margin-bottom: 24px; }
         .todo-input-group input { 
-            flex: 1; padding: 12px 16px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); 
-            border-radius: var(--radius-sm); color: #fff; font-size: 13px; font-family: var(--font-sans);
+            flex: 1; padding: 14px 16px; background: #ffffff; border: 2px solid var(--border-dark); 
+            border-radius: var(--radius-sm); color: var(--text-dark); font-size: 13px; font-weight: 600; font-family: var(--font-sans);
         }
         .todo-input-group input:focus { outline: none; border-color: var(--sol-lime); }
-        .todo-input-group button { background: var(--sol-lime); border: none; padding: 0 20px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 800; color: #000; font-size: 12px; }
+        .todo-input-group button { background: var(--bg-dark); border: 2px solid var(--bg-dark); padding: 0 24px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 800; color: #ffffff; font-size: 12px; text-transform: uppercase; font-family: var(--font-mono); }
+        .todo-input-group button:hover { background: var(--sol-lime); color: #000; border-color: var(--border-dark); }
         
         .todo-item { 
-            display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255,255,255,0.02); 
-            border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; transition: 0.2s; border-left: 3px solid var(--sol-lime);
+            display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: var(--bg-canvas); 
+            border: 2px solid var(--border-dark); border-radius: var(--radius-sm); margin-bottom: 10px; transition: 0.2s; border-left: 6px solid var(--sol-lime);
         }
-        .todo-item:hover { background: rgba(255,255,255,0.06); }
-        .todo-item.done { opacity: 0.4; border-left-color: var(--text-muted); }
+        .todo-item:hover { transform: translateX(3px); }
+        .todo-item.done { opacity: 0.5; border-left-color: var(--text-muted); }
         .todo-item.done span { text-decoration: line-through; }
-        .todo-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--sol-lime); }
-        .todo-item span { flex: 1; font-size: 13px; color: var(--text-main); font-weight: 500; }
-        .todo-item .del-todo { color: var(--danger); cursor: pointer; font-weight: 800; font-size: 14px; opacity: 0.6; }
-        .todo-item .del-todo:hover { opacity: 1; }
+        .todo-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--sol-lime); }
+        .todo-item span { flex: 1; font-size: 13px; color: var(--text-dark); font-weight: 700; }
+        .todo-item .del-todo { color: var(--danger); cursor: pointer; font-weight: 900; font-size: 16px; }
 
-        /* MODALE & OVERLAYS */
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 5000; display: none; }
+        /* MODALS & OVERLAYS */
+        .overlay { position: fixed; inset: 0; background: rgba(10, 10, 11, 0.85); backdrop-filter: blur(6px); z-index: 5000; display: none; }
         .modal { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); opacity: 0; 
-            background: var(--bg-panel); border: 1px solid var(--border); padding: 30px; border-radius: var(--radius-md); 
-            display: none; z-index: 5001; width: 400px; box-shadow: 0 25px 60px rgba(0,0,0,0.8); transition: 0.2s; 
+            background: var(--bg-canvas); border: 2px solid var(--border-dark); padding: 32px; border-radius: var(--radius-md); 
+            display: none; z-index: 5001; width: 400px; box-shadow: 10px 10px 0px var(--border-dark); transition: 0.2s; 
         }
         .modal.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        .modal h2 { margin-top: 0; font-family: 'Orbitron'; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; color: #fff; }
-        .modal label { display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-top: 14px; }
-        .modal input, .modal select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-top: 5px; color: #fff; font-family: var(--font-sans); }
-        .m-btns { display: flex; gap: 10px; margin-top: 24px; }
-        .m-btn { flex: 1; padding: 12px; border: none; font-weight: 800; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; text-transform: uppercase; }
+        .modal h2 { margin-top: 0; font-family: 'Orbitron'; font-size: 18px; border-bottom: 2px solid var(--border-dark); padding-bottom: 12px; color: var(--text-dark); }
+        .modal label { display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-top: 16px; letter-spacing: 0.5px; }
+        .modal input, .modal select { width: 100%; padding: 12px; background: #ffffff; border: 2px solid var(--border-dark); border-radius: var(--radius-sm); margin-top: 6px; color: var(--text-dark); font-family: var(--font-sans); font-weight: 600; }
+        .m-btns { display: flex; gap: 10px; margin-top: 28px; }
+        .m-btn { flex: 1; padding: 14px; border: 2px solid var(--border-dark); font-weight: 800; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; text-transform: uppercase; font-family: var(--font-mono); }
         .m-save { background: var(--sol-lime); color: #000; }
-        .m-cancel { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+        .m-cancel { background: var(--bg-card); color: var(--text-dark); }
 
-        .user-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
-        .user-row span { font-size: 12px; font-weight: 600; color: #fff; }
-        .user-row select { padding: 6px; background: #000; color: #fff; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; }
+        .user-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+        .user-row span { font-size: 12px; font-weight: 700; color: var(--text-dark); }
+        .user-row select { padding: 6px; background: #ffffff; color: var(--text-dark); border: 2px solid var(--border-dark); border-radius: 4px; font-size: 11px; font-weight: 700; }
 
         .toast-stack { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-        .toast { background: var(--bg-card); color: #fff; border: 1px solid var(--border); padding: 12px 18px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: 0.3s; }
+        .toast { background: var(--bg-dark); color: #ffffff; border: 2px solid var(--border-dark); padding: 12px 20px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; opacity: 0; transform: translateY(10px); transition: 0.3s; font-family: var(--font-mono); box-shadow: 4px 4px 0px var(--sol-lime); }
         .toast.show { opacity: 1; transform: translateY(0); }
     </style>
 </head>
@@ -194,22 +199,23 @@
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
         <h2>SOL<span>PRO</span></h2>
-        <p>EXECUTIVE MANAGEMENT SUITE</p>
+        <p>ALLIES STUDIO EXECUTIVE</p>
         <label>E-Mail Adresse</label>
-        <input type="email" id="loginEmail" placeholder="name@solpro.at">
+        <input type="email" id="loginEmail" placeholder="operator@solpro.at">
         <label>Passwort</label>
         <input type="password" id="loginPass" placeholder="••••••••">
         <button id="loginBtn" onclick="handleLogin()">Sitzung Starten</button>
-        <div id="authStatus" style="margin-top:16px; font-size:12px; font-weight:600; min-height:18px;"></div>
+        <div id="authStatus" style="margin-top:16px; font-size:12px; font-weight:700;"></div>
     </div>
 </div>
 
 <div class="accent-line"></div>
 
-<!-- KOPFZEILE (HUD) -->
+<!-- HUD HEADER -->
 <div class="hud">
-    <div class="brand-container">
+    <div class="brand">
         <div class="logo">SOL<span>PRO</span></div>
+        <div class="studio-tag">V11.5 // ALLIES</div>
     </div>
     
     <div class="kpi-board">
@@ -246,10 +252,10 @@
         <div class="task-wrapper">
             <div class="task-header">
                 <h2>Aufgaben & To-Dos</h2>
-                <span id="taskCount" style="font-family:var(--font-mono); font-size:12px; color:var(--sol-lime); font-weight:700;">0 Aktiv</span>
+                <span id="taskCount" style="font-family:var(--font-mono); font-size:13px; color:var(--text-dark); font-weight:800; background:var(--sol-lime); padding:4px 10px; border-radius:4px; border:2px solid var(--border-dark);">0 Aktiv</span>
             </div>
             <div class="todo-input-group">
-                <input type="text" id="todoInput" placeholder="Neue Aufgabe eintragen...">
+                <input type="text" id="todoInput" placeholder="Neue Aufgabe eingeben...">
                 <button onclick="addTodo()">HINZUFÜGEN</button>
             </div>
             <div id="todoList"></div>
@@ -257,26 +263,26 @@
     </div>
 </div>
 
-<div id="actionGridCtx" style="display:none; position:fixed; z-index:9000; background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px; width:200px; box-shadow:0 10px 30px rgba(0,0,0,0.8);"></div>
+<div id="actionGridCtx" style="display:none; position:fixed; z-index:9000; background:var(--bg-dark); color:#fff; border:2px solid var(--border-dark); border-radius:var(--radius-sm); padding:8px; width:220px; box-shadow:6px 6px 0px rgba(0,0,0,0.5);"></div>
 <div class="overlay" id="p_overlay" onclick="closeModals()"></div>
 
 <!-- MODALS -->
 <div class="modal" id="paletteModal">
-    <h2 id="pModalTitle">Projekt Einstellungen</h2>
+    <h2 id="pModalTitle">Projekt Konfiguration</h2>
     <label>Projekt Name</label><input type="text" id="palNameInput">
     <label>Leistung (kWp)</label><input type="number" id="palKwpInput">
-    <label>Farbe</label><input type="color" id="palColorInput" style="height:44px;">
+    <label>Farbe</label><input type="color" id="palColorInput" style="height:44px; padding:2px;">
     <input type="hidden" id="palEditId">
     <div class="m-btns">
         <button class="m-btn m-save" onclick="savePaletteItem()">Speichern</button>
         <button class="m-btn m-cancel" onclick="closeModals()">Abbrechen</button>
     </div>
-    <button class="m-btn" id="palDelBtn" onclick="deletePaletteItem()" style="display:none; width:100%; margin-top:12px; background:var(--danger-bg); color:var(--danger); border:1px solid var(--danger);">Projekt Löschen</button>
+    <button class="m-btn" id="palDelBtn" onclick="deletePaletteItem()" style="display:none; width:100%; margin-top:12px; background:var(--danger-bg); color:var(--danger); border:2px solid var(--danger);">Projekt Löschen</button>
 </div>
 
 <div class="modal" id="userModal">
     <h2>Nutzerverwaltung (Admin)</h2>
-    <div id="userList" style="max-height:280px; overflow-y:auto; margin-top:12px;"></div>
+    <div id="userList" style="max-height:280px; overflow-y:auto; margin-top:10px;"></div>
     <div class="m-btns">
         <button class="m-btn m-cancel" onclick="closeModals()">Schließen</button>
     </div>
@@ -286,7 +292,7 @@
 
 <script>
     /* ==========================================
-       SUPABASE SCHLÜSSEL & INITIALISIERUNG
+       SUPABASE CONFIGURATION
        ========================================== */
     const SUPABASE_URL = "https://iuxklqcpexoziqxrohwa.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VteOTQ6g28z9Dvo-QUG8jw_hehaZpWu";
@@ -299,6 +305,20 @@
     let contextCtxMenuPID = null, selectedCellDomID = null;
     const baseFlottenListe = ["SOL 2", "SOL 3", "SOL 4", "SOL 12", "SOL 16"];
     const managementFarben = ["#1e3a8a","#0284c7","#059669","#ca8a04","#b91c1c","#6d28d9","#0f766e","#a21caf","#4f46e5","#b45309","#4338ca","#064e3b"];
+
+    // ==========================================
+    // DYNAMISCHE TEXTFARBEN-BERECHNUNG (LUMINANZ)
+    // ==========================================
+    function getLesbareTextfarbe(hexColor) {
+        if(!hexColor) return '#ffffff';
+        let h = hexColor.replace('#', '');
+        if (h.length === 3) h = h.split('').map(c => c + c).join('');
+        const r = parseInt(h.substr(0,2),16);
+        const g = parseInt(h.substr(2,2),16);
+        const b = parseInt(h.substr(4,2),16);
+        const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return (yiq >= 135) ? '#000000' : '#ffffff';
+    }
 
     // ==========================================
     // ANMELDUNG & ROLLEN (ROBUST)
@@ -315,8 +335,7 @@
             return;
         }
 
-        btn.innerText = "Prüfe Daten..."; 
-        btn.disabled = true;
+        btn.innerText = "Prüfe Daten..."; btn.disabled = true;
 
         try {
             const { data, error } = await solproSupa.auth.signInWithPassword({ email, password });
@@ -327,22 +346,19 @@
             document.getElementById('authOverlay').style.display = 'none';
             startApp();
         } catch (e) {
-            status.innerText = "❌ Anmeldung fehlgeschlagen: " + e.message;
+            status.innerText = "❌ Fehler: " + e.message;
             status.style.color = "var(--danger)";
         } finally {
-            btn.innerText = "Sitzung Starten"; 
-            btn.disabled = false;
+            btn.innerText = "Sitzung Starten"; btn.disabled = false;
         }
     }
 
     async function fetchUserRole() {
         try {
-            // Nutzt maybeSingle um Abstürze zu verhindern
             const { data } = await solproSupa.from('profiles').select('role').eq('id', currentUser.id).maybeSingle();
             if (data && data.role) {
                 userRole = data.role.toLowerCase();
             } else {
-                // Erstellt neues Profil als Viewer
                 await solproSupa.from('profiles').upsert([{ id: currentUser.id, email: currentUser.email, role: 'viewer' }]);
                 userRole = 'viewer';
             }
@@ -355,14 +371,8 @@
         }
     }
 
-    function handleLogout() { 
-        solproSupa.auth.signOut(); 
-        window.location.reload(); 
-    }
+    function handleLogout() { solproSupa.auth.signOut(); window.location.reload(); }
 
-    // ==========================================
-    // RECHTE-SYSTEM
-    // ==========================================
     const canPlan = () => (userRole === 'admin' || userRole === 'editor');
     const canDelete = () => (userRole === 'admin');
 
@@ -404,7 +414,7 @@
     }
 
     // ==========================================
-    // GRID AUFBAUEN (KALENDER)
+    // GRID KALENDER AUFBAUEN
     // ==========================================
     function buildGrid() {
         const thead = document.getElementById('gridHead'); 
@@ -464,7 +474,6 @@
         
         await solproSupa.from('fleet_status').upsert({ bus_id: sid, is_offline: isNowOffline });
         
-        // Button UI anpassen
         const row = document.getElementById('row_' + sid);
         const btn = row.querySelector('.toggle-btn');
         if(isNowOffline) {
@@ -479,14 +488,14 @@
     }
 
     // ==========================================
-    // MALER-LOGIK (DRAG & PAINT)
+    // DRAG & PAINT LOGIK
     // ==========================================
     function setupMouseDragPainting() {
         document.addEventListener('mousedown', e => {
             if (e.target.classList.contains('project-cell') && e.button === 0) {
                 if(isAppLockedForEditing || !canPlan()) return;
                 isDrawing = true; selectedCells = [e.target.id]; 
-                e.target.style.outline = "2px solid var(--sol-lime)";
+                e.target.style.outline = "2px solid var(--border-dark)";
             }
             if (e.target.classList.contains('project-cell') && e.button === 2) {
                 if(isAppLockedForEditing || !canPlan()) return; 
@@ -501,7 +510,7 @@
         document.addEventListener('mouseover', e => { 
             if(isDrawing && e.target.classList.contains('project-cell') && !selectedCells.includes(e.target.id)) { 
                 selectedCells.push(e.target.id); 
-                e.target.style.outline = "2px solid var(--sol-lime)";
+                e.target.style.outline = "2px solid var(--border-dark)";
             } 
         });
 
@@ -534,7 +543,7 @@
     }
 
     // ==========================================
-    // PROJEKT-PALETTE & MODALE
+    // PROJEKT-PALETTE
     // ==========================================
     function renderProjectsToTopPalette() {
         let container = document.getElementById('paletteUI');
@@ -543,9 +552,12 @@
         
         projects.forEach(p => {
             let counts = Object.keys(plannerGrid).filter(k => plannerGrid[k] === p.id).length;
+            let txtColor = getLesbareTextfarbe(p.color);
             let el = document.createElement('div');
             el.className = `palette-item ${activeProjectId === p.id ? 'active' : ''}`;
-            el.innerHTML = `<div class="palette-color-dot" style="background:${p.color};"></div><b>${p.name}</b> <span style="opacity:0.6;">${counts}T</span>`;
+            el.style.backgroundColor = p.color;
+            el.style.color = txtColor;
+            el.innerHTML = `<b>${p.name}</b> <span style="opacity:0.75;">${counts}T</span>`;
             el.onclick = () => { activeProjectId = p.id; renderProjectsToTopPalette(); };
             el.oncontextmenu = (e) => { 
                 e.preventDefault(); e.stopPropagation(); 
@@ -561,9 +573,9 @@
             container.appendChild(el);
         });
 
-        [{ id: 'ERASER', label: '🧼 Radierer', c: '#ffffff' }, { id: 'SYS_VACATION', label: '🌴 Ausfall', c: '#a4c639' }].forEach(t => {
+        [{ id: 'ERASER', label: '🧼 Radierer' }, { id: 'SYS_VACATION', label: '🌴 Ausfall' }].forEach(t => {
             let el = document.createElement('div'); 
-            el.className = `palette-item ${(activeProjectId === t.id ? 'active' : '')}`; 
+            el.className = `palette-item sys-tool ${(activeProjectId === t.id ? 'active' : '')}`; 
             el.innerHTML = `<b>${t.label}</b>`;
             el.onclick = () => { activeProjectId = t.id; renderProjectsToTopPalette(); };
             container.appendChild(el);
@@ -576,8 +588,12 @@
         document.getElementById('palEditId').value = ""; 
         document.getElementById('palNameInput').value = ""; 
         document.getElementById('palKwpInput').value = ""; 
-        // Automatische Zufallsfarbe wählen
-        document.getElementById('palColorInput').value = managementFarben[Math.floor(Math.random()*managementFarben.length)]; 
+        
+        // Smarte automatische Farbauswahl: Wählt nächste freie Profi-Farbe
+        const usedColors = projects.map(p => p.color);
+        const freeColor = managementFarben.find(c => !usedColors.includes(c)) || managementFarben[Math.floor(Math.random()*managementFarben.length)];
+        document.getElementById('palColorInput').value = freeColor; 
+        
         document.getElementById('palDelBtn').style.display = 'none';
         openPaletteModal();
     }
@@ -608,7 +624,7 @@
     }
 
     // ==========================================
-    // CONTEXT MENÜ (RECHTSKLICK AUF GRID)
+    // RECHTSKLICK-MENÜ
     // ==========================================
     function bautHtmlFurDasActionContextMenu() {
         let ActionPanel = document.getElementById('actionGridCtx');
@@ -701,7 +717,7 @@
             div.innerHTML = `<input type="checkbox" ${t.is_completed ? 'checked' : ''} onclick="toggleTodo('${t.id}', ${t.is_completed})"><span>${t.task}</span><div class="del-todo" onclick="deleteTodo('${t.id}')">✕</div>`;
             list.appendChild(div);
         });
-        document.getElementById('taskCount').innerText = `${todos.filter(t=>!t.is_completed).length} Offen`;
+        document.getElementById('taskCount').innerText = `${todos.filter(t=>!t.is_completed).length} Aktiv`;
     }
 
     // ==========================================
@@ -733,15 +749,24 @@
     }
 
     // ==========================================
-    // NÜTZLICHE HILFSFUNKTIONEN
+    // HILFSFUNKTIONEN & REPAINT
     // ==========================================
     function fullGridRepaintUI_Logic() {
         document.querySelectorAll('.project-cell').forEach(c => { c.style.backgroundColor="transparent"; c.innerText=""; });
         Object.keys(plannerGrid).forEach(k => {
             let p = projects.find(x=>x.id===plannerGrid[k]); let cell = document.getElementById(k);
             if(!cell) return;
-            if(plannerGrid[k] === "SYS_VACATION") { cell.style.background="repeating-linear-gradient(45deg, rgba(255,255,255,0.05), rgba(255,255,255,0.05) 8px, transparent 8px, transparent 16px)"; cell.innerText="AUSFALL"; cell.style.color="var(--text-muted)"; return; }
-            if(p) { cell.style.backgroundColor=p.color; cell.innerText=p.name; cell.style.color="#000"; }
+            if(plannerGrid[k] === "SYS_VACATION") { 
+                cell.style.background="repeating-linear-gradient(45deg, rgba(255,255,255,0.06), rgba(255,255,255,0.06) 8px, transparent 8px, transparent 16px)"; 
+                cell.innerText="AUSFALL"; 
+                cell.style.color="var(--text-muted)"; 
+                return; 
+            }
+            if(p) { 
+                cell.style.backgroundColor = p.color; 
+                cell.style.color = getLesbareTextfarbe(p.color); 
+                cell.innerText = p.name; 
+            }
         });
         evalDashboardMathemations();
     }
