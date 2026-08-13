@@ -2,275 +2,372 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-device, initial-scale=1.0">
-    <title>SOLPRO | TERMINAL V10.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOLPRO | Executive Suite V11.0</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis. constantly/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 
         :root {
-            --bg-black: #000000;
-            --bg-panel: #0a0a0a;
-            --panel-border: #1a1a1a;
-            --accent-lime: #D4FF00; /* Aggressives Fintech Neon */
-            --text-main: #ffffff;
-            --text-dim: #666666;
-            --danger: #ff3366;
-            --success: #00ff41;
+            --bg-main: #0b0f19;
+            --bg-panel: #111827;
+            --bg-card: #1f2937;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.2);
+            --sol-lime: #a4c639;
+            --sol-lime-glow: rgba(164, 198, 57, 0.25);
+            --cyan: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #f43f5e;
+            --danger-bg: rgba(244, 63, 94, 0.15);
+            --success: #10b981;
+            --radius-sm: 6px;
+            --radius-md: 10px;
             --font-mono: 'JetBrains Mono', monospace;
-            --rad: 0px; /* Brutalist: Zero rounding */
+            --font-sans: 'Inter', sans-serif;
         }
 
-        * { box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; }
+        
         body {
-            background: var(--bg-black); color: var(--text-main);
-            font-family: 'Inter', sans-serif; margin: 0;
-            overflow: hidden; display: flex; flex-direction: column; height: 100vh;
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            margin: 0; overflow: hidden;
+            display: flex; flex-direction: column; height: 100vh;
+            user-select: none;
         }
 
-        /* --- AUTH OVERLAY --- */
-        #authOverlay {
-            position: fixed; inset: 0; background: #000; z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
+        /* ANMELDUNG (AUTH OVERLAY) */
+        .auth-overlay {
+            position: fixed; inset: 0; background: rgba(5, 8, 15, 0.95); z-index: 10000;
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(16px);
         }
         .auth-card {
-            background: #000; border: 1px solid var(--accent-lime);
-            padding: 40px; width: 360px; text-align: center;
+            background: var(--bg-panel); border: 1px solid var(--border);
+            padding: 40px; border-radius: 16px; width: 380px; text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
         }
-        .auth-card h2 { font-family: 'Orbitron'; margin: 0 0 20px 0; letter-spacing: 2px; }
-        .auth-card label { display: block; text-align: left; font-size: 10px; color: var(--accent-lime); margin-top: 15px; font-family: var(--font-mono); }
+        .auth-card h2 { font-family: 'Orbitron'; margin: 0 0 8px 0; font-size: 24px; color: #fff; }
+        .auth-card h2 span { color: var(--sol-lime); }
+        .auth-card p { font-size: 11px; color: var(--text-muted); margin-bottom: 24px; font-weight: 600; }
+        .auth-card label { display: block; text-align: left; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 14px; letter-spacing: 0.5px; }
         .auth-card input { 
-            width: 100%; padding: 12px; margin-top: 5px; background: #111; 
-            border: 1px solid var(--panel-border); color: #fff; font-family: var(--font-mono);
+            width: 100%; padding: 12px 14px; margin-top: 6px; background: rgba(0,0,0,0.5); 
+            border: 1px solid var(--border); border-radius: var(--radius-sm); color: #fff; font-size: 13px;
         }
+        .auth-card input:focus { outline: none; border-color: var(--sol-lime); box-shadow: 0 0 10px var(--sol-lime-glow); }
         .auth-card button { 
-            width: 100%; padding: 14px; margin-top: 25px; background: var(--accent-lime); 
-            border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-family: var(--font-mono);
+            width: 100%; padding: 14px; margin-top: 24px; background: var(--sol-lime); border: none; 
+            font-weight: 800; cursor: pointer; border-radius: var(--radius-sm); color: #000; font-size: 12px;
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
         }
+        .auth-card button:hover { background: #bada33; }
 
-        /* --- HUD & NAVIGATION --- */
+        /* KOPFZEILE (HUD) */
+        .accent-line { height: 3px; background: linear-gradient(90deg, var(--sol-lime), var(--cyan), transparent); flex-shrink: 0; }
         .hud { 
-            height: 70px; background: #000; border-bottom: 1px solid var(--panel-border);
-            display: flex; align-items: center; padding: 0 20px; gap: 25px; flex-shrink: 0;
+            height: 72px; background: var(--bg-panel); border-bottom: 1px solid var(--border); 
+            display: flex; align-items: center; padding: 0 20px; gap: 16px; z-index: 3000; flex-shrink: 0; 
         }
-        .logo { font-family: 'Orbitron'; font-size: 22px; font-weight: 900; letter-spacing: -1px; }
-        .logo span { color: var(--accent-lime); }
+        .logo { font-family: 'Orbitron'; font-size: 20px; font-weight: 900; color: #fff; }
+        .logo span { color: var(--sol-lime); }
 
-        .kpi-board { display: flex; gap: 0; border: 1px solid var(--panel-border); }
-        .kpi-card { padding: 6px 15px; min-width: 110px; background: #000; border-right: 1px solid var(--panel-border); }
-        .kpi-card:last-child { border-right: none; }
-        .kpi-lbl { font-size: 9px; color: var(--text-dim); text-transform: uppercase; display: block; }
-        .kpi-val { font-family: var(--font-mono); font-size: 16px; color: #fff; font-weight: 700; }
-        .kpi-val.highlight { color: var(--accent-lime); }
+        .kpi-board { display: flex; gap: 8px; border-left: 1px solid var(--border); padding-left: 16px; }
+        .kpi-card { background: var(--bg-card); padding: 6px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); min-width: 110px; }
+        .kpi-lbl { font-size: 8px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-val { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: #fff; margin-top: 2px; }
+        .kpi-val small { font-size: 10px; color: var(--text-muted); font-weight: 400; }
 
-        .palette-container { display: flex; align-items: center; flex-grow: 1; overflow-x: auto; gap: 6px; }
+        .palette-container { display: flex; align-items: center; flex-grow: 1; overflow-x: auto; gap: 6px; padding: 0 10px; }
         .palette-item { 
-            padding: 6px 12px; border: 1px solid var(--panel-border); background: #111; 
-            font-size: 10px; font-weight: 700; color: #aaa; cursor: pointer; white-space: nowrap;
+            padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; 
+            border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: #fff; 
+            display: flex; align-items: center; gap: 8px; white-space: nowrap; transition: 0.15s;
         }
-        .palette-item.active { border-color: var(--accent-lime); color: #fff; }
+        .palette-item:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.06); }
+        .palette-item.active { border-color: var(--sol-lime); box-shadow: 0 0 12px var(--sol-lime-glow); background: var(--bg-card); }
+        .palette-color-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .btn-add { width: 30px; height: 30px; border-radius: 50%; background: var(--sol-lime); border: none; font-size: 18px; font-weight: 900; cursor: pointer; color: #000; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-        .controls { display: flex; gap: 8px; }
-        .btn { background: #000; border: 1px solid var(--panel-border); padding: 8px 12px; font-size: 10px; font-weight: 700; cursor: pointer; color: #fff; font-family: var(--font-mono); text-transform: uppercase; }
-        .btn:hover { border-color: var(--accent-lime); color: var(--accent-lime); }
-        .btn.active { background: var(--accent-lime); color: #000; border-color: var(--accent-lime); }
-        .btn.danger { color: var(--danger); border-color: var(--danger); }
+        .controls { display: flex; gap: 6px; align-items: center; }
+        .btn { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 8px 12px; 
+            font-size: 10px; font-weight: 700; cursor: pointer; border-radius: var(--radius-sm); color: #fff; 
+            text-transform: uppercase; transition: 0.2s; font-family: var(--font-mono);
+        }
+        .btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+        .btn.active { background: var(--sol-lime); color: #000; border-color: var(--sol-lime); }
+        .btn.mode-switch { background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+        .btn.readonly { background: var(--danger-bg); color: var(--danger); border-color: rgba(244, 63, 94, 0.3); }
+        .btn.danger { color: var(--danger); border-color: rgba(244, 63, 94, 0.3); }
 
-        /* TABS */
-        .nav-tabs { display: flex; background: #000; border-bottom: 1px solid var(--panel-border); }
-        .nav-tab { padding: 12px 30px; font-size: 11px; font-family: var(--font-mono); cursor: pointer; color: var(--text-muted); }
-        .nav-tab.active { color: var(--accent-lime); border-bottom: 2px solid var(--accent-lime); }
+        /* TAB REITER (PLANUNG / AUFGABEN) */
+        .nav-tabs { display: flex; background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 0 20px; }
+        .nav-tab { padding: 12px 20px; font-size: 11px; font-weight: 800; cursor: pointer; color: var(--text-muted); text-transform: uppercase; transition: 0.2s; letter-spacing: 0.5px; }
+        .nav-tab:hover { color: #fff; }
+        .nav-tab.active { color: var(--sol-lime); border-bottom: 2px solid var(--sol-lime); background: rgba(164, 198, 57, 0.05); }
 
-        /* MAIN CONTENT */
-        .main-container { flex: 1; display: flex; overflow: hidden; }
-        .viewport { flex: 1; overflow: auto; padding: 20px; }
-        .sidebar { width: 300px; background: var(--bg-panel); border-left: 1px solid var(--panel-border); display: flex; flex-direction: column; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--panel-border); font-family: 'Orbitron'; font-size: 13px; }
-        .sidebar-content { flex: 1; padding: 20px; overflow-y: auto; }
+        /* HAUPTBEREICH */
+        .main-wrapper { flex: 1; display: flex; overflow: hidden; position: relative; }
+        .view-layer { position: absolute; inset: 0; display: none; overflow: auto; padding: 16px; }
+        .view-layer.active { display: block; }
 
-        /* TASK LIST STYLE */
-        .todo-input-group { display: flex; gap: 5px; margin-bottom: 20px; }
-        .todo-input-group input { flex: 1; background: #000; border: 1px solid var(--panel-border); color: #fff; padding: 10px; font-family: var(--font-mono); font-size: 12px; outline: none; }
-        .todo-input-group button { background: var(--accent-lime); border: none; padding: 0 15px; cursor: pointer; font-weight: 800; font-family: var(--font-mono); }
-        .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: #1a1a1a; border: 1px solid var(--panel-border); margin-bottom: 5px; }
-        .todo-item.done { opacity: 0.3; }
-        .todo-item span { flex: 1; font-size: 12px; }
-        .todo-item input[type="checkbox"] { accent-color: var(--accent-lime); }
-        .del-task { color: var(--danger); cursor: pointer; font-size: 10px; }
+        /* GRID TABELLE */
+        table { border-collapse: separate; border-spacing: 0; width: max-content; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+        th, td { border: 1px solid var(--border); text-align: center; }
+        #gridHead th { position: sticky; top: 0; background: #0f172a; font-size: 10px; font-weight: 800; color: var(--text-muted); z-index: 100; text-transform: uppercase; padding: 6px; }
+        #gridHead tr:nth-child(1) th { height: 28px; background: #060911; color: var(--sol-lime); }
+        td:first-child { position: sticky; left: 0; z-index: 80; background: #1e293b; width: 160px !important; text-align: left; padding-left: 14px; font-weight: 800; border-right: 2px solid var(--cyan); color: #fff; font-size: 12px; }
+        
+        .project-cell { height: 48px; cursor: crosshair; font-size: 10px; font-weight: 800; text-transform: uppercase; transition: 0.1s; color: #fff; }
+        .project-cell:hover { filter: brightness(1.25); outline: 1px solid #fff; }
+        .monday-start { border-left: 2px solid var(--cyan) !important; }
+        .day-num { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: #fff; }
+        .day-short { font-size: 8px; color: var(--text-muted); font-weight: 600; }
 
-        /* GRID STYLE */
-        table { border-collapse: collapse; width: max-content; background: var(--bg-panel); border: 1px solid var(--panel-border); }
-        th, td { border: 1px solid var(--panel-border); padding: 10px; font-family: var(--font-mono); font-size: 11px; }
-        th { background: #000; color: var(--text-muted); text-transform: uppercase; font-size: 10px; }
-        td:first-child { position: sticky; left: 0; z-index: 80; background: #111; font-weight: 700; color: #fff; width: 150px; border-right: 2px solid var(--accent-lime); }
-        .project-cell { height: 40px; cursor: crosshair; font-weight: 700; text-transform: uppercase; }
-        .stat-row td { background: #000 !important; font-weight: 800; color: var(--accent-lime); }
+        /* FLOTTEN-STEUERUNG IN DER GRID */
+        .bus-ctrl { display: flex; align-items: center; justify-content: space-between; padding-right: 8px; }
+        .toggle-btn { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border); background: rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .toggle-btn.active { background: var(--success); border-color: var(--success); color: #000; }
+        .toggle-btn.active::after { content: '✓'; font-size: 11px; font-weight: 900; }
+        .toggle-btn.inactive { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+        .toggle-btn.inactive::after { content: '✕'; font-size: 11px; font-weight: 900; }
 
-        /* MODALS */
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 5000; display: none; }
-        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-panel); border: 1px solid var(--accent-lime); padding: 30px; z-index: 5001; width: 380px; display: none; }
-        .modal.show { display: block; }
-        .modal h2 { font-family: 'Orbitron'; margin: 0 0 20px 0; font-size: 15px; border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; }
-        .modal label { display: block; font-size: 10px; color: var(--text-muted); margin-top: 15px; font-weight: 700; }
-        .modal input { width: 100%; padding: 10px; background: #000; border: 1px solid var(--panel-border); color: #fff; font-family: var(--font-mono); margin-top: 5px; }
-        .m-btns { display: flex; gap: 10px; margin-top: 25px; }
-        .m-btn { flex: 1; padding: 10px; border: none; cursor: pointer; font-family: var(--font-mono); font-weight: 700; }
-        .m-save { background: var(--accent-lime); color: #000; }
-        .m-cancel { background: transparent; color: #fff; border: 1px solid var(--panel-border); }
+        .stat-row td { background: #060911 !important; color: var(--text-main); font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
+        .stat-row td:first-child { color: var(--sol-lime) !important; }
 
-        /* TOASTS */
-        .toast-stack { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: #000; border: 1px solid var(--accent-lime); color: #fff; padding: 12px 20px; font-size: 12px; font-family: var(--font-mono); opacity: 0; transition: 0.3s; }
-        .toast.show { opacity: 1; }
-        .toast.err { border-color: var(--danger); }
+        /* AUFGABEN CENTER */
+        .task-wrapper { max-width: 750px; margin: 20px auto; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .task-header h2 { font-family: 'Orbitron'; font-size: 18px; color: #fff; margin: 0; }
+        .todo-input-group { display: flex; gap: 8px; margin-bottom: 24px; }
+        .todo-input-group input { 
+            flex: 1; padding: 12px 16px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); 
+            border-radius: var(--radius-sm); color: #fff; font-size: 13px; font-family: var(--font-sans);
+        }
+        .todo-input-group input:focus { outline: none; border-color: var(--sol-lime); }
+        .todo-input-group button { background: var(--sol-lime); border: none; padding: 0 20px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 800; color: #000; font-size: 12px; }
+        
+        .todo-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255,255,255,0.02); 
+            border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; transition: 0.2s; border-left: 3px solid var(--sol-lime);
+        }
+        .todo-item:hover { background: rgba(255,255,255,0.06); }
+        .todo-item.done { opacity: 0.4; border-left-color: var(--text-muted); }
+        .todo-item.done span { text-decoration: line-through; }
+        .todo-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--sol-lime); }
+        .todo-item span { flex: 1; font-size: 13px; color: var(--text-main); font-weight: 500; }
+        .todo-item .del-todo { color: var(--danger); cursor: pointer; font-weight: 800; font-size: 14px; opacity: 0.6; }
+        .todo-item .del-todo:hover { opacity: 1; }
 
-        .sel-highlight { outline: 1px solid var(--accent-lime); outline-offset: -1px; background: var(--volt-dim); }
+        /* MODALE & OVERLAYS */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 5000; display: none; }
+        .modal { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); opacity: 0; 
+            background: var(--bg-panel); border: 1px solid var(--border); padding: 30px; border-radius: var(--radius-md); 
+            display: none; z-index: 5001; width: 400px; box-shadow: 0 25px 60px rgba(0,0,0,0.8); transition: 0.2s; 
+        }
+        .modal.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        .modal h2 { margin-top: 0; font-family: 'Orbitron'; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; color: #fff; }
+        .modal label { display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-top: 14px; }
+        .modal input, .modal select { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-top: 5px; color: #fff; font-family: var(--font-sans); }
+        .m-btns { display: flex; gap: 10px; margin-top: 24px; }
+        .m-btn { flex: 1; padding: 12px; border: none; font-weight: 800; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; text-transform: uppercase; }
+        .m-save { background: var(--sol-lime); color: #000; }
+        .m-cancel { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+
+        .user-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .user-row span { font-size: 12px; font-weight: 600; color: #fff; }
+        .user-row select { padding: 6px; background: #000; color: #fff; border: 1px solid var(--border); border-radius: 4px; font-size: 11px; }
+
+        .toast-stack { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { background: var(--bg-card); color: #fff; border: 1px solid var(--border); padding: 12px 18px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: 0.3s; }
+        .toast.show { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
 
-<!-- AUTH LAYER -->
+<!-- AUTH OVERLAY -->
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
         <h2>SOL<span>PRO</span></h2>
-        <p style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);">AUTHENTICATION_PROTOCOL_V10</p>
-        <label>OPERATOR_ID</label>
-        <input type="email" id="loginEmail" placeholder="user@solpro.at">
-        <label>PASSKEY</label>
+        <p>EXECUTIVE MANAGEMENT SUITE</p>
+        <label>E-Mail Adresse</label>
+        <input type="email" id="loginEmail" placeholder="name@solpro.at">
+        <label>Passwort</label>
         <input type="password" id="loginPass" placeholder="••••••••">
-        <button id="loginBtn" onclick="handleLogin()">Access System</button>
-        <div id="authStatus" style="margin-top:15px; font-size:10px; color:var(--danger); font-family:var(--font-mono);"></div>
+        <button id="loginBtn" onclick="handleLogin()">Sitzung Starten</button>
+        <div id="authStatus" style="margin-top:16px; font-size:12px; font-weight:600; min-height:18px;"></div>
     </div>
 </div>
 
-<!-- MAIN INTERFACE -->
 <div class="accent-line"></div>
+
+<!-- KOPFZEILE (HUD) -->
 <div class="hud">
-    <div class="brand"><div class="logo">SOL<span>PRO</span></div></div>
+    <div class="brand-container">
+        <div class="logo">SOL<span>PRO</span></div>
+    </div>
+    
     <div class="kpi-board">
-        <div class="kpi-card"><span class="kpi-lbl">UTILIZATION</span><span class="kpi-val" id="kpiCapRate">0%</span></div>
-        <div class="kpi-card"><span class="kpi-lbl">TOTAL_DAYS</span><span class="kpi-val" id="kpiTotalDays">0 T</span></div>
-        <div class="kpi-card"><span class="kpi-lbl">VOLUME</span><span class="kpi-val highlight" id="kpiTotalKwp">0 <small>kWp</small></span></div>
+        <div class="kpi-card"><span class="kpi-lbl">Auslastung</span><span class="kpi-val" id="kpiCapRate">0%</span></div>
+        <div class="kpi-card"><span class="kpi-lbl">Netto Tage</span><span class="kpi-val" id="kpiTotalDays">0 T</span></div>
+        <div class="kpi-card"><span class="kpi-lbl">Volumen</span><span class="kpi-val" id="kpiTotalKwp">0 <small>kWp</small></span></div>
     </div>
+
     <div class="palette-container" id="paletteUI"></div>
-    <div class        ="controls">
-        <button class="btn" id="userBtn" style="display:none" onclick="openUserManagement()">USER_MGT</button>
-        <button class="btn" onclick="refreshAllData()">SYNC</button>
-        <button class="btn primary" id="lockStateBtn" onclick="toggleSystemLock()">PLAN_MODE</button>
-        <button class="btn danger" onclick="handleLogout()">LOGOUT</button>
+
+    <div class="controls">
+        <button class="btn" id="userBtn" style="display:none" onclick="openUserManagement()">⚙️ Nutzer</button>
+        <button class="btn" onclick="refreshAllData()">🔄 Sync</button>
+        <button class="btn mode-switch planning" id="lockStateBtn" onclick="toggleSystemLock()">✏️ Planen</button>
+        <button class="btn danger" onclick="handleLogout()">Logout</button>
     </div>
 </div>
 
+<!-- TAB REITER -->
 <div class="nav-tabs">
-    <div class="nav-tab active" id="tab-planner" onclick="switchView('planner')">[ PLANNER ]</div>
-    <div class="nav-tab" id="tab-tasks" onclick="switchView('tasks')">[ TASKS ]</div>
+    <div class="nav-tab active" id="tab-planner" onclick="switchView('planner')">📊 PLANUNG</div>
+    <div class="nav-tab" id="tab-tasks" onclick="switchView('tasks')">🎯 AUFGABEN-CENTER</div>
 </div>
 
+<!-- HAUPTBEREICH -->
 <div class="main-wrapper">
-    <div class="viewport" id="view-planner">
+    <!-- PLANUNG LAYER -->
+    <div class="view-layer active" id="view-planner">
         <table id="theTable"><thead id="gridHead"></thead><tbody id="gridBody"></tbody></table>
     </div>
-    <div class="viewport" id="view-tasks" style="display:none;">
-        <div style="max-width:600px; margin: 0 auto;">
-            <h2 style="font-family:var(--font-mono); font-size:16px; color:#fff; text-transform:uppercase;">Command_Tasks</h2>
+
+    <!-- AUFGABEN LAYER -->
+    <div class="view-layer" id="view-tasks">
+        <div class="task-wrapper">
+            <div class="task-header">
+                <h2>Aufgaben & To-Dos</h2>
+                <span id="taskCount" style="font-family:var(--font-mono); font-size:12px; color:var(--sol-lime); font-weight:700;">0 Aktiv</span>
+            </div>
             <div class="todo-input-group">
-                <input type="text" id="todoInput" placeholder="Enter task command...">
-                <button onclick="addTodo()">ADD</button>
+                <input type="text" id="todoInput" placeholder="Neue Aufgabe eintragen...">
+                <button onclick="addTodo()">HINZUFÜGEN</button>
             </div>
             <div id="todoList"></div>
         </div>
     </div>
-    <div class="sidebar">
-        <div class="sidebar-header"><h3>SYSTEM_LOG</h3></div>
-        <div class="sidebar-content" style="font-size:10px; font-family:var(--font-mono); color:var(--text-muted); line-height:1.6;">
-            OPERATOR: <span id="userEmailDisp" style="color:#fff;">-</span><br>
-            ROLE: <span id="userRoleDisp" style="color:var(--accent-lime);">-</span><br>
-            STATUS: <span style="color:var(--success);">ONLINE</span>
-        </div>
-    </div>
 </div>
 
-<!-- MODALS & CONTEXT -->
-<div id="actionGridCtx" style="display:none; position:fixed; z-index:9000; background:#111; border:1px solid var(--accent-lime); padding:5px; width:180px; box-shadow:0 10px 30px #000;"></div>
+<div id="actionGridCtx" style="display:none; position:fixed; z-index:9000; background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px; width:200px; box-shadow:0 10px 30px rgba(0,0,0,0.8);"></div>
 <div class="overlay" id="p_overlay" onclick="closeModals()"></div>
+
+<!-- MODALS -->
 <div class="modal" id="paletteModal">
-    <h2 id="pModalTitle">PROJ_CFG</h2>
-    <label>ID</label><input type="text" id="palNameInput">
-    <label>kWp</label><input type="number" id="palKwpInput">
-    <label>COLOR</label><input type="color" id="palColorInput" style="height:30px">
+    <h2 id="pModalTitle">Projekt Einstellungen</h2>
+    <label>Projekt Name</label><input type="text" id="palNameInput">
+    <label>Leistung (kWp)</label><input type="number" id="palKwpInput">
+    <label>Farbe</label><input type="color" id="palColorInput" style="height:44px;">
     <input type="hidden" id="palEditId">
     <div class="m-btns">
-        <button class="m-btn m-save" onclick="savePaletteItem()">COMMIT</button>
-        <button class="m-btn m-cancel" onclick="closeModals()">ABORT</button>
+        <button class="m-btn m-save" onclick="savePaletteItem()">Speichern</button>
+        <button class="m-btn m-cancel" onclick="closeModals()">Abbrechen</button>
     </div>
-    <button class="m-btn" id="palDelBtn" onclick="deletePaletteItem()" style="display:none; width:100%; margin-top:10px; background:transparent; color:var(--danger); border:1px solid var(--danger);">PURGE</button>
+    <button class="m-btn" id="palDelBtn" onclick="deletePaletteItem()" style="display:none; width:100%; margin-top:12px; background:var(--danger-bg); color:var(--danger); border:1px solid var(--danger);">Projekt Löschen</button>
 </div>
 
 <div class="modal" id="userModal">
-    <h2>USER_MGT</h2>
-    <div id="userList" style="max-height:300px; overflow-y:auto;"></div>
-    <div class="m-btns"><button class="m-btn m-cancel" onclick="closeModals()">CLOSE</button></div>
+    <h2>Nutzerverwaltung (Admin)</h2>
+    <div id="userList" style="max-height:280px; overflow-y:auto; margin-top:12px;"></div>
+    <div class="m-btns">
+        <button class="m-btn m-cancel" onclick="closeModals()">Schließen</button>
+    </div>
 </div>
 
 <div class="toast-stack" id="toastStack"></div>
 
 <script>
     /* ==========================================
-       CORE CONFIG
+       SUPABASE SCHLÜSSEL & INITIALISIERUNG
        ========================================== */
     const SUPABASE_URL = "https://iuxklqcpexoziqxrohwa.supabase.co";
     const SUPABASE_KEY = "sb_publishable_VteOTQ6g28z9Dvo-QUG8jw_hehaZpWu";
     const solproSupa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let currentUser = null, userRole = 'viewer';
+    let currentUser = null;
+    let userRole = 'viewer';
     let projects = [], plannerGrid = {}, deactivatedBuses = [], todos = [];
     let activeProjectId = "ERASER", isDrawing = false, selectedCells = [], isAppLockedForEditing = false;
-    let contextCtxMenuPID = null, selectedCellDomID = null, highlightTimer = null;
+    let contextCtxMenuPID = null, selectedCellDomID = null;
     const baseFlottenListe = ["SOL 2", "SOL 3", "SOL 4", "SOL 12", "SOL 16"];
     const managementFarben = ["#1e3a8a","#0284c7","#059669","#ca8a04","#b91c1c","#6d28d9","#0f766e","#a21caf","#4f46e5","#b45309","#4338ca","#064e3b"];
 
     // ==========================================
-    // AUTH LOGIC
+    // ANMELDUNG & ROLLEN (ROBUST)
     // ==========================================
     async function handleLogin() {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPass').value;
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPass').value.trim();
         const status = document.getElementById('authStatus');
         const btn = document.getElementById('loginBtn');
 
-        if(!email || !password) return (status.innerText = "ERR: MISSING_CREDS");
-        btn.innerText = "VERIFYING..."; btn.disabled = true;
+        if(!email || !password) {
+            status.innerText = "Bitte E-Mail und Passwort eingeben";
+            status.style.color = "var(--danger)";
+            return;
+        }
+
+        btn.innerText = "Prüfe Daten..."; 
+        btn.disabled = true;
 
         try {
             const { data, error } = await solproSupa.auth.signInWithPassword({ email, password });
             if (error) throw error;
             currentUser = data.user;
             await fetchUserRole();
+            
             document.getElementById('authOverlay').style.display = 'none';
             startApp();
         } catch (e) {
-            status.innerText = "ERR: " + e.message.toUpperCase();
-            btn.innerText = "LOGIN"; btn.disabled = false;
+            status.innerText = "❌ Anmeldung fehlgeschlagen: " + e.message;
+            status.style.color = "var(--danger)";
+        } finally {
+            btn.innerText = "Sitzung Starten"; 
+            btn.disabled = false;
         }
     }
 
     async function fetchUserRole() {
-        const { data, error } = await solproSupa.from('profiles').select('role').eq('id', currentUser.id).single();
-        if (data) userRole = data.role;
-        else {
-            await solproSupa.from('profiles').insert([{ id: currentUser.id, email: currentUser.email, role: 'viewer' }]);
+        try {
+            // Nutzt maybeSingle um Abstürze zu verhindern
+            const { data } = await solproSupa.from('profiles').select('role').eq('id', currentUser.id).maybeSingle();
+            if (data && data.role) {
+                userRole = data.role.toLowerCase();
+            } else {
+                // Erstellt neues Profil als Viewer
+                await solproSupa.from('profiles').upsert([{ id: currentUser.id, email: currentUser.email, role: 'viewer' }]);
+                userRole = 'viewer';
+            }
+        } catch(e) {
             userRole = 'viewer';
         }
-        document.getElementById('userRoleDisp').innerText = userRole.toUpperCase();
-        document.getElementById('userEmailDisp').innerText = currentUser.email.split('@')[0].toUpperCase();
-        if(userRole === 'admin') document.getElementById('userBtn').style.display = 'block';
+        
+        if(userRole === 'admin') {
+            document.getElementById('userBtn').style.display = 'block';
+        }
     }
 
-    function handleLogout() { solproSupa.auth.signOut(); window.location.reload(); }
+    function handleLogout() { 
+        solproSupa.auth.signOut(); 
+        window.location.reload(); 
+    }
 
     // ==========================================
-    // APP CORE
+    // RECHTE-SYSTEM
+    // ==========================================
+    const canPlan = () => (userRole === 'admin' || userRole === 'editor');
+    const canDelete = () => (userRole === 'admin');
+
+    // ==========================================
+    // APP START & DATEN-SYNC
     // ==========================================
     async function startApp() {
         buildGrid();
@@ -279,6 +376,13 @@
         renderProjectsToTopPalette();
         setupMouseDragPainting();
         setupGlobalUiHandlers();
+        
+        if(userRole === 'viewer') {
+            isAppLockedForEditing = true;
+            const btn = document.getElementById('lockStateBtn');
+            btn.className = 'btn readonly';
+            btn.innerText = '🔒 Nur Lesen';
+        }
     }
 
     async function refreshAllData() {
@@ -293,82 +397,124 @@
             
             fullGridRepaintUI_Logic();
             renderProjectsToTopPalette();
-            showToast("SYNC_OK", "success");
-        } catch (e) { showToast("SYNC_ERR", "error"); }
-    }
-
-    async function loadTodos() {
-        const { data } = await solproSupa.from('todos').select('*').eq('user_id', currentUser.id).order('id', { ascending: false });
-        todos = data || [];
-        renderTodos();
+            showToast("Daten synchronisiert", "success");
+        } catch (e) { 
+            showToast("Fehler beim Sync", "error"); 
+        }
     }
 
     // ==========================================
-    // GRID LOGIC
+    // GRID AUFBAUEN (KALENDER)
     // ==========================================
     function buildGrid() {
-        const thead = document.getElementById('gridHead'); const tbody = document.getElementById('gridBody');
-        let currentDay = new Date(2026, 7, 17); const endDate = new Date(2026, 11, 31); const dateArray = [];
-        while(currentDay <= endDate) { if(currentDay.getDay()!==0 && currentDay.getDay()!==6) dateArray.push(new Date(currentDay)); currentDay.setDate(currentDay.getDate()+1); }
+        const thead = document.getElementById('gridHead'); 
+        const tbody = document.getElementById('gridBody');
+        let currentDay = new Date(2026, 7, 17); 
+        const endDate = new Date(2026, 11, 31); 
+        const dateArray = [];
+
+        while(currentDay <= endDate) { 
+            if(currentDay.getDay() !== 0 && currentDay.getDay() !== 6) dateArray.push(new Date(currentDay)); 
+            currentDay.setDate(currentDay.getDate()+1); 
+        }
         
-        let trMonat = `<tr><th rowspan="3" class="fixed-corner"><div class="logo" style="font-size:14px;">SOL<span>PRO</span></div></th>`;
+        let trMonat = `<tr><th rowspan="3" class="fixed-corner"><div class="logo">SOL<span>PRO</span></div></th>`;
         let trKW = `<tr>`, trTage = `<tr>`;
         let lastM=-1, mSpans=[], lastKW=-1, kwSpans=[];
+
         dateArray.forEach(d => {
             let m=d.getMonth(), kw=getKalenderWocheMath(d);
             if(m!==lastM){ mSpans.push({label:d.toLocaleString('de-DE',{month:'short'}).toUpperCase(), count:1}); lastM=m; } else mSpans[mSpans.length-1].count++;
-            if(kw!==lastKW){ kwSpans.push({label:'W'+kw, count:1}); lastKW=kw; } else kwSpans[kwSpans.length-1].count++;
+            if(kw!==lastKW){ kwSpans.push({label:'KW '+kw, count:1}); lastKW=kw; } else kwSpans[kwSpans.length-1].count++;
         });
+
         mSpans.forEach(ms => trMonat += `<th colspan="${ms.count}">${ms.label}</th>`);
         kwSpans.forEach(ks => trKW += `<th colspan="${ks.count}">${ks.label}</th>`);
+        
         dateArray.forEach(d => {
             let iso = d.toISOString().split('T')[0];
             trTage += `<th id="th-${iso}" class="${d.getDay()===1?'monday-start':''}"><div class="day-num">${d.getDate()}</div><div class="day-short">${d.toLocaleString('de-DE',{weekday:'short'})}</div></th>`;
         });
+
         thead.innerHTML = trMonat + `</tr>` + trKW + `</tr>` + trTage + `</tr>`;
 
         baseFlottenListe.forEach(w => {
             let sf = w.replace(/\s+/g,'_');
-            let rw = `<tr id="row_${sf}" class="worker-row is-active"><td><div class="bus-ctrl" style="display:flex; align-items:center; justify-content:space-between; width:100%; font-family:var(--font-mono); font-size:11px;"><span>${w}</span><button class="toggle-btn ${deactivatedBuses.includes(sf)?'inactive':'active'}" onclick="toggleBusState('${sf}')"></button></div></td>`;
+            let isOff = deactivatedBuses.includes(sf);
+            let rw = `<tr id="row_${sf}" class="worker-row ${isOff?'is-offline':'is-active'}"><td><div class="bus-ctrl"><span>${w}</span><button title="Ausfall umschalten" class="toggle-btn ${isOff?'inactive':'active'}" onclick="toggleBusState('${sf}')"></button></div></td>`;
+            
             dateArray.forEach(d => {
                 let iso = d.toISOString().split('T')[0];
                 rw += `<td id="CELL_${sf}_${iso}" class="project-cell${(d.getDay()===1?' monday-start':'')}" data-date-ts="${d.getTime()}"></td>`;
             });
             tbody.insertAdjacentHTML('beforeend', rw + `</tr>`);
         });
-        let fRow = `<tr class="stat-row"><td>AGGREGATE</td>`;
+
+        let fRow = `<tr class="stat-row"><td>LEISTUNG</td>`;
         dateArray.forEach(d => fRow += `<td id="COUNT_${d.toISOString().split('T')[0]}">0</td>`);
         tbody.insertAdjacentHTML('beforeend', fRow + `</tr>`);
     }
 
     async function toggleBusState(sid) {
-        if(userRole === 'viewer') return;
+        if(!canPlan() || isAppLockedForEditing) return showToast('Keine Berechtigung!', 'warn');
         const isNowOffline = !deactivatedBuses.includes(sid);
-        if(isNowOffline) { deactivatedBuses.push(sid); document.getElementById('row_'+sid).classList.replace('is-active','is-offline'); }
-        else { deactivatedBuses=deactivatedBuses.filter(v=>v!==sid); document.getElementById('row_'+sid).classList.replace('is-offline','is-active'); }
+        
+        if(isNowOffline) { deactivatedBuses.push(sid); }
+        else { deactivatedBuses = deactivatedBuses.filter(v=>v!==sid); }
+        
         await solproSupa.from('fleet_status').upsert({ bus_id: sid, is_offline: isNowOffline });
+        
+        // Button UI anpassen
+        const row = document.getElementById('row_' + sid);
+        const btn = row.querySelector('.toggle-btn');
+        if(isNowOffline) {
+            row.classList.replace('is-active', 'is-offline');
+            btn.className = 'toggle-btn inactive';
+        } else {
+            row.classList.replace('is-offline', 'is-active');
+            btn.className = 'toggle-btn active';
+        }
+        
         fullGridRepaintUI_Logic();
     }
 
+    // ==========================================
+    // MALER-LOGIK (DRAG & PAINT)
+    // ==========================================
     function setupMouseDragPainting() {
         document.addEventListener('mousedown', e => {
             if (e.target.classList.contains('project-cell') && e.button === 0) {
-                if(isAppLockedForEditing || userRole === 'viewer') return;
-                isDrawing = true; selectedCells = [e.target.id]; e.target.classList.add('selecting'); e.target.style.outline = "1px solid #fff";
+                if(isAppLockedForEditing || !canPlan()) return;
+                isDrawing = true; selectedCells = [e.target.id]; 
+                e.target.style.outline = "2px solid var(--sol-lime)";
             }
             if (e.target.classList.contains('project-cell') && e.button === 2) {
-                if(isAppLockedForEditing || userRole === 'viewer') return; e.preventDefault(); selectedCellDomID = e.target.id;
-                bautHtmlFurDasActionContextMenu(); let cm=document.getElementById('actionGridCtx'); cm.style.display="block"; cm.style.left=e.clientX+"px"; cm.style.top=e.clientY+"px";
+                if(isAppLockedForEditing || !canPlan()) return; 
+                e.preventDefault(); 
+                selectedCellDomID = e.target.id;
+                bautHtmlFurDasActionContextMenu(); 
+                let cm = document.getElementById('actionGridCtx'); 
+                cm.style.display="block"; cm.style.left=e.clientX+"px"; cm.style.top=e.clientY+"px";
             }
         });
+
         document.addEventListener('mouseover', e => { 
             if(isDrawing && e.target.classList.contains('project-cell') && !selectedCells.includes(e.target.id)) { 
-                selectedCells.push(e.target.id); e.target.classList.add('selecting'); e.target.style.outline = "1px solid #fff";
+                selectedCells.push(e.target.id); 
+                e.target.style.outline = "2px solid var(--sol-lime)";
             } 
         });
+
         document.addEventListener('mouseup', e => { 
-            if(isDrawing && e.button === 0 && selectedCells.length > 0) { verarbeiteMalerZugAufGrid(); } 
-            document.querySelectorAll('.selecting').forEach(nd => { nd.classList.remove('selecting'); nd.style.outline=""; }); isDrawing = false; 
+            if(isDrawing && e.button === 0 && selectedCells.length > 0) { 
+                verarbeiteMalerZugAufGrid(); 
+            } 
+            document.querySelectorAll('.project-cell').forEach(nd => nd.style.outline=""); 
+            isDrawing = false; 
+        });
+
+        document.addEventListener('contextmenu', e => { 
+            if (e.target.classList.contains('project-cell')) e.preventDefault(); 
         });
     }
 
@@ -382,19 +528,98 @@
                 await solproSupa.from('planner_grid').upsert({ cell_id: cid, project_id: activeProjectId });
             }
         }
-        fullGridRepaintUI_Logic(); renderProjectsToTopPalette(); selectedCells = [];
+        fullGridRepaintUI_Logic(); 
+        renderProjectsToTopPalette(); 
+        selectedCells = [];
     }
 
+    // ==========================================
+    // PROJEKT-PALETTE & MODALE
+    // ==========================================
+    function renderProjectsToTopPalette() {
+        let container = document.getElementById('paletteUI');
+        if(!container) return;
+        container.innerHTML = canPlan() ? `<button class="btn-add" title="Neues Projekt" onclick="oeffneProjectCreatorModal()">+</button>` : '';
+        
+        projects.forEach(p => {
+            let counts = Object.keys(plannerGrid).filter(k => plannerGrid[k] === p.id).length;
+            let el = document.createElement('div');
+            el.className = `palette-item ${activeProjectId === p.id ? 'active' : ''}`;
+            el.innerHTML = `<div class="palette-color-dot" style="background:${p.color};"></div><b>${p.name}</b> <span style="opacity:0.6;">${counts}T</span>`;
+            el.onclick = () => { activeProjectId = p.id; renderProjectsToTopPalette(); };
+            el.oncontextmenu = (e) => { 
+                e.preventDefault(); e.stopPropagation(); 
+                if(!canPlan()) return; 
+                document.getElementById('palEditId').value = p.id; 
+                document.getElementById('palNameInput').value = p.name; 
+                document.getElementById('palKwpInput').value = p.kwp || 0; 
+                document.getElementById('palColorInput').value = p.color; 
+                document.getElementById('palDelBtn').style.display = canDelete() ? "block" : "none"; 
+                document.getElementById('pModalTitle').innerText = "Projekt Bearbeiten"; 
+                openPaletteModal(); 
+            };
+            container.appendChild(el);
+        });
+
+        [{ id: 'ERASER', label: '🧼 Radierer', c: '#ffffff' }, { id: 'SYS_VACATION', label: '🌴 Ausfall', c: '#a4c639' }].forEach(t => {
+            let el = document.createElement('div'); 
+            el.className = `palette-item ${(activeProjectId === t.id ? 'active' : '')}`; 
+            el.innerHTML = `<b>${t.label}</b>`;
+            el.onclick = () => { activeProjectId = t.id; renderProjectsToTopPalette(); };
+            container.appendChild(el);
+        });
+    }
+
+    function oeffneProjectCreatorModal() {
+        if(!canPlan() || isAppLockedForEditing) return;
+        document.getElementById('pModalTitle').innerText = "Neues Projekt Anlegen"; 
+        document.getElementById('palEditId').value = ""; 
+        document.getElementById('palNameInput').value = ""; 
+        document.getElementById('palKwpInput').value = ""; 
+        // Automatische Zufallsfarbe wählen
+        document.getElementById('palColorInput').value = managementFarben[Math.floor(Math.random()*managementFarben.length)]; 
+        document.getElementById('palDelBtn').style.display = 'none';
+        openPaletteModal();
+    }
+
+    async function savePaletteItem() {
+        let name = document.getElementById('palNameInput').value.trim(); 
+        let kwp = parseFloat(document.getElementById('palKwpInput').value) || 0;
+        let id = document.getElementById('palEditId').value;
+        if(!name) return showToast('Bitte Namen eingeben', 'error');
+        
+        let projData = { name, kwp, color: document.getElementById('palColorInput').value };
+        if(id) {
+            projData.id = id;
+            await solproSupa.from('projects').upsert(projData);
+        } else {
+            const { data } = await solproSupa.from('projects').insert([projData]).select().single();
+            if(data) { projects.push(data); activeProjectId = data.id; }
+        }
+        closeModals(); await refreshAllData(); renderProjectsToTopPalette();
+    }
+
+    async function deletePaletteItem() {
+        if(!canDelete()) return;
+        let id = document.getElementById('palEditId').value; 
+        await solproSupa.from('projects').delete().eq('id', id);
+        await solproSupa.from('planner_grid').delete().eq('project_id', id);
+        closeModals(); await refreshAllData(); renderProjectsToTopPalette();
+    }
+
+    // ==========================================
+    // CONTEXT MENÜ (RECHTSKLICK AUF GRID)
+    // ==========================================
     function bautHtmlFurDasActionContextMenu() {
         let ActionPanel = document.getElementById('actionGridCtx');
         let prj = projects.find(p => p.id === activeProjectId);
         let content = `
             ${(activeProjectId !== 'ERASER' && activeProjectId !== 'SYS_VACATION' && prj)
-            ? `<button onclick="fireAction('FILL_PROJECT')" style="color:${prj.color};">SET_WEEK [${prj.name}]</button><hr>` : ''}
-            <button onclick="fireAction('FILL_URLAUB')">SET_WEEK_OFFLINE</button>
+            ? `<button onclick="fireAction('FILL_PROJECT')" style="color:${prj.color}; font-weight:800;">Woche Zuweisen [${prj.name}]</button><hr>` : ''}
+            <button onclick="fireAction('FILL_URLAUB')">Ganze KW auf Ausfall</button>
             <hr>
-            ${canDelete() ? `<button onclick="fireAction('DELETE_WEEK')" class="danger-text">PURGE_WEEK</button>` : ''}
-            ${canDelete() ? `<button onclick="fireAction('DELETE_CELL')" class="danger-text">PURGE_CELL</button>` : ''}
+            ${canDelete() ? `<button onclick="fireAction('DELETE_WEEK')" style="color:var(--danger)">Woche Löschen</button>` : ''}
+            ${canDelete() ? `<button onclick="fireAction('DELETE_CELL')" style="color:var(--danger)">Tag Löschen</button>` : ''}
         `;
         ActionPanel.innerHTML = content;
     }
@@ -404,7 +629,7 @@
         if(!selectedCellDomID) return;
         
         if(cmd === 'DELETE_CELL') { 
-            if(!canDelete()) return showToast("NO_PERM", "error");
+            if(!canDelete()) return showToast("Keine Berechtigung", "error");
             delete plannerGrid[selectedCellDomID]; 
             await solproSupa.from('planner_grid').delete().eq('cell_id', selectedCellDomID);
             fullGridRepaintUI_Logic(); renderProjectsToTopPalette(); return; 
@@ -437,70 +662,22 @@
         fullGridRepaintUI_Logic(); renderProjectsToTopPalette();
     }
 
-    function renderProjectsToTopPalette() {
-        let container = document.getElementById('paletteUI');
-        if(!container) return;
-        container.innerHTML = canPlan() ? `<button class="btn-add" onclick="oeffneProjectCreatorModal()">+</button>` : '';
-        projects.forEach(p => {
-            let counts = Object.keys(plannerGrid).filter(k => plannerGrid[k] === p.id).length;
-            let el = document.createElement('div');
-            el.className = `palette-item ${activeProjectId === p.id ? 'active' : ''}`;
-            el.innerHTML = `<div class="palette-color-dot" style="background:${p.color};"></div><b>${p.name}</b> <span style="opacity:0.5;">${counts}T</span>`;
-            el.onclick = () => { activeProjectId = p.id; renderProjectsToTopPalette(); };
-            el.oncontextmenu = (e) => { e.preventDefault(); e.stopPropagation(); if(!canPlan()) return; document.getElementById('palEditId').value = p.id; document.getElementById('palNameInput').value = p.name; document.getElementById('palKwpInput').value = p.kwp || 0; document.getElementById('palColorInput').value = p.color; document.getElementById('palDelBtn').style.display = canDelete() ? "block" : "none"; document.getElementById('pModalTitle').innerText = "EDIT_PROJECT"; openPaletteModal(); };
-            container.appendChild(el);
-        });
-        [{ id: 'ERASER', label: 'ERASER', c: '#fff' }, { id: 'SYS_VACATION', label: 'OFFLINE', c: '#D4FF00' }].forEach(t => {
-            let el = document.createElement('div'); el.className = `palette-item ${(activeProjectId === t.id ? 'active' : '')}`; 
-            el.innerHTML = `<div class="palette-color-dot" style="background:${t.c};"></div><b>${t.label}</b>`;
-            el.onclick = () => { activeProjectId = t.id; renderProjectsToTopPalette(); };
-            container.appendChild(el);
-        });
-    }
-
-    function oeffneProjectCreatorModal() {
-        if(!canPlan()) return showToast('ERR_AUTH', 'error');
-        if(isAppLockedForEditing) return;
-        document.getElementById('pModalTitle').innerText = "NEW_PROJECT"; document.getElementById('palEditId').value = ""; document.getElementById('palNameInput').value = ""; document.getElementById('palKwpInput').value = ""; document.getElementById('palColorInput').value = "#a4c639"; 
-        document.getElementById('palDelBtn').style.display = "none";
-        openPaletteModal();
-    }
-
-    async function savePaletteItem() {
-        let name = document.getElementById('palNameInput').value.trim(); 
-        let kwp = parseFloat(document.getElementById('palKwpInput').value) || 0;
-        let id = document.getElementById('palEditId').value;
-        if(!name) return showToast('ERR_MISSING_NAME', 'error');
-        
-        let projData = { name, kwp, color: document.getElementById('palColorInput').value };
-        if(id) {
-            projData.id = id;
-            await solproSupa.from('projects').upsert(projData);
-        } else {
-            const { data } = await solproSupa.from('projects').insert([projData]).select().single();
-            projects.push(data);
-            activeProjectId = data.id;
-        }
-        closeModals(); await refreshAllData(); renderProjectsToTopPalette();
-    }
-
-    async function deletePaletteItem() {
-        if(!canDelete()) return;
-        let id = document.getElementById('palEditId').value; 
-        await solproSupa.from('projects').delete().eq('id', id);
-        await solproSupa.from('planner_grid').delete().eq('project_id', id);
-        closeModals(); await refreshAllData(); renderProjectsToTopPalette();
-    }
-
     // ==========================================
-    // TASK & USER MANAGEMENT
+    // AUFGABEN-CENTER (TO-DOS)
     // ==========================================
+    async function loadTodos() {
+        if(!currentUser) return;
+        const { data } = await solproSupa.from('todos').select('*').eq('user_id', currentUser.id).order('id', { ascending: false });
+        todos = data || [];
+        renderTodos();
+    }
+
     async function addTodo() {
         const input = document.getElementById('todoInput');
         const task = input.value.trim();
         if(!task) return;
         const { data, error } = await solproSupa.from('todos').insert([{ task, user_id: currentUser.id, is_completed: false }]).select().single();
-        if(error) return showToast("ERR_SAVE", "error");
+        if(error) return showToast("Fehler beim Speichern", "error");
         input.value = ""; todos.unshift(data); renderTodos();
     }
 
@@ -516,28 +693,32 @@
 
     function renderTodos() {
         const list = document.getElementById('todoList');
+        if(!list) return;
         list.innerHTML = '';
         todos.forEach(t => {
             const div = document.createElement('div');
             div.className = `todo-item ${t.is_completed ? 'done' : ''}`;
-            div.innerHTML = `<input type="checkbox" ${t.is_completed ? 'checked' : ''} onclick="toggleTodo('${t.id}', ${t.is_completed})"><span>${t.task}</span><div class="del-task" onclick="deleteTodo('${t.id}')">DEL</div>`;
+            div.innerHTML = `<input type="checkbox" ${t.is_completed ? 'checked' : ''} onclick="toggleTodo('${t.id}', ${t.is_completed})"><span>${t.task}</span><div class="del-todo" onclick="deleteTodo('${t.id}')">✕</div>`;
             list.appendChild(div);
         });
-        document.getElementById('taskCount').innerText = `${todos.filter(t=>!t.is_completed).length} ACTIVE`;
+        document.getElementById('taskCount').innerText = `${todos.filter(t=>!t.is_completed).length} Offen`;
     }
 
+    // ==========================================
+    // ADMIN NUTZERVERWALTUNG
+    // ==========================================
     async function openUserManagement() {
         if(userRole !== 'admin') return;
         const { data } = await solproSupa.from('profiles').select('*');
         const list = document.getElementById('userList');
         list.innerHTML = '';
-        data.forEach(u => {
+        (data || []).forEach(u => {
             const row = document.createElement('div');
             row.className = 'user-row';
             row.innerHTML = `<span>${u.email}</span><select onchange="updateUserRole('${u.id}', this.value)">
-                <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>VIEWER</option>
-                <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>EDITOR</option>
-                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>ADMIN</option>
+                <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>Viewer (Nur Lesen)</option>
+                <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>Editor (Planen)</option>
+                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin (Vollzugriff)</option>
             </select>`;
             list.appendChild(row);
         });
@@ -548,34 +729,19 @@
 
     async function updateUserRole(userId, newRole) {
         await solproSupa.from('profiles').update({ role: newRole }).eq('id', userId);
-        showToast(`ROLE_UPDATED: ${newRole}`, "success");
+        showToast(`Rolle auf ${newRole} geändert`, "success");
     }
 
     // ==========================================
-    // SYSTEM UTILS
+    // NÜTZLICHE HILFSFUNKTIONEN
     // ==========================================
-    function toggleSystemLock() {
-        if(!canPlan()) return;
-        isAppLockedForEditing = !isAppLockedForEditing; 
-        let btn = document.getElementById('lockStateBtn');
-        if(isAppLockedForEditing){ btn.className = 'btn readonly'; btn.innerText = 'READ_ONLY'; }
-        else { btn.className = 'btn primary'; btn.innerText = 'PLAN_MODE'; }
-    }
-
-    function setView(view, el) {
-        document.querySelectorAll('.view-layer').forEach(v => v.style.display = 'none');
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(`view-${view}`).style.display = 'block';
-        el.classList.add('active');
-    }
-
     function fullGridRepaintUI_Logic() {
-        document.querySelectorAll('.project-cell').forEach(c => { c.style.backgroundColor="transparent"; c.innerText=""; c.style.color="#fff"; });
+        document.querySelectorAll('.project-cell').forEach(c => { c.style.backgroundColor="transparent"; c.innerText=""; });
         Object.keys(plannerGrid).forEach(k => {
             let p = projects.find(x=>x.id===plannerGrid[k]); let cell = document.getElementById(k);
             if(!cell) return;
-            if(plannerGrid[k] === "SYS_VACATION") { cell.style.background="repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 8px, #000 8px, #000 16px)"; cell.innerText="OFF"; cell.style.color="var(--text-muted)"; return; }
-            if(p) { cell.style.backgroundColor=p.color; cell.style.color="#000"; cell.innerText=p.name; }
+            if(plannerGrid[k] === "SYS_VACATION") { cell.style.background="repeating-linear-gradient(45deg, rgba(255,255,255,0.05), rgba(255,255,255,0.05) 8px, transparent 8px, transparent 16px)"; cell.innerText="AUSFALL"; cell.style.color="var(--text-muted)"; return; }
+            if(p) { cell.style.backgroundColor=p.color; cell.innerText=p.name; cell.style.color="#000"; }
         });
         evalDashboardMathemations();
     }
@@ -601,6 +767,21 @@
         document.getElementById('kpiTotalKwp').innerHTML = totalKwp + " <small>kWp</small>";
     }
 
+    function switchView(v) {
+        document.querySelectorAll('.view-layer').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(`view-${v}`).classList.add('active');
+        document.getElementById(`tab-${v}`).classList.add('active');
+    }
+
+    function toggleSystemLock() {
+        if(!canPlan()) return;
+        isAppLockedForEditing = !isAppLockedForEditing; 
+        let btn = document.getElementById('lockStateBtn');
+        if(isAppLockedForEditing){ btn.className = 'btn readonly'; btn.innerText = '🔒 Nur Lesen'; }
+        else { btn.className = 'btn mode-switch planning'; btn.innerText = '✏️ Planen'; }
+    }
+
     function openPaletteModal() {
         document.getElementById('p_overlay').style.display = 'block';
         const m = document.getElementById('paletteModal');
@@ -609,48 +790,25 @@
     }
 
     function closeModals() {
-        document.querySelectorAll('.modal').forEach(m => { m.classList.remove('show'); m.style.display = 'none'; });
+        document.querySelectorAll('.modal').forEach(m => { m.classList.remove('show'); setTimeout(()=>m.style.display='none', 200); });
         document.getElementById('p_overlay').style.display = 'none';
     }
 
     function setupGlobalUiHandlers() {
         document.addEventListener('click', e => { 
-            if(!e.target.closest('.menu-wrap') && !e.target.closest('.nav-tab')) {
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                document.getElementById('tab-planner').classList.add('active');
-                document.getElementById('tab-tasks').classList.remove('active');
-                document.getElementById('view-planner').style.display = 'block';
-                document.getElementById('view-tasks').style.display = 'none';
-            }
             if(!e.target.closest('#actionGridCtx')) document.getElementById('actionGridCtx').style.display = 'none';
         });
     }
 
     function getKalenderWocheMath(d){ let x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()+4-(x.getDay()||7)); return Math.ceil((((x-new Date(x.getFullYear(),0,1))/86400000)+1)/7); }
-    function getLesbareTextfarbe(h){ return "#000"; }
+    
     function showToast(msg, type) {
         const stack = document.getElementById('toastStack');
-        const t = document.createElement('div'); t.className = `toast ${type === 'error' ? 'err' : ''}`;
+        const t = document.createElement('div'); t.className = `toast`; t.style.borderColor = type === 'success' ? 'var(--sol-lime)' : 'var(--danger)';
         t.innerText = msg; stack.appendChild(t);
         setTimeout(() => t.classList.add('show'), 10);
         setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
     }
-    function nuclearSystemReset() { if(confirm("DATA_PURGE: Wipe all local state?")) { localStorage.clear(); window.location.reload(); } }
-    function renderProjectsToTopPalette() { /* already implemented above */ }
-    function setupMouseDragPainting() { /* already implemented above */ }
-
-    // START
-    window.onload = () => {
-        console.log("SOLPRO V10.0 Online.");
-    };
-    
-    // Important: This calls the actually init
-    async function startApp_wrapper() {
-        await startApp();
-    }
-    // Call real start
-    startApp();
-
 </script>
 </body>
 </html>
