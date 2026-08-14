@@ -452,7 +452,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
       <div class="list-hero">
         <div>
           <h1>Kunden & Interessenten</h1>
-          <p>PDF-Uploads erscheinen hier als Interessenten</p>
+          <p>PDF-Uploads → Direkt als Einsatz im Planer verfügbar</p>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn" id="btnNewCustomer">+ Manuell anlegen</button>
@@ -1242,11 +1242,17 @@ function renderPalette() {
   if (canEdit()) {
     const add = document.createElement('button');
     add.className = 'btn-add-chip'; add.textContent = '+';
-    add.onclick = () => switchTab('orders');
+    add.onclick = () => {
+      // Quick-Create: Neuen Einsatz direkt erstellen
+      const name = prompt('Einsatz-Name (z.B. "Montage Müller"):');
+      if (name) {
+        quickCreateProject(name);
+      }
+    };
     c.appendChild(add);
   }
-  // Nur Aufträge & im_einsatz Projekte in der Palette
-  const paletteProjects = state.projects.filter(p => ['auftrag','im_einsatz'].includes(p.status));
+  // Alle Projekte in der Palette (nicht nur Aufträge)
+  const paletteProjects = state.projects.filter(p => !p.archived_at);
   paletteProjects.forEach(p => {
     const cnt = Object.values(state.grid).filter(v => v === p.id).length;
     const el = document.createElement('div');
@@ -1266,6 +1272,11 @@ function renderPalette() {
   va.textContent = '🌴 Urlaub';
   va.onclick = () => { state.activeProjId = 'VACATION'; renderPalette(); };
   c.appendChild(va);
+  const si = document.createElement('div');
+  si.className = 'pal-chip' + (state.activeProjId === 'SICK' ? ' active' : '');
+  si.textContent = '🤒 Krank';
+  si.onclick = () => { state.activeProjId = 'SICK'; renderPalette(); };
+  c.appendChild(si);
 }
 
 function setupGridPaint() {
@@ -1311,10 +1322,30 @@ function applyPaint() {
     const busSlug = el.dataset.bus, isoDate = el.dataset.date;
     const bus = state.buses.find(b => b.slug === busSlug);
     if (!bus) return null;
-    const value = state.activeProjId === 'ERASER' ? null : (state.activeProjId === 'VACATION' ? 'vacation' : state.activeProjId);
-    if (value === null) delete state.grid[cid];
-    else state.grid[cid] = value;
-    return { bus, isoDate, value };
+    
+    let value = null;
+    let kind = 'project';
+    
+    if (state.activeProjId === 'ERASER') {
+      value = null;
+    } else if (state.activeProjId === 'VACATION') {
+      value = null;
+      kind = 'vacation';
+    } else if (state.activeProjId === 'SICK') {
+      value = null;
+      kind = 'sick';
+    } else {
+      value = state.activeProjId;
+      kind = 'project';
+    }
+    
+    if (value === null && kind === 'project') {
+      delete state.grid[cid];
+    } else {
+      state.grid[cid] = kind === 'project' ? value : kind;
+    }
+    
+    return { bus, isoDate, value, kind };
   }).filter(Boolean);
   repaint();
   renderPalette();
@@ -1322,13 +1353,14 @@ function applyPaint() {
   (async () => {
     try {
       for (const u of updates) {
-        if (u.value === null) {
+        if (u.value === null && u.kind === 'project') {
           await sb.from('grid_assignments').delete().eq('bus_id', u.bus.id).eq('work_date', u.isoDate);
         } else {
           const row = {
-            bus_id: u.bus.id, work_date: u.isoDate,
-            project_id: u.value === 'vacation' ? null : u.value,
-            kind: u.value === 'vacation' ? 'vacation' : 'project',
+            bus_id: u.bus.id, 
+            work_date: u.isoDate,
+            project_id: u.kind === 'project' ? u.value : null,
+            kind: u.kind,
             version: 1
           };
           await sb.from('grid_assignments').upsert(row, { onConflict: 'bus_id,work_date' });
@@ -1399,6 +1431,28 @@ function toggleLock() {
 function updateLockUI() {
   $('lockText').textContent = state.isLocked ? 'Gesperrt' : 'Planen';
   document.body.classList.toggle('locked-view', state.isLocked);
+}
+
+// Quick-Create: Projekt direkt erstellen
+async function quickCreateProject(name) {
+  try {
+    const { data, error } = await sb.from('projects').insert({
+      name: name,
+      status: 'im_einsatz', // Direkt als Einsatz
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      kwp: 0
+    }).select().single();
+    
+    if (error) throw error;
+    
+    state.projects.unshift(data);
+    state.activeProjId = data.id;
+    renderPalette();
+    showToast('Einsatz "' + name + '" erstellt', 'success');
+  } catch (e) {
+    console.error('Quick create error:', e);
+    showToast('Fehler beim Erstellen: ' + e.message, 'error');
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1698,54 +1752,87 @@ function extractFields(text) {
 }
 
 async function savePdfExtract() {
-  const custName = $('pdfCustName').value.trim();
   const projName = $('pdfProjName').value.trim();
-  if (!custName || !projName) { showToast('Kunde und Projektname erforderlich', 'error'); return; }
+  if (!projName) { showToast('Projektname erforderlich', 'error'); return; }
+  
+  const custName = $('pdfCustName').value.trim();
   showLoader(true, 'Speichere…');
+  
   try {
-    // 1. PDF in Storage hochladen
-    const fileName = `${Date.now()}_${state._pdfFileName.replace(/[^\w.\-]/g, '_')}`;
-    const { error: upErr } = await sb.storage.from('project-pdfs').upload(fileName, state._pdfBuffer, { contentType: 'application/pdf' });
-    if (upErr) throw upErr;
-    // 2. Kunde anlegen/verwenden
     let customerId = null;
-    const existing = state.customers.find(c => c.name.toLowerCase() === custName.toLowerCase());
-    if (existing) { customerId = existing.id; }
-    else {
-      const { data: newC, error: cErr } = await sb.from('customers').insert({
-        name: custName,
-        firma: $('pdfCustFirma').value.trim() || null,
-        plz_ort: $('pdfCustPlzOrt').value.trim() || null,
-        telefon: $('pdfCustTelefon').value.trim() || null
-      }).select().single();
-      if (cErr) throw cErr;
-      customerId = newC.id;
+    
+    // 1. Kunde nur anlegen wenn Name angegeben
+    if (custName) {
+      const existing = state.customers.find(c => c.name.toLowerCase() === custName.toLowerCase());
+      if (existing) { 
+        customerId = existing.id; 
+      } else {
+        const { data: newC, error: cErr } = await sb.from('customers').insert({
+          name: custName,
+          firma: $('pdfCustFirma').value.trim() || null,
+          plz_ort: $('pdfCustPlzOrt').value.trim() || null,
+          telefon: $('pdfCustTelefon').value.trim() || null
+        }).select().single();
+        if (cErr) throw cErr;
+        customerId = newC.id;
+      }
     }
-    // 3. Projekt anlegen als Interessent
+    
+    // 2. PDF in Storage hochladen (mit Fehlerbehandlung)
+    let fileName = null;
+    if (state._pdfBuffer) {
+      try {
+        fileName = `${Date.now()}_${state._pdfFileName.replace(/[^\w.\-]/g, '_')}`;
+        const { error: upErr } = await sb.storage.from('project-pdfs').upload(fileName, state._pdfBuffer, { contentType: 'application/pdf' });
+        if (upErr) {
+          console.warn('PDF upload failed, continuing without storage:', upErr);
+          fileName = null; // Nicht fatal, weiter ohne Storage
+        }
+      } catch (e) {
+        console.warn('PDF upload exception, continuing without storage:', e);
+        fileName = null;
+      }
+    }
+    
+    // 3. Projekt anlegen - direkt als Einsatz möglich
     const { data: newP, error: pErr } = await sb.from('projects').insert({
       name: projName,
       customer_id: customerId,
-      status: 'interessent',
+      status: 'im_einsatz', // Direkt als Einsatz statt Interessent
       anlagengroesse: parseFloat($('pdfAnlagengröße').value) || null,
       speicher_kwh: parseFloat($('pdfSpeicher').value) || null,
       dachform: $('pdfDachform').value.trim() || null,
       dacheindeckung: $('pdfDacheindeckung').value.trim() || null,
       color: COLORS[Math.floor(Math.random()*COLORS.length)]
     }).select().single();
+    
     if (pErr) throw pErr;
-    // 4. Dokument-Eintrag
-    await sb.from('project_documents').insert({
-      project_id: newP.id,
-      customer_id: customerId,
-      file_name: state._pdfFileName,
-      file_path: fileName,
-      file_size: state._pdfSize,
-      status: 'neu'
-    });
+    
+    // 4. Dokument-Eintrag nur wenn PDF hochgeladen
+    if (fileName) {
+      try {
+        await sb.from('project_documents').insert({
+          project_id: newP.id,
+          customer_id: customerId,
+          file_name: state._pdfFileName,
+          file_path: fileName,
+          file_size: state._pdfSize,
+          status: 'neu'
+        });
+      } catch (e) {
+        console.warn('Document entry failed:', e);
+      }
+    }
+    
     await loadCustomers(); await loadProjects();
     closeModal();
-    showToast('Als Interessent gespeichert – im Tab "Aufträge" weiterverarbeiten', 'success', 5000);
-    switchTab('orders');
+    showToast('Einsatz "' + projName + '" erstellt - sofort im Planer verfügbar!', 'success', 5000);
+    switchTab('planner');
+    
+    // Automatisch zum neuen Projekt wechseln
+    state.activeProjId = newP.id;
+    renderPalette();
+    
   } catch (e) {
     console.error('Save PDF error:', e);
     showToast('Fehler: ' + e.message, 'error');
