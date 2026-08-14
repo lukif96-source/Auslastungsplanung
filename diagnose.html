@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#12110F">
 <title>SOLPRO · Suite v2</title>
 
-<!-- Externe Libs -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Supabase JS - Alternative CDN -->
+<script src="https://unpkg.com/@supabase/supabase-js@2.47.0/dist/main.min.js"></script>
 
 <style>
 :root {
@@ -171,18 +171,29 @@ async function runDiagnostics() {
   clearLogs();
   log('🔍 Diagnose gestartet...');
 
+  // Check if supabase is loaded
+  if (!window.supabase) {
+    log('✗ Supabase-Bibliothek nicht geladen - warte 2 Sekunden...', 'error');
+    await new Promise(r => setTimeout(r, 2000));
+  }
+
   // 1. Supabase Client
   log('1️⃣ Erstelle Supabase-Client...');
   let sb;
   try {
+    if (!window.supabase || !window.supabase.createClient) {
+      throw new Error('window.supabase.createClient ist nicht verfügbar');
+    }
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     log('✓ Supabase-Client erstellt', 'success');
     document.getElementById('connStatus').innerHTML = '<span class="success-msg">✓ Verbunden</span>';
-    document.getElementById('connStatus').parentElement.parentElement.querySelector('.status-icon').className = 'status-icon ok';
-    document.getElementById('connStatus').parentElement.parentElement.querySelector('.status-icon').textContent = '✓';
+    document.querySelector('[id="connStatus"]').parentElement.parentElement.querySelector('.status-icon').className = 'status-icon ok';
+    document.querySelector('[id="connStatus"]').parentElement.parentElement.querySelector('.status-icon').textContent = '✓';
   } catch (e) {
     log(`✗ Fehler beim Client erstellen: ${e.message}`, 'error');
     document.getElementById('connStatus').innerHTML = `<span class="error-msg">✗ ${e.message}</span>`;
+    document.querySelector('[id="connStatus"]').parentElement.parentElement.querySelector('.status-icon').className = 'status-icon error';
+    document.querySelector('[id="connStatus"]').parentElement.parentElement.querySelector('.status-icon').textContent = '✗';
     return;
   }
 
@@ -258,8 +269,8 @@ async function runDiagnostics() {
   log('✅ Diagnose abgeschlossen');
 }
 
-// Auto-run on load
-window.addEventListener('load', runDiagnostics);
+// Auto-run on load - wait for supabase to load
+setTimeout(runDiagnostics, 1000);
 </script>
 
 </body>
