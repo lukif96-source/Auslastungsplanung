@@ -1515,12 +1515,13 @@ async function saveCustomer() {
     email: $('custEmail').value.trim() || null
   };
   try {
+    console.log('Saving customer:', data, 'ID:', id);
     if (id) {
       const { error } = await sb.from('customers').update(data).eq('id', id);
-      if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Update error:', error); return; }
     } else {
       const { error } = await sb.from('customers').insert(data);
-      if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Insert error:', error); return; }
     }
     await loadCustomers();
     renderCustomers();
@@ -1650,12 +1651,13 @@ $('projSave').onclick = async () => {
     color: $('projColor').value
   };
   try {
+    console.log('Saving project:', data, 'ID:', id);
     if (id) {
       const { error } = await sb.from('projects').update(data).eq('id', id);
-      if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Update error:', error); return; }
     } else {
       const { error } = await sb.from('projects').insert(data);
-      if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Insert error:', error); return; }
     }
     await loadProjects();
     renderOrders(); renderPalette();
@@ -1762,6 +1764,8 @@ async function savePdfExtract() {
   showLoader(true, 'Speichere…');
   
   try {
+    console.log('Starting PDF extract save. Project:', projName, 'Customer:', custName);
+    
     let customerId = null;
     
     // 1. Kunde nur anlegen wenn Name angegeben
@@ -1769,7 +1773,9 @@ async function savePdfExtract() {
       const existing = state.customers.find(c => c.name.toLowerCase() === custName.toLowerCase());
       if (existing) { 
         customerId = existing.id; 
+        console.log('Using existing customer:', customerId);
       } else {
+        console.log('Creating new customer:', custName);
         const { data: newC, error: cErr } = await sb.from('customers').insert({
           name: custName,
           firma: $('pdfCustFirma').value.trim() || null,
@@ -1778,6 +1784,7 @@ async function savePdfExtract() {
         }).select().single();
         if (cErr) throw cErr;
         customerId = newC.id;
+        console.log('Customer created:', customerId);
       }
     }
     
@@ -1786,18 +1793,24 @@ async function savePdfExtract() {
     if (state._pdfBuffer) {
       try {
         fileName = `${Date.now()}_${state._pdfFileName.replace(/[^\w.\-]/g, '_')}`;
+        console.log('Uploading PDF to storage:', fileName);
         const { error: upErr } = await sb.storage.from('project-pdfs').upload(fileName, state._pdfBuffer, { contentType: 'application/pdf' });
         if (upErr) {
           console.warn('PDF upload failed, continuing without storage:', upErr);
+          showToast('PDF-Upload fehlgeschlagen, Projekt wird ohne Datei erstellt', 'warn');
           fileName = null; // Nicht fatal, weiter ohne Storage
+        } else {
+          console.log('PDF uploaded successfully');
         }
       } catch (e) {
         console.warn('PDF upload exception, continuing without storage:', e);
+        showToast('PDF-Upload fehlgeschlagen, Projekt wird ohne Datei erstellt', 'warn');
         fileName = null;
       }
     }
     
     // 3. Projekt anlegen - direkt als Einsatz möglich
+    console.log('Creating project:', projName);
     const { data: newP, error: pErr } = await sb.from('projects').insert({
       name: projName,
       customer_id: customerId,
@@ -1810,10 +1823,12 @@ async function savePdfExtract() {
     }).select().single();
     
     if (pErr) throw pErr;
+    console.log('Project created:', newP.id);
     
     // 4. Dokument-Eintrag nur wenn PDF hochgeladen
     if (fileName) {
       try {
+        console.log('Creating document entry');
         await sb.from('project_documents').insert({
           project_id: newP.id,
           customer_id: customerId,
@@ -1893,14 +1908,31 @@ async function saveProto() {
   const notizen = $('protoNotiz').value.trim() || null;
   const project_id = $('protoProject').value || null;
   try {
+    console.log('Saving protocol:', { standort, pruefer, pruefdatum, mppt_config });
     const { data: proto, error } = await sb.from('protocols').insert({
       standort, pruefer, pruefdatum, modul_wp, mppt_config, notizen, project_id
     }).select().single();
-    if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+    if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Protocol insert error:', error); return; }
+    console.log('Protocol created:', proto.id);
+    
     const rows = state._protoStrings.map(s => {
       const get = field => parseFloat(document.querySelector(`[data-no="${s.no}"][data-field="${field}"]`)?.value) || null;
-      return { protocol_id: proto.id, string_no: s.no, uoc: get('uoc'), isc: get('isc'), umpp: get('umpp'), impp: get('impp'), sort_order: s.no, is_active: true };
+      return { 
+        protocol_id: proto.id, 
+        string_no: s.no, 
+        uoc: get('uoc'), 
+        isc: get('isc'), 
+        umpp: get('umpp'), 
+        impp: get('impp'), 
+        sort_order: s.no, 
+        is_active: true,
+        wr: s.wr,
+        mppt: s.mppt,
+        str: s.str,
+        label: s.label
+      };
     });
+    console.log('Inserting protocol strings:', rows);
     await sb.from('protocol_strings').insert(rows);
     showToast('Protokoll gespeichert', 'success');
     renderSavedProtos();
@@ -2032,8 +2064,14 @@ async function saveCredential() {
   };
   const id = $('credId').value;
   try {
-    if (id) await sb.from('credentials').update(data).eq('id', id);
-    else await sb.from('credentials').insert(data);
+    console.log('Saving credential:', data, 'ID:', id);
+    if (id) {
+      const { error } = await sb.from('credentials').update(data).eq('id', id);
+      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Update error:', error); return; }
+    } else {
+      const { error } = await sb.from('credentials').insert(data);
+      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Insert error:', error); return; }
+    }
     await loadCredentials();
     renderCredCats(); renderCredGrid();
     closeModal();
@@ -2088,8 +2126,9 @@ async function addTask() {
   const txt = $('taskInput').value.trim();
   if (!txt) return;
   try {
+    console.log('Adding task:', txt);
     const { data, error } = await sb.from('todos').insert({ text: txt, created_by: state.user.id }).select().single();
-    if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+    if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Insert error:', error); return; }
     state.todos.unshift(data);
     $('taskInput').value = '';
     renderTodos();
