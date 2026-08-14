@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#12110F">
+<title>SOLPRO · Suite v2</title>
+
+<!-- Externe Libs -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --cream: #F7F4EE; --cream-deep: #EDE9DF; --ink: #12110F; --ink-mid: #3a3730;
+  --ink-muted: #8a8478; --lime: #B8D84B; --lime-dk: #8faa2c; --lime-glow: rgba(184,216,75,0.22);
+  --gold: #D4A017; --danger: #C8303A; --danger-bg: rgba(200,48,58,0.08);
+  --success: #1A7A4A; --warn: #B86A10; --info: #2563eb;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--cream); color: var(--ink); }
+body { display: flex; align-items: center; justify-content: center; padding: 20px; }
+
+.container { width: 100%; max-width: 600px; }
+
+.header { text-align: center; margin-bottom: 30px; }
+.header h1 { font-size: 28px; margin-bottom: 8px; }
+.header p { color: var(--ink-muted); font-size: 14px; }
+
+.status-box {
+  background: white;
+  border: 1px solid var(--cream-deep);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--cream-deep);
+}
+.status-item:last-child { border-bottom: none; }
+
+.status-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.status-icon.ok { background: rgba(26, 122, 74, 0.15); color: var(--success); }
+.status-icon.error { background: var(--danger-bg); color: var(--danger); }
+.status-icon.loading { background: rgba(37, 99, 235, 0.15); color: var(--info); animation: spin 1s linear infinite; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.status-label { flex: 1; }
+.status-label .title { font-weight: 600; font-size: 14px; }
+.status-label .desc { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+
+.error-msg { color: var(--danger); font-size: 12px; font-family: monospace; }
+.success-msg { color: var(--success); font-size: 12px; }
+
+.test-grid {
+  background: white;
+  border: 1px solid var(--cream-deep);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.test-grid h3 { font-size: 14px; margin-bottom: 12px; }
+.test-row { padding: 8px; background: var(--cream); border-radius: 4px; margin-bottom: 8px; font-size: 12px; }
+
+.button-group { display: flex; gap: 8px; }
+button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+button.primary { background: var(--ink); color: white; }
+button.primary:hover { background: var(--ink-mid); }
+button.danger { background: var(--danger-bg); color: var(--danger); }
+button.danger:hover { background: rgba(200, 48, 58, 0.15); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🔧 SOLPRO Diagnose</h1>
+    <p>Supabase-Verbindung & Datenbankstatus</p>
+  </div>
+
+  <div class="status-box">
+    <div class="status-item">
+      <div class="status-icon loading">⟳</div>
+      <div class="status-label">
+        <div class="title">Supabase-Verbindung</div>
+        <div class="desc" id="connStatus">Wird überprüft...</div>
+      </div>
+    </div>
+
+    <div class="status-item">
+      <div class="status-icon" id="authIcon">⟳</div>
+      <div class="status-label">
+        <div class="title">Authentifizierung</div>
+        <div class="desc" id="authStatus">Wird überprüft...</div>
+      </div>
+    </div>
+
+    <div class="status-item">
+      <div class="status-icon" id="dbIcon">⟳</div>
+      <div class="status-label">
+        <div class="title">Datenbank-Tabellen</div>
+        <div class="desc" id="dbStatus">Wird überprüft...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-grid">
+    <h3>📊 Tabellen-Status</h3>
+    <div id="tablesList"></div>
+  </div>
+
+  <div class="test-grid">
+    <h3>🔍 Debug-Log</h3>
+    <div id="debugLog" style="font-family: monospace; font-size: 11px; max-height: 200px; overflow-y: auto;"></div>
+  </div>
+
+  <div class="button-group">
+    <button class="primary" onclick="runDiagnostics()">🔄 Erneut testen</button>
+    <button class="danger" onclick="clearLogs()">Logs löschen</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://iuxklqcpexoziqxrohwa.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_VteOTQ6g28z9Dvo-QUG8jw_hehaZpWu';
+
+let logs = [];
+
+function log(msg, type = 'info') {
+  const time = new Date().toLocaleTimeString();
+  logs.push({ time, msg, type });
+  const debugLog = document.getElementById('debugLog');
+  const entry = document.createElement('div');
+  entry.style.color = type === 'error' ? '#C8303A' : type === 'success' ? '#1A7A4A' : '#8a8478';
+  entry.textContent = `[${time}] ${msg}`;
+  debugLog.appendChild(entry);
+  debugLog.scrollTop = debugLog.scrollHeight;
+  console.log(`[${type.toUpperCase()}]`, msg);
+}
+
+function clearLogs() {
+  logs = [];
+  document.getElementById('debugLog').innerHTML = '';
+}
+
+async function runDiagnostics() {
+  clearLogs();
+  log('🔍 Diagnose gestartet...');
+
+  // 1. Supabase Client
+  log('1️⃣ Erstelle Supabase-Client...');
+  let sb;
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    log('✓ Supabase-Client erstellt', 'success');
+    document.getElementById('connStatus').innerHTML = '<span class="success-msg">✓ Verbunden</span>';
+    document.getElementById('connStatus').parentElement.parentElement.querySelector('.status-icon').className = 'status-icon ok';
+    document.getElementById('connStatus').parentElement.parentElement.querySelector('.status-icon').textContent = '✓';
+  } catch (e) {
+    log(`✗ Fehler beim Client erstellen: ${e.message}`, 'error');
+    document.getElementById('connStatus').innerHTML = `<span class="error-msg">✗ ${e.message}</span>`;
+    return;
+  }
+
+  // 2. Auth Status
+  log('2️⃣ Überprüfe Auth-Status...');
+  try {
+    const { data: { user }, error } = await sb.auth.getUser();
+    if (error) {
+      log(`✗ Auth-Fehler: ${error.message}`, 'error');
+      document.getElementById('authStatus').innerHTML = `<span class="error-msg">Nicht angemeldet</span>`;
+      document.getElementById('authIcon').className = 'status-icon error';
+      document.getElementById('authIcon').textContent = '✗';
+    } else if (user) {
+      log(`✓ User angemeldet: ${user.email}`, 'success');
+      document.getElementById('authStatus').innerHTML = `<span class="success-msg">✓ ${user.email}</span>`;
+      document.getElementById('authIcon').className = 'status-icon ok';
+      document.getElementById('authIcon').textContent = '✓';
+    } else {
+      log('ℹ Kein User angemeldet (normal für Diagnose)', 'info');
+      document.getElementById('authStatus').innerHTML = `<span class="error-msg">Nicht angemeldet</span>`;
+      document.getElementById('authIcon').className = 'status-icon error';
+      document.getElementById('authIcon').textContent = '?';
+    }
+  } catch (e) {
+    log(`✗ Auth-Check Fehler: ${e.message}`, 'error');
+  }
+
+  // 3. Tabellen-Check
+  log('3️⃣ Überprüfe Datenbank-Tabellen...');
+  const tables = ['buses', 'grid_assignments', 'projects', 'customers', 'credentials', 'profiles', 'todos'];
+  let successCount = 0;
+  const tablesList = document.getElementById('tablesList');
+  tablesList.innerHTML = '';
+
+  for (const table of tables) {
+    try {
+      const { data, error, status } = await sb.from(table).select('*').limit(1);
+      if (error && error.code === 'PGRST116') {
+        log(`⚠ Tabelle "${table}" existiert nicht`, 'error');
+        tablesList.innerHTML += `<div class="test-row"><span style="color: #C8303A;">✗ ${table}</span> - Tabelle existiert nicht</div>`;
+      } else if (error && error.message.includes('permission')) {
+        log(`⚠ Tabelle "${table}" - RLS-Fehler (Permission denied)`, 'error');
+        tablesList.innerHTML += `<div class="test-row"><span style="color: #B86A10;">⚠ ${table}</span> - RLS-Problem (nicht angemeldet?)</div>`;
+      } else if (error) {
+        log(`⚠ Tabelle "${table}" - Fehler: ${error.message}`, 'error');
+        tablesList.innerHTML += `<div class="test-row"><span style="color: #C8303A;">✗ ${table}</span> - ${error.message}</div>`;
+      } else {
+        log(`✓ Tabelle "${table}" - OK (${data?.length || 0} Zeilen)`, 'success');
+        tablesList.innerHTML += `<div class="test-row"><span style="color: #1A7A4A;">✓ ${table}</span> - ${data?.length || 0} Zeilen</div>`;
+        successCount++;
+      }
+    } catch (e) {
+      log(`✗ Tabelle "${table}" - Exception: ${e.message}`, 'error');
+      tablesList.innerHTML += `<div class="test-row"><span style="color: #C8303A;">✗ ${table}</span> - ${e.message}</div>`;
+    }
+  }
+
+  // DB Status
+  if (successCount === tables.length) {
+    document.getElementById('dbStatus').innerHTML = `<span class="success-msg">✓ Alle Tabellen OK</span>`;
+    document.getElementById('dbIcon').className = 'status-icon ok';
+    document.getElementById('dbIcon').textContent = '✓';
+  } else if (successCount > 0) {
+    document.getElementById('dbStatus').innerHTML = `<span class="error-msg">⚠ ${successCount}/${tables.length} Tabellen</span>`;
+    document.getElementById('dbIcon').className = 'status-icon error';
+    document.getElementById('dbIcon').textContent = '⚠';
+  } else {
+    document.getElementById('dbStatus').innerHTML = `<span class="error-msg">✗ Keine Tabellen erreichbar</span>`;
+    document.getElementById('dbIcon').className = 'status-icon error';
+    document.getElementById('dbIcon').textContent = '✗';
+  }
+
+  log('✅ Diagnose abgeschlossen');
+}
+
+// Auto-run on load
+window.addEventListener('load', runDiagnostics);
+</script>
+
+</body>
+</html>
