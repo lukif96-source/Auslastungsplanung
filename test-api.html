@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOLPRO API Test v2</title>
+<style>
+body { font-family: monospace; background: #f5f5f5; color: #333; padding: 20px; }
+.container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+h1 { color: #12110F; }
+.test { margin: 15px 0; padding: 10px; border-left: 4px solid #ccc; }
+.test.ok { border-left-color: #1A7A4A; background: #f0fdf4; }
+.test.error { border-left-color: #C8303A; background: #fdf2f2; }
+.test.loading { border-left-color: #2563eb; background: #f0f9ff; }
+.status { font-weight: bold; }
+.ok .status { color: #1A7A4A; }
+.error .status { color: #C8303A; }
+.loading .status { color: #2563eb; }
+.message { font-size: 12px; margin-top: 5px; }
+button { padding: 10px 20px; margin: 10px 0; cursor: pointer; background: #12110F; color: white; border: none; border-radius: 4px; }
+button:hover { background: #3a3730; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🔧 SOLPRO - API Test v2</h1>
+  <p>Testet Supabase REST-API direkt</p>
+  
+  <div id="results"></div>
+  
+  <button onclick="runTest()">🔄 Test starten</button>
+  <button onclick="document.getElementById('results').innerHTML=''">Löschen</button>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://iuxklqcpexoziqxrohwa.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_VteOTQ6g28z9Dvo-QUG8jw_hehaZpWu';
+
+function addResult(title, message, status = 'loading') {
+  const div = document.createElement('div');
+  div.className = `test ${status}`;
+  div.innerHTML = `<span class="status">${status === 'ok' ? '✓' : status === 'error' ? '✗' : '⟳'}</span> <strong>${title}</strong><div class="message">${message}</div>`;
+  document.getElementById('results').appendChild(div);
+  return div;
+}
+
+async function runTest() {
+  document.getElementById('results').innerHTML = '';
+  
+  addResult('Test Start', 'Teste Supabase REST API...');
+  
+  // Test 1: Supabase URL erreichbar
+  let r1 = addResult('1. Verbindung', 'Teste iuxklqcpexoziqxrohwa.supabase.co...');
+  try {
+    const response = await fetch(SUPABASE_URL);
+    r1.className = 'test ok';
+    r1.querySelector('.status').textContent = '✓';
+    r1.querySelector('.message').textContent = `✓ Server antwortet (HTTP ${response.status})`;
+  } catch (e) {
+    r1.className = 'test error';
+    r1.querySelector('.status').textContent = '✗';
+    r1.querySelector('.message').textContent = `✗ ${e.message}`;
+  }
+  
+  // Test 2: buses Tabelle
+  let r2 = addResult('2. Tabelle: buses', 'Lade Daten...');
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/buses?select=*&limit=1`,
+      { headers: { 'apikey': SUPABASE_KEY } }
+    );
+    const data = await response.json();
+    
+    if (response.ok) {
+      r2.className = 'test ok';
+      r2.querySelector('.status').textContent = '✓';
+      r2.querySelector('.message').textContent = `✓ Existiert (${Array.isArray(data) ? data.length : 0} Einträge)`;
+    } else {
+      r2.className = 'test error';
+      r2.querySelector('.status').textContent = '✗';
+      r2.querySelector('.message').textContent = `✗ HTTP ${response.status} - ${data?.message || 'Unbekannter Fehler'}`;
+    }
+  } catch (e) {
+    r2.className = 'test error';
+    r2.querySelector('.status').textContent = '✗';
+    r2.querySelector('.message').textContent = `✗ ${e.message}`;
+  }
+  
+  // Test 3: profiles Tabelle
+  let r3 = addResult('3. Tabelle: profiles', 'Lade Daten...');
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/profiles?select=*&limit=1`,
+      { headers: { 'apikey': SUPABASE_KEY } }
+    );
+    const data = await response.json();
+    
+    if (response.ok) {
+      r3.className = 'test ok';
+      r3.querySelector('.status').textContent = '✓';
+      r3.querySelector('.message').textContent = `✓ Existiert (${Array.isArray(data) ? data.length : 0} Einträge)`;
+    } else {
+      r3.className = 'test error';
+      r3.querySelector('.status').textContent = '✗';
+      r3.querySelector('.message').textContent = `✗ HTTP ${response.status}`;
+    }
+  } catch (e) {
+    r3.className = 'test error';
+    r3.querySelector('.status').textContent = '✗';
+    r3.querySelector('.message').textContent = `✗ ${e.message}`;
+  }
+
+  // Test 4: projects Tabelle
+  let r4 = addResult('4. Tabelle: projects', 'Lade Daten...');
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/projects?select=*&limit=1`,
+      { headers: { 'apikey': SUPABASE_KEY } }
+    );
+    const data = await response.json();
+    
+    if (response.ok) {
+      r4.className = 'test ok';
+      r4.querySelector('.status').textContent = '✓';
+      r4.querySelector('.message').textContent = `✓ Existiert (${Array.isArray(data) ? data.length : 0} Einträge)`;
+    } else {
+      r4.className = 'test error';
+      r4.querySelector('.status').textContent = '✗';
+      r4.querySelector('.message').textContent = `✗ HTTP ${response.status}`;
+    }
+  } catch (e) {
+    r4.className = 'test error';
+    r4.querySelector('.status').textContent = '✗';
+    r4.querySelector('.message').textContent = `✗ ${e.message}`;
+  }
+
+  // Test 5: grid_assignments Tabelle
+  let r5 = addResult('5. Tabelle: grid_assignments', 'Lade Daten...');
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/grid_assignments?select=*&limit=1`,
+      { headers: { 'apikey': SUPABASE_KEY } }
+    );
+    const data = await response.json();
+    
+    if (response.ok) {
+      r5.className = 'test ok';
+      r5.querySelector('.status').textContent = '✓';
+      r5.querySelector('.message').textContent = `✓ Existiert (${Array.isArray(data) ? data.length : 0} Einträge)`;
+    } else {
+      r5.className = 'test error';
+      r5.querySelector('.status').textContent = '✗';
+      r5.querySelector('.message').textContent = `✗ HTTP ${response.status}`;
+    }
+  } catch (e) {
+    r5.className = 'test error';
+    r5.querySelector('.status').textContent = '✗';
+    r5.querySelector('.message').textContent = `✗ ${e.message}`;
+  }
+
+  addResult('Test Ende', '✅ Diagnose abgeschlossen', 'ok');
+}
+
+// Auto-run
+window.addEventListener('load', () => setTimeout(runTest, 500));
+</script>
+
+</body>
+</html>
