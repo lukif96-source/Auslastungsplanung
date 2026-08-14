@@ -1018,7 +1018,7 @@ async function loadProjects() {
   try {
     const { data, error } = await sb.from('projects').select('*').order('updated_at', { ascending: false });
     if (error) return;
-    state.projects = (data || []).filter(p => !p.archived_at);
+    state.projects = data || []; // Keine Filterung mehr - alle Projekte inklusive abgeschlossene
   } catch (e) {
     console.error('Load projects error:', e);
   }
@@ -1251,8 +1251,8 @@ function renderPalette() {
     };
     c.appendChild(add);
   }
-  // Alle Projekte in der Palette (nicht nur Aufträge)
-  const paletteProjects = state.projects.filter(p => !p.archived_at);
+  // Alle Projekte in der Palette (inklusive archivierte/abgeschlossene)
+  const paletteProjects = state.projects;
   paletteProjects.forEach(p => {
     const cnt = Object.values(state.grid).filter(v => v === p.id).length;
     const el = document.createElement('div');
@@ -1584,9 +1584,12 @@ function renderOrders() {
         <div class="list-card-actions">
           <button class="btn" onclick="editProject('${p.id}')">✏️</button>
           ${p.status === 'interessent' ? `<button class="btn success" onclick="setStatus('${p.id}','auftrag')">→ Auftrag</button>` : ''}
+          ${p.status === 'angebot' ? `<button class="btn success" onclick="setStatus('${p.id}','auftrag')">→ Auftrag</button>` : ''}
           ${p.status === 'auftrag' ? `<button class="btn warn" onclick="setStatus('${p.id}','im_einsatz')">→ Einsatz</button>` : ''}
           ${p.status === 'im_einsatz' ? `<button class="btn success" onclick="setStatus('${p.id}','abgeschlossen')">✓ Fertig</button>` : ''}
-          ${p.status === 'auftrag' || p.status === 'im_einsatz' ? `<button class="btn primary" onclick="switchTab('planner')">📅 Planen</button>` : ''}
+          ${p.status === 'abgeschlossen' ? `<button class="btn warn" onclick="setStatus('${p.id}','im_einsatz')">↶ Reaktivieren</button>` : ''}
+          ${p.status === 'abgelehnt' ? `<button class="btn success" onclick="setStatus('${p.id}','interessent')">↶ Neu starten</button>` : ''}
+          ${p.status === 'auftrag' || p.status === 'im_einsatz' || p.status === 'abgeschlossen' ? `<button class="btn primary" onclick="switchTab('planner')">📅 Planen</button>` : ''}
         </div>
       </div>`;
   }).join('');
@@ -1857,12 +1860,18 @@ function buildProto() {
     const count = parseInt(m.trim());
     if (!count) return;
     for (let s = 0; s < count * 2; s++) {
-      strings.push({ no: idx++, wr: mi + 1, mppt: Math.floor(s/2) + 1, str: (s%2) + 1 });
+      strings.push({ 
+        no: idx++, 
+        wr: mi + 1, 
+        mppt: Math.floor(s/2) + 1, 
+        str: (s%2) + 1,
+        label: `${mi + 1}.${Math.floor(s/2) + 1}.${(s%2) + 1}` // WR.MPPT.String Format
+      });
     }
   });
   $('protoList').innerHTML = strings.map(s => `
     <div class="proto-string">
-      <div class="str-id">S${s.no}</div>
+      <div class="str-id">${s.label}</div>
       <div><div class="str-label">Uoc (V)</div><input type="number" step="0.1" data-no="${s.no}" data-field="uoc"></div>
       <div><div class="str-label">Isc (A)</div><input type="number" step="0.1" data-no="${s.no}" data-field="isc"></div>
       <div><div class="str-label">Umpp (V)</div><input type="number" step="0.1" data-no="${s.no}" data-field="umpp"></div>
@@ -1926,7 +1935,7 @@ function exportProtoExcel() {
   if (!state._protoStrings) { showToast('Erst Matrix laden', 'warn'); return; }
   const rows = state._protoStrings.map(s => {
     const get = field => document.querySelector(`[data-no="${s.no}"][data-field="${field}"]`)?.value || '';
-    return { String: s.no, WR: s.wr, MPPT: s.mppt, Uoc_V: get('uoc'), Isc_A: get('isc'), Umpp_V: get('umpp'), Impp_A: get('impp') };
+    return { String: s.label, WR: s.wr, MPPT: s.mppt, Uoc_V: get('uoc'), Isc_A: get('isc'), Umpp_V: get('umpp'), Impp_A: get('impp') };
   });
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
