@@ -160,9 +160,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .view-J th[id^="th-"],.view-J .project-cell{width:26px}
 .view-J .project-cell{font-size:0!important}
 
-.stat-row td{background:var(--ink)!important;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:8px;padding:4px 2px}
-.stat-row td:first-child{background:#000!important;color:var(--lime)!important;font-family:var(--font-body);font-size:9px;font-weight:800}
-
 .list-shell{max-width:1100px;margin:0 auto}
 .list-hero{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 .list-hero h1{font-family:var(--font-display);font-size:24px;font-weight:800;letter-spacing:-.5px}
@@ -193,7 +190,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .list-card-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
 .list-card-actions .btn{flex:1;min-width:0;font-size:10px;padding:7px 8px}
 
-/* PROJEKT-KARTE: alle Felder sichtbar */
 .proj-color-bar{position:absolute;top:0;left:0;right:0;height:4px;border-radius:var(--radius) var(--radius) 0 0}
 .proj-card-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
 .proj-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:2px;box-shadow:0 0 0 2px rgba(255,255,255,0.8),0 2px 4px rgba(0,0,0,0.15)}
@@ -239,7 +235,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .str-tog-btn{padding:8px 10px;border:1px solid var(--cream-deep);background:#fff;border-radius:5px;font-size:9px;font-weight:800;cursor:pointer;min-height:36px;letter-spacing:.3px;white-space:nowrap;color:var(--ink-muted);transition:all .15s}
 .str-tog-btn.on{background:var(--lime);color:var(--ink);border-color:var(--lime-dk)}
 .str-tog-btn:hover{transform:scale(1.05)}
-.str-tog-btn.on:hover{background:var(--lime-dk)}
 
 @media (max-width:600px){
   .proto-string{grid-template-columns:1fr 1fr;gap:8px}
@@ -308,7 +303,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .overlay.show{display:block;opacity:1}
 .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.97);opacity:0;background:var(--glass-bg-heavy);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow-lg);backdrop-filter:blur(var(--blur));border-radius:16px;padding:22px;display:none;z-index:5001;width:420px;max-width:94vw;max-height:90vh;overflow:auto;transition:transform .15s var(--ease),opacity .15s}
 .modal.show{display:block;opacity:1;transform:translate(-50%,-50%) scale(1)}
-.modal.wide{width:780px}
+.modal.wide{width:820px}
 .modal h2{font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .modal h2 .x{cursor:pointer;font-size:18px;color:var(--ink-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .15s}
 .modal h2 .x:hover{background:rgba(18,17,15,.08);color:var(--ink);transform:rotate(90deg)}
@@ -331,10 +326,9 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .toast .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--lime-dk)}
 .toast.t-success .dot{background:var(--success)}.toast.t-error .dot{background:var(--danger)}.toast.t-warn .dot{background:var(--warn)}.toast.t-info .dot{background:var(--info)}
 
-/* PDF EXTRACT */
 .pdf-extract-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
 @media (max-width:700px){.pdf-extract-grid{grid-template-columns:1fr}}
-.pdf-raw{background:#1a1916;color:#d4d0c4;border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:10px;max-height:300px;overflow:auto;white-space:pre-wrap;line-height:1.5}
+.pdf-raw{background:#1a1916;color:#d4d0c4;border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:10px;max-height:320px;overflow:auto;white-space:pre-wrap;line-height:1.5}
 .pdf-raw mark{background:var(--lime);color:var(--ink);padding:1px 3px;border-radius:3px;font-weight:700}
 .pdf-raw-empty{color:var(--ink-muted);text-align:center;padding:30px 12px;font-size:12px}
 .pdf-drop{border:2px dashed var(--cream-deep);border-radius:var(--radius);padding:30px;text-align:center;cursor:pointer;background:rgba(255,255,255,0.3);transition:all .15s var(--ease)}
@@ -354,9 +348,10 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .user-table th,.user-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--cream-deep)}
 .user-table th{font-size:9px;text-transform:uppercase;color:var(--ink-muted);letter-spacing:.4px;font-weight:700;background:rgba(0,0,0,0.02)}
 .user-table tr:hover td{background:rgba(184,216,75,0.04)}
-.user-table .role-select{padding:4px 8px;font-size:11px;border-radius:6px}
 .bus-pill{display:inline-block;padding:2px 8px;border-radius:12px;background:var(--cream-deep);font-size:10px;margin:2px;font-family:var(--font-mono)}
 .bus-pill.assigned{background:var(--lime);color:var(--ink);font-weight:700}
+
+.pdf-debug{background:#0a0a0a;color:#7fff7f;border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:10px;max-height:200px;overflow:auto;white-space:pre-wrap;line-height:1.5;margin-top:8px}
 
 @media (max-width:768px){
   .topbar{padding:0 12px;min-height:56px;gap:8px}
@@ -365,7 +360,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
   .kpi-val{font-size:12px}
   .view{padding:10px}
   .tab{padding:11px 12px;font-size:10px;min-height:44px}
-  .planner-grid-wrap{max-height:calc(100vh - 260px)}
   td:first-child{width:90px!important;font-size:10px;padding-left:6px}
   .user-chip .name-hide{display:none}
   .user-chip{padding:6px 8px}
@@ -383,7 +377,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 
 <div id="loader"><div class="spinner"></div><div class="loader-text" id="loaderText">Lade Suite…</div></div>
 
-<!-- AUTH -->
 <div id="authOverlay">
   <div class="auth-card">
     <div class="auth-logo">SOL<span>PRO</span></div>
@@ -416,7 +409,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
   </div>
 </div>
 
-<!-- TOPBAR + TABS -->
 <div class="topbar" id="topbar" style="display:none">
   <div class="logo">SOL<span>PRO</span></div>
   <div class="topbar-spacer"></div>
@@ -466,10 +458,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
   <div id="view-customers" class="view">
     <div class="list-shell">
       <div class="list-hero">
-        <div>
-          <h1>Kunden & Interessenten</h1>
-          <p>PDF-Uploads erscheinen hier als Interessenten</p>
-        </div>
+        <div><h1>Kunden & Interessenten</h1><p>PDF-Uploads erscheinen hier als Interessenten</p></div>
         <div style="display:flex;gap:8px">
           <button class="btn" id="btnNewCustomer">+ Manuell anlegen</button>
           <button class="btn primary" id="btnUploadPdf">📄 PDF hochladen</button>
@@ -485,10 +474,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
   <div id="view-orders" class="view">
     <div class="list-shell">
       <div class="list-hero">
-        <div>
-          <h1>Aufträge</h1>
-          <p>Status-Workflow: Interessent → Angebot → Auftrag → Einsatz → Abgeschlossen</p>
-        </div>
+        <div><h1>Aufträge</h1><p>Status-Workflow: Interessent → Angebot → Auftrag → Einsatz → Abgeschlossen</p></div>
         <button class="btn primary" id="btnExportOrdersPdf">📄 PDF Export</button>
       </div>
       <div class="list-toolbar">
@@ -535,7 +521,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
           <button class="btn" id="btnExportProto">📊 Excel</button>
           <button class="btn warn" id="btnExportProtoPdf">📄 PDF</button>
         </div>
-        <p style="font-size:10px;color:var(--ink-muted);margin-top:10px;line-height:1.5">MPPTs kommagetrennt: <strong>2,3</strong> = WR1 hat 2 MPPT, WR2 hat 3 MPPT. Jeder MPPT hat 2 Strings → ID = <code>WR.MPPT.String</code> (z.B. <code>1.2.1</code>).</p>
+        <p style="font-size:10px;color:var(--ink-muted);margin-top:10px;line-height:1.5">MPPTs kommagetrennt: <strong>2,3</strong> = WR1 hat 2 MPPT, WR2 hat 3 MPPT. Jeder MPPT hat 2 Strings → ID = <code>WR.MPPT.String</code> (z.B. <code>1.2.1</code>). Mit „N. belegt" markierte Strings werden inaktiv gespeichert.</p>
         <div class="proto-strings" id="protoList"></div>
       </div>
       <div id="savedProtos"></div>
@@ -578,7 +564,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 
 </div>
 
-<!-- MODALS -->
 <div class="overlay" id="overlay"></div>
 
 <div class="modal" id="customerModal">
@@ -655,6 +640,10 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
   </div>
   <div id="pdfExtractArea" style="display:none">
     <div class="extracted-summary" id="pdfSummary"></div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+      <button class="btn" id="btnRescanPdf" type="button" style="font-size:10px">🔍 Rohtext erneut scannen</button>
+      <button class="btn" id="btnShowPatterns" type="button" style="font-size:10px">🧪 Debug-Log</button>
+    </div>
     <div class="pdf-extract-grid">
       <div>
         <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-muted);margin-bottom:8px">Formular (prüfen & ergänzen)</h3>
@@ -664,8 +653,12 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
           <div class="form-field field-auto" id="fa-pdfCustFirma"><label>Firma</label><input type="text" id="pdfCustFirma" maxlength="120"></div>
         </div>
         <div class="form-row cols-2">
+          <div class="form-field field-auto" id="fa-pdfCustStrasse"><label>Straße / Nr.</label><input type="text" id="pdfCustStrasse" maxlength="200"></div>
           <div class="form-field field-auto" id="fa-pdfCustPlzOrt"><label>PLZ / Ort</label><input type="text" id="pdfCustPlzOrt" maxlength="120"></div>
+        </div>
+        <div class="form-row cols-2">
           <div class="form-field field-auto" id="fa-pdfCustTelefon"><label>Telefon</label><input type="text" id="pdfCustTelefon" maxlength="40"></div>
+          <div class="form-field field-auto" id="fa-pdfCustEmail"><label>E-Mail</label><input type="email" id="pdfCustEmail" maxlength="120"></div>
         </div>
         <div class="form-row cols-2">
           <div class="form-field field-auto" id="fa-pdfProjName"><label>Projektname *</label><input type="text" id="pdfProjName" maxlength="120"></div>
@@ -681,6 +674,10 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
       <div>
         <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-muted);margin-bottom:8px">Rohtext aus PDF (extrahiert)</h3>
         <div class="pdf-raw" id="pdfRawText"></div>
+        <div id="pdfDebugArea" style="display:none">
+          <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-muted);margin:10px 0 4px">Debug-Log</h3>
+          <div class="pdf-debug" id="pdfDebugLog"></div>
+        </div>
       </div>
     </div>
     <div class="m-btns">
@@ -754,6 +751,7 @@ const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY
 const $ = id => document.getElementById(id);
 const escHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const escAttr = escHtml;
+const escRe = s => String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const daysSince = ts => Math.floor((Date.now() - ts) / 86400000);
 const showLoader = (on, txt) => { $('loaderText').textContent = txt || 'Lade…'; $('loader').classList.toggle('show', on); };
 function showToast(msg, type='info', ms=3500) {
@@ -905,6 +903,8 @@ function setupListeners(){
   $('btnInviteUser').onclick = inviteUser;
   $('userSave').onclick = saveUser;
   $('pdfSave').onclick = savePdfExtract;
+  $('btnRescanPdf').onclick = () => { if (state._pdfRawText) runExtraction(); };
+  $('btnShowPatterns').onclick = () => { $('pdfDebugArea').style.display = $('pdfDebugArea').style.display==='none' ? '' : 'none'; };
   $('customerSearch').oninput = e => { state.customerSearch = e.target.value.toLowerCase(); renderCustomers(); };
   $('orderSearch').oninput = e => { state.orderSearch = e.target.value.toLowerCase(); renderOrders(); };
   $('credSearch').oninput = e => { state._credSearch = e.target.value.toLowerCase(); renderCredGrid(); };
@@ -1150,7 +1150,7 @@ function renderOrders(){
   const grid = $('orderGrid');
   let list = state.projects.slice();
   if (state.orderFilter) list = list.filter(p => p.status===state.orderFilter);
-  if (state.orderSearch) { const q=state.orderSearch; list = list.filter(p => (p.name+' '+(p.dachform||'')+' '+(p.dacheindeckung||'')+' '+(p.kunde_name||'')).toLowerCase().includes(q)); }
+  if (state.orderSearch) { const q=state.orderSearch; list = list.filter(p => (p.name+' '+(p.dachform||'')+' '+(p.dacheindeckung||'')).toLowerCase().includes(q)); }
   if (!list.length) { grid.innerHTML = `<div class="empty-state"><div class="icon">📋</div><h3>Keine Projekte</h3><p>Lade ein PDF hoch oder lege manuell ein Projekt an.</p></div>`; return; }
   grid.innerHTML = list.map(p => {
     const customer = state.customers.find(c => c.id===p.customer_id);
@@ -1245,12 +1245,16 @@ window.quickDeleteProject = async (id) => {
   showToast('Projekt gelöscht', 'success');
 };
 
-// PDF UPLOAD + EXTRACT  (FUNKTIONIERT JETZT)
+// =====================================================================
+// PDF UPLOAD + EXTRACT  — KOMPLETT NEUE, ROBUSTE VERSION
+// =====================================================================
 function openPdfModal(){
   $('pdfExtractArea').style.display='none';
   $('pdfDrop').style.display='';
   $('pdfFile').value='';
-  // Auto-Flags zurücksetzen
+  state._pdfRawText = '';
+  state._pdfDebugLog = '';
+  $('pdfDebugArea').style.display = 'none';
   document.querySelectorAll('.field-auto').forEach(el => el.classList.remove('has-value'));
   showModal('pdfModal');
 }
@@ -1260,54 +1264,37 @@ async function handlePdfFile(file){
   try {
     const arrayBuffer = await file.arrayBuffer();
     let fullText = '';
+    let pageTexts = [];
     try {
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        // Items haben oft 'hasEOL' Flag - berücksichtige Zeilenumbrüche
-        const parts = content.items.map(it => it.str + (it.hasEOL ? '\n' : ' '));
-        fullText += parts.join('') + '\n';
+        const items = content.items;
+        let pageLines = [];
+        let currentLine = '';
+        let lastY = null;
+        for (const it of items) {
+          const y = it.transform ? it.transform[5] : null;
+          if (lastY !== null && y !== null && Math.abs(y - lastY) > 2) {
+            if (currentLine.trim()) pageLines.push(currentLine.trim());
+            currentLine = '';
+          }
+          currentLine += it.str + (it.hasEOL ? '' : ' ');
+          lastY = y;
+        }
+        if (currentLine.trim()) pageLines.push(currentLine.trim());
+        pageTexts.push(pageLines.join('\n'));
+        fullText += pageLines.join('\n') + '\n\n';
       }
     } catch (pdfErr) {
       console.warn('PDF.js Fehler:', pdfErr);
-      fullText = '';
     }
-
-    // Markiere erkannte Felder + zeige Text
-    const fields = extractFields(fullText);
-    $('pdfRawText').textContent = fullText || '(Kein Textlayer erkannt – das PDF ist vermutlich ein Scan. Bitte alle Felder manuell ausfüllen.)';
+    state._pdfRawText = fullText;
+    state._pdfPages = pageTexts;
+    $('pdfRawText').textContent = fullText || '(Kein Textlayer erkannt – das PDF ist vermutlich ein Scan.)';
     $('pdfFileName').value = file.name;
-
-    // Felder setzen + Auto-Flag setzen
-    const setField = (id, val) => {
-      const el = $(id); if (!el) return;
-      el.value = val || '';
-      const wrap = $('fa-'+id);
-      if (wrap) wrap.classList.toggle('has-value', !!val);
-    };
-    setField('pdfCustName', fields.name);
-    setField('pdfCustFirma', fields.firma);
-    setField('pdfCustPlzOrt', fields.plz_ort);
-    setField('pdfCustTelefon', fields.telefon);
-    setField('pdfProjName', fields.projektname || fields.name);
-    setField('pdfDatum', fields.datum);
-    setField('pdfAnlagengröße', fields.anlagengroesse);
-    setField('pdfSpeicher', fields.speicher);
-    setField('pdfDachform', fields.dachform);
-    setField('pdfDacheindeckung', fields.dacheindeckung);
-
-    const filled = Object.values(fields).filter(Boolean).length;
-    if (fullText && filled > 0) {
-      $('pdfSummary').className = 'extracted-summary';
-      $('pdfSummary').innerHTML = `✅ <strong>${filled} Felder automatisch erkannt</strong> – gelb markiert. Bitte trotzdem prüfen & ergänzen, dann speichern.`;
-    } else if (fullText && filled === 0) {
-      $('pdfSummary').className = 'extracted-summary warn';
-      $('pdfSummary').innerHTML = `⚠️ <strong>Text gelesen, aber keine passenden Felder gefunden</strong>. Das PDF hat ein anderes Layout. Bitte manuell ausfüllen.`;
-    } else {
-      $('pdfSummary').className = 'extracted-summary error';
-      $('pdfSummary').innerHTML = `📄 <strong>Scan erkannt</strong> – kein Textlayer. Bitte alle Felder manuell ausfüllen.`;
-    }
+    runExtraction();
     $('pdfDrop').style.display = 'none';
     $('pdfExtractArea').style.display = '';
     state._pdfBuffer = arrayBuffer;
@@ -1320,87 +1307,215 @@ async function handlePdfFile(file){
   showLoader(false);
 }
 
-function extractFields(text){
-  const fields = {};
-  if (!text || !text.trim()) return fields;
-  // Normalisiere Whitespace
-  const norm = text.replace(/\r/g,'').replace(/[ \t]+/g,' ').replace(/\n[ \t]+/g,'\n').trim();
-  const lines = norm.split('\n').map(l => l.trim()).filter(Boolean);
-
-  // Strategie 1: Label pro Zeile (häufigstes Layout)
-  const labelRegex = (lbl) => new RegExp('^\\s*' + lbl + '\\s*[:\\-]?\\s*(.*)$', 'i');
-
-  const isStopLine = (line) => {
-    return /^(Firma|Name|Projektname|PLZ\s*\/\s*Ort|Straße|Telefon|E-Mail|Datum|Dachform|Dacheindeckung|Sparren|Gebäude|First|Traufen|Netzbetreiber|Zähler|Stromverbrauch|Photovoltaik|Ladestation|Stromspeicher|Notstrom|Wartung|Garantie|Förderansuchen|Anlagengröße|Seite|Bestandsaufnahme|SOLPRO)/i.test(line);
+function runExtraction(){
+  if (!state._pdfRawText) return;
+  const fields = extractFields(state._pdfRawText);
+  console.log('[PDF Extract] Erkannte Felder:', fields);
+  state._lastExtract = fields;
+  // Felder setzen + Auto-Flag setzen
+  const setField = (id, val) => {
+    const el = $(id); if (!el) return;
+    el.value = val || '';
+    const wrap = $('fa-'+id);
+    if (wrap) wrap.classList.toggle('has-value', !!val);
   };
+  setField('pdfCustName', fields.name);
+  setField('pdfCustFirma', fields.firma);
+  setField('pdfCustStrasse', fields.strasse);
+  setField('pdfCustPlzOrt', fields.plz_ort);
+  setField('pdfCustTelefon', fields.telefon);
+  setField('pdfCustEmail', fields.email);
+  setField('pdfProjName', fields.projektname || fields.name);
+  setField('pdfDatum', fields.datum);
+  setField('pdfAnlagengröße', fields.anlagengroesse);
+  setField('pdfSpeicher', fields.speicher);
+  setField('pdfDachform', fields.dachform);
+  setField('pdfDacheindeckung', fields.dacheindeckung);
 
-  const findValue = (startIdx, maxLines = 3) => {
-    // Wenn Zeile NUR Label ist → Wert in nächster Zeile
-    // Wenn Zeile "Label: Wert" → Wert extrahieren
-    const line = lines[startIdx];
-    const m = line.match(/^([^:]+?)\s*[:\-]\s*(.+)$/);
-    if (m && m[2].trim()) return m[2].trim();
-    // Andernfalls: nächste Zeile(n) lesen bis Stop-Label
-    const parts = [];
-    for (let i = startIdx+1; i < Math.min(startIdx+1+maxLines, lines.length); i++) {
-      if (isStopLine(lines[i])) break;
-      parts.push(lines[i]);
-    }
-    return parts.join(' ').trim() || null;
-  };
+  const filled = Object.values(fields).filter(Boolean).length;
+  const total = 12;
+  if (state._pdfRawText && filled > 0) {
+    $('pdfSummary').className = 'extracted-summary';
+    $('pdfSummary').innerHTML = `✅ <strong>${filled}/${total} Felder automatisch erkannt</strong> – gelb markiert. Bitte trotzdem prüfen & ergänzen, dann speichern.<br><span style="font-size:10px;opacity:.8">💡 Im Rohtext rechts siehst du den extrahierten Text. Nicht erkannte Felder bitte manuell ausfüllen. Bei Problemen: 🔍 Rohtext erneut scannen oder 🧪 Debug-Log öffnen.</span>`;
+  } else if (state._pdfRawText && filled === 0) {
+    $('pdfSummary').className = 'extracted-summary warn';
+    $('pdfSummary').innerHTML = `⚠️ <strong>Text gelesen, aber keine Felder gefunden</strong>. Das PDF hat ein anderes Layout.<br><span style="font-size:10px;opacity:.8">→ Probiere "🔍 Rohtext erneut scannen" oder fülle manuell aus. Öffne 🧪 Debug-Log für Details.</span>`;
+  } else {
+    $('pdfSummary').className = 'extracted-summary error';
+    $('pdfSummary').innerHTML = `📄 <strong>Scan erkannt</strong> – kein Textlayer. Bitte alle Felder manuell ausfüllen.`;
+  }
+  if (state._pdfDebugLog && $('pdfDebugLog')) $('pdfDebugLog').textContent = state._pdfDebugLog;
+}
 
-  for (let i = 0; i < lines.length; i++) {
-    const l = lines[i];
-    if (/^Name\s*$/i.test(l) && !fields.name) {
-      const v = findValue(i, 3);
-      if (v && v.length > 1 && !/^(Firma|Herr|Frau)/i.test(v)) fields.name = v;
-    }
-    if (/^Firma\s*$/i.test(l) && !fields.firma) {
-      const v = findValue(i, 2);
-      if (v && v.length > 1) fields.firma = v;
-    }
-    if (/^Projektname\s*$/i.test(l) && !fields.projektname) {
-      const v = findValue(i, 2);
-      if (v) fields.projektname = v;
-    }
-    if (/^Telefonnummer\s*$/i.test(l) && !fields.telefon) {
-      const v = findValue(i, 2);
-      if (v) fields.telefon = v;
-    }
-    if (/^E-Mail-Adresse\s*$/i.test(l) && !fields.email) {
-      const v = findValue(i, 1);
-      if (v && /@/.test(v)) fields.email = v;
-    }
-    if (/^Datum\s*$/i.test(l) && !fields.datum) {
-      const v = findValue(i, 1);
-      if (v) fields.datum = v;
-    }
-    if (/^Dachform\s*$/i.test(l) && !fields.dachform) {
-      const v = findValue(i, 1);
-      if (v) fields.dachform = v;
-    }
-    if (/^Dacheindeckung\s*$/i.test(l) && !fields.dacheindeckung) {
-      const v = findValue(i, 1);
-      if (v) fields.dacheindeckung = v;
-    }
-    if (/^PLZ\s*\/\s*Ort\s*$/i.test(l) && !fields.plz_ort) {
-      const v = findValue(i, 1);
-      if (v) fields.plz_ort = v;
-    }
-    // Anlagengröße: suche Zahl in der Nähe
-    if (/^(definierte\s+)?Anlagengröße\s*\([^)]+\)\s*$/i.test(l) && !fields.anlagengroesse) {
-      for (let j = i; j < Math.min(i+5, lines.length); j++) {
-        const m = lines[j].match(/(\d+(?:[.,]\d+)?)/);
-        if (m) { fields.anlagengroesse = m[1].replace(',', '.'); break; }
-      }
-    }
-    if (/^Stromspeicher\s*\([^)]+\)\s*$/i.test(l) && !fields.speicher) {
-      for (let j = i; j < Math.min(i+5, lines.length); j++) {
-        const m = lines[j].match(/(\d+(?:[.,]\d+)?)/);
-        if (m) { fields.speicher = m[1].replace(',', '.'); break; }
+// ====== Label-Patterns (Multi-Variante) ======
+const FIELD_PATTERNS = {
+  name: [/^(?:Kundenname|Kunden\s*name|Name|Vorname\s*\/\s*Nachname|Ansprechpartner)\s*[:\-]?\s*$/i, /^Name\s*[:\-]/i],
+  firma: [/^(?:Firma|Firmenname|Unternehmen|Betrieb)\s*[:\-]?\s*$/i, /^Firma\s*[:\-]/i],
+  strasse: [
+    /^(?:Stra(?:ß|ss)e\s*\/\s*Nr\.?|Stra(?:ß|ss)e\s*\/\s*Nr|Anschrift|Adresse)\s*[:\-]?\s*$/i,
+    /^(?:Stra(?:ß|ss)e|Anschrift|Adresse)\s*[:\-]?\s*$/i,
+    /^Stra(?:ß|ss)e\s*\/\s*Nr\.\s*[:\-]/i
+  ],
+  plz_ort: [
+    /^(?:PLZ\s*\/\s*Ort|Postleitzahl\s*\/\s*Ort|Ort\s*\/\s*PLZ|Wohnort)\s*[:\-]?\s*$/i,
+    /^(?:PLZ|Postleitzahl)\s*[:\-]\s*\d/i,
+    /^Ort\s*[:\-]/i
+  ],
+  telefon: [/^(?:Telefonnummer|Telefon|Tel\.?|Handy|Mobil(?:nummer)?|Festnetz)\s*[:\-]?\s*$/i, /^Tel\.?\s*[:\-]/i],
+  email: [/^(?:E[\-\s]?Mail[\-\s]?Adresse|E[\-\s]?Mail|Email)\s*[:\-]?\s*$/i, /E[\-\s]?Mail\s*[:\-]/i],
+  projektname: [/^(?:Projektname|Projektbezeichnung|Projekt)\s*[:\-]?\s*$/i, /^Projekt\s*[:\-]/i],
+  datum: [/^(?:Datum|Aufnahmedatum|Erstellt\s*am|Datum\s*der\s*Aufnahme)\s*[:\-]?\s*$/i, /^Datum\s*[:\-]/i],
+  dachform: [/^(?:Dachform|Art\s*des\s*Daches)\s*[:\-]?\s*$/i],
+  dacheindeckung: [/^(?:Dacheindeckung|Eindeckung|Dachbelag)\s*[:\-]?\s*$/i]
+};
+
+const STOP_LABELS = [
+  'Firma','Kundenname','Name','Vorname','Nachname','Ansprechpartner',
+  'Straße','Strasse','Anschrift','Adresse',
+  'PLZ','Postleitzahl','Ort','Wohnort',
+  'Telefonnummer','Telefon','Tel','Tel.','Handy','Mobil','Festnetz',
+  'E-Mail','Email','E-Mail-Adresse',
+  'Projektname','Projekt','Projektbezeichnung',
+  'Datum','Aufnahmedatum','Erstellt',
+  'Dachform','Dacheindeckung','Eindeckung','Dachbelag',
+  'Sparrenmaterial','Sparrenabstand','Sparrenstärke','Gebäudemaße','Dachunterkonstruktion',
+  'Dachlänge','Breite','Traufenhöhe','Firsthöhe','Firstlänge','Dachneigung',
+  'Netzbetreiber','Zählernummer','Stromverbrauch',
+  'Photovoltaik','Ladestation','Stromspeicher','Notstrom',
+  'Wartungsvertrag','Garantieverlängerung','Förderansuchen',
+  'Anlagengröße','definierte Anlagengröße',
+  'Seite','Bestandsaufnahme','SOLPRO','Kundendaten','Projektadresse',
+  'Angaben','Allgemein','Montage','Belegung','Sonstiges','Checkliste'
+];
+
+const isStopLabel = (line) => {
+  const t = (line || '').trim();
+  if (!t) return true;
+  // Direkter Match
+  for (const lbl of STOP_LABELS) {
+    if (t.toLowerCase() === lbl.toLowerCase()) return true;
+  }
+  // Beginnt mit Label + Separator
+  for (const lbl of STOP_LABELS) {
+    const re = new RegExp('^' + escRe(lbl) + '(\\s*[:\\-./]\\s*|\\s+(?=[A-ZÄÖÜ])|$)','i');
+    if (re.test(t)) return true;
+  }
+  return false;
+};
+
+// Inline-Parser: "Label: Wert" in einer Zeile
+function parseInline(line){
+  const m = line.match(/^([A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß\.\/\-\s]{1,40}?)\s*[:\-]\s*(.+)$/);
+  if (!m) return null;
+  const label = m[1].trim();
+  const value = m[2].trim();
+  if (value.length < 1 || value.length > 200) return null;
+  for (const [field, patterns] of Object.entries(FIELD_PATTERNS)) {
+    // Test mit und ohne ":"
+    for (const p of patterns) {
+      if (p.test(label) || p.test(label + ':') || p.test(label + ' ')) {
+        // Validierung
+        if (field === 'plz_ort' && !/\d{4,5}/.test(value)) continue;
+        if (field === 'email' && !/@/.test(value)) continue;
+        if (field === 'telefon' && value.replace(/\D/g,'').length < 5) continue;
+        if (field === 'strasse' && value.length < 2) continue;
+        return [field, value];
       }
     }
   }
+  return null;
+}
+
+function extractFields(text){
+  const fields = {};
+  const debug = [];
+  debug.push('=== PDF EXTRACTOR v3 ===');
+  debug.push('Text length: ' + (text?.length || 0) + ' chars');
+  if (!text || !text.trim()) {
+    state._pdfDebugLog = debug.join('\n');
+    return fields;
+  }
+
+  // Normalisierung
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  debug.push('Lines: ' + lines.length);
+  debug.push('First 5 lines:');
+  lines.slice(0, 5).forEach((l, i) => debug.push('  ' + i + ': ' + l.substring(0, 80)));
+
+  // Strategie A: Inline-Pattern
+  debug.push('\n--- Strategie A: Inline ---');
+  for (let i = 0; i < lines.length; i++) {
+    const inline = parseInline(lines[i]);
+    if (inline) {
+      const [field, value] = inline;
+      if (!fields[field]) {
+        fields[field] = value;
+        debug.push('  ✓ ' + field + ' = "' + value.substring(0, 60) + '" (line ' + i + ')');
+      }
+    }
+  }
+
+  // Strategie B: Label-Only Zeile, Wert in nächster Zeile
+  debug.push('\n--- Strategie B: Multi-Line ---');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    // Wenn die Zeile schon als Inline verarbeitet wurde → skip
+    if (parseInline(line)) continue;
+    // Entferne trailing ":" und "-" für den Test
+    const cleanLine = line.replace(/[:\-]\s*$/, '').trim();
+    if (!cleanLine || cleanLine.length < 2) continue;
+
+    for (const [field, patterns] of Object.entries(FIELD_PATTERNS)) {
+      if (fields[field]) continue;
+      const matched = patterns.some(p => p.test(cleanLine) || p.test(cleanLine + ':') || p.test(cleanLine + ' '));
+      if (!matched) continue;
+
+      // Nächste Zeile(n) sammeln bis Stop-Label
+      const valueParts = [];
+      for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
+        const next = lines[j].trim();
+        if (!next) continue;
+        if (isStopLabel(next)) break;
+        // Inline in der nächsten Zeile? → nur bis zum Doppelpunkt nehmen
+        const inlineNext = parseInline(next);
+        if (inlineNext) {
+          valueParts.push(inlineNext[1]);
+          break;
+        }
+        valueParts.push(next);
+      }
+      const value = valueParts.join(' ').replace(/\s+/g, ' ').trim();
+      if (!value || value.length > 200) continue;
+      // Validierung
+      if (field === 'plz_ort' && !/\d{4,5}/.test(value)) continue;
+      if (field === 'email' && !/@/.test(value)) continue;
+      if (field === 'telefon' && value.replace(/\D/g,'').length < 5) continue;
+      if (field === 'strasse' && value.length < 2) continue;
+
+      fields[field] = value;
+      debug.push('  ✓ ' + field + ' = "' + value.substring(0, 60) + '" (line ' + i + ')');
+      break;
+    }
+  }
+
+  // Strategie C: Bonus-Regex für Telefon/Email
+  debug.push('\n--- Strategie C: Regex-Fallback ---');
+  if (!fields.telefon) {
+    const m = text.match(/(?:\+43|0043|0)\s*[\d\s\-/]{6,}/);
+    if (m) { fields.telefon = m[0].trim(); debug.push('  ✓ telefon = "' + fields.telefon + '" (regex)'); }
+  }
+  if (!fields.email) {
+    const m = text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
+    if (m) { fields.email = m[0]; debug.push('  ✓ email = "' + fields.email + '" (regex)'); }
+  }
+  // PLZ/Ort: suche nach "PLZ: 1234 Ort" oder "1234 Ort"
+  if (!fields.plz_ort) {
+    const m = text.match(/\b(\d{4,5})\s+([A-ZÄÖÜ][a-zäöüß\-]+(?:\s+[A-ZÄÖÜ][a-zäöüß\-]+)*)/);
+    if (m) { fields.plz_ort = (m[1] + ' ' + m[2]).trim(); debug.push('  ✓ plz_ort = "' + fields.plz_ort + '" (regex)'); }
+  }
+
+  debug.push('\n=== Ergebnis: ' + Object.values(fields).filter(Boolean).length + '/12 Felder ===');
+  state._pdfDebugLog = debug.join('\n');
   return fields;
 }
 
@@ -1419,7 +1534,10 @@ async function savePdfExtract(){
     else {
       const { data: newC, error: cErr } = await sb.from('customers').insert({
         name: custName, firma: $('pdfCustFirma').value.trim()||null,
-        plz_ort: $('pdfCustPlzOrt').value.trim()||null, telefon: $('pdfCustTelefon').value.trim()||null
+        strasse: $('pdfCustStrasse').value.trim()||null,
+        plz_ort: $('pdfCustPlzOrt').value.trim()||null,
+        telefon: $('pdfCustTelefon').value.trim()||null,
+        email: $('pdfCustEmail').value.trim()||null
       }).select().single();
       if (cErr) throw cErr;
       customerId = newC.id;
@@ -1456,7 +1574,6 @@ function renderProtoProjects(){
 function buildProto(){
   const mpptRaw = $('protoMppt').value;
   const strings = [];
-  let mpptCounter = 0; // fortlaufend über alle WRs
   mpptRaw.split(',').forEach((m, mi) => {
     const count = parseInt(m.trim());
     if (!count) return;
@@ -1464,11 +1581,9 @@ function buildProto(){
       const mpptIdx = Math.floor(s/2) + 1;
       const strIdx = (s%2) + 1;
       strings.push({
-        no: strings.length + 1,        // globale Sortier-ID
-        wr: mi + 1,
-        mppt: mpptIdx,
-        str: strIdx,
-        id: `${mi+1}.${mpptIdx}.${strIdx}`,  // 1.1.1, 1.1.2, 1.2.1, ...
+        no: strings.length + 1,
+        wr: mi + 1, mppt: mpptIdx, str: strIdx,
+        id: `${mi+1}.${mpptIdx}.${strIdx}`,
         isActive: true
       });
     }
@@ -1487,8 +1602,6 @@ function buildProto(){
     </div>
   `).join('');
   state._protoStrings = strings;
-
-  // Toggle-Handler
   document.querySelectorAll('.str-tog-btn').forEach(btn => btn.onclick = () => {
     const no = parseInt(btn.dataset.no);
     const s = state._protoStrings.find(x => x.no===no); if (!s) return;
@@ -1497,10 +1610,8 @@ function buildProto(){
     const row = document.querySelector(`.proto-string[data-no="${no}"]`);
     row.classList.toggle('is-inactive', !isActive);
     row.querySelectorAll('input[type="number"]').forEach(inp => inp.disabled = !isActive);
-    // Buttons updaten
     row.querySelectorAll('.str-tog-btn').forEach(b => b.classList.toggle('on', (b.dataset.tog==='active')===isActive));
   });
-
   if (!$('protoPruefer').value && state.profile) $('protoPruefer').value = state.profile.display_name;
 }
 
@@ -1565,8 +1676,6 @@ function exportProtoPdf(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
-
-  // Header
   doc.setFillColor(18, 17, 15);
   doc.rect(0, 0, pageW, 28, 'F');
   doc.setTextColor(184, 216, 75);
@@ -1575,10 +1684,7 @@ function exportProtoPdf(){
   doc.setTextColor(247, 244, 238);
   doc.setFontSize(11); doc.setFont('helvetica', 'normal');
   doc.text('Mess- und Prüfprotokoll · PV-Generator', 12, 22);
-
-  // Meta
-  doc.setTextColor(18, 17, 15);
-  doc.setFontSize(9);
+  doc.setTextColor(18, 17, 15); doc.setFontSize(9);
   const meta = [
     ['Standort:', $('protoStandort').value || '—'],
     ['Prüfer:', $('protoPruefer').value || '—'],
@@ -1599,8 +1705,6 @@ function exportProtoPdf(){
     doc.text(lines, 38, y);
     y += lines.length * 5;
   }
-
-  // Table
   const body = state._protoStrings.map(s => {
     const get = field => document.querySelector(`[data-no="${s.no}"][data-field="${field}"]`)?.value || '—';
     return [s.id, s.wr, s.mppt, s.str, s.isActive ? '✓' : '—', get('uoc'), get('isc'), get('umpp'), get('impp')];
@@ -1613,7 +1717,7 @@ function exportProtoPdf(){
     headStyles: { fillColor: [18, 17, 15], textColor: [184, 216, 75], fontStyle: 'bold', fontSize: 9 },
     bodyStyles: { fontSize: 9, textColor: [18, 17, 15] },
     alternateRowStyles: { fillColor: [247, 244, 238] },
-    didDrawPage: (data) => {
+    didDrawPage: () => {
       const str = `Seite ${doc.internal.getNumberOfPages()}`;
       doc.setFontSize(8); doc.setTextColor(138, 132, 120);
       doc.text(str, pageW - 12, doc.internal.pageSize.getHeight() - 6, { align: 'right' });
@@ -1630,8 +1734,6 @@ function exportOrdersPdf(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
-
-  // Header
   doc.setFillColor(18, 17, 15);
   doc.rect(0, 0, pageW, 28, 'F');
   doc.setTextColor(184, 216, 75);
@@ -1640,30 +1742,22 @@ function exportOrdersPdf(){
   doc.setTextColor(247, 244, 238);
   doc.setFontSize(11); doc.setFont('helvetica', 'normal');
   doc.text('Projekt-Übersicht' + (state.orderFilter ? ' · ' + STATUS_LABELS[state.orderFilter] : ''), 12, 22);
-
-  doc.setTextColor(18, 17, 15);
-  doc.setFontSize(9);
+  doc.setTextColor(18, 17, 15); doc.setFontSize(9);
   doc.text(`Exportiert: ${new Date().toLocaleString('de-AT')}`, 12, 36);
   doc.text(`Anzahl: ${list.length} Projekt(e)`, 12, 41);
-
   const body = list.map(p => {
     const c = state.customers.find(x => x.id===p.customer_id);
     return [
-      p.name,
-      c ? c.name : '—',
-      STATUS_LABELS[p.status] || p.status,
-      p.kwp || '—',
-      p.anlagengroesse || '—',
+      p.name, c ? c.name : '—', STATUS_LABELS[p.status] || p.status,
+      p.kwp || '—', p.anlagengroesse || '—',
       p.speicher_kwh ? p.speicher_kwh + ' kWh' : '—',
-      p.dachform || '—',
-      p.dacheindeckung || '—'
+      p.dachform || '—', p.dacheindeckung || '—'
     ];
   });
   doc.autoTable({
     startY: 48,
     head: [['Projekt', 'Kunde', 'Status', 'kWp', 'Wunsch', 'Speicher', 'Dachform', 'Eindeckung']],
-    body,
-    theme: 'grid',
+    body, theme: 'grid',
     headStyles: { fillColor: [18, 17, 15], textColor: [184, 216, 75], fontStyle: 'bold', fontSize: 8 },
     bodyStyles: { fontSize: 8, textColor: [18, 17, 15] },
     alternateRowStyles: { fillColor: [247, 244, 238] },
