@@ -290,7 +290,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 /* ── MODALS ── */
 .overlay{position:fixed;inset:0;background:rgba(18,17,15,.45);backdrop-filter:blur(4px);z-index:5000;display:none}
 .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.97);opacity:0;background:var(--glass-bg-heavy);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow-lg);backdrop-filter:blur(var(--blur));border-radius:16px;padding:22px;display:none;z-index:5001;width:420px;max-width:94vw;max-height:90vh;overflow:auto;transition:transform .15s var(--ease),opacity .15s}
-.modal.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.modal.show{display:block;opacity:1;transform:translate(-50%,-50%) scale(1)}
 .modal.wide{width:720px}
 .modal h2{font-family:var(--font-display);font-size:16px;font-weight:800;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .modal h2 .x{cursor:pointer;font-size:18px;color:var(--ink-muted);width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%}
@@ -452,7 +452,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
       <div class="list-hero">
         <div>
           <h1>Kunden & Interessenten</h1>
-          <p>PDF-Uploads → Direkt als Einsatz im Planer verfügbar</p>
+          <p>PDF-Uploads erscheinen hier als Interessenten</p>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn" id="btnNewCustomer">+ Manuell anlegen</button>
@@ -849,14 +849,9 @@ $('authLoginBtn').onclick = async () => {
   const status = $('authStatus');
   if (!email || !pw) { status.textContent = 'E-Mail und Passwort erforderlich'; return; }
   status.textContent = 'Anmelde…'; status.className = 'auth-status info';
-  try {
-    const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
-    if (error) { status.textContent = error.message; status.className = 'auth-status'; return; }
-    await bootApp();
-  } catch (e) {
-    status.textContent = 'Verbindungsfehler: ' + e.message;
-    status.className = 'auth-status';
-  }
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+  if (error) { status.textContent = error.message; status.className = 'auth-status'; return; }
+  await bootApp();
 };
 
 $('authSignupBtn').onclick = async () => {
@@ -867,20 +862,15 @@ $('authSignupBtn').onclick = async () => {
   if (!name || !email || !pw) { status.textContent = 'Alle Felder erforderlich'; return; }
   if (pw.length < 6) { status.textContent = 'Passwort min. 6 Zeichen'; return; }
   status.textContent = 'Erstelle Account…'; status.className = 'auth-status info';
-  try {
-    const { data, error } = await sb.auth.signUp({
-      email, password: pw, options: { data: { display_name: name } }
-    });
-    if (error) { status.textContent = error.message; status.className = 'auth-status'; return; }
-    if (data.user && !data.session) {
-      status.textContent = 'Account erstellt. Bitte E-Mail bestätigen (Spam prüfen).'; status.className = 'auth-status success';
-      return;
-    }
-    await bootApp();
-  } catch (e) {
-    status.textContent = 'Verbindungsfehler: ' + e.message;
-    status.className = 'auth-status';
+  const { data, error } = await sb.auth.signUp({
+    email, password: pw, options: { data: { display_name: name } }
+  });
+  if (error) { status.textContent = error.message; status.className = 'auth-status'; return; }
+  if (data.user && !data.session) {
+    status.textContent = 'Account erstellt. Bitte E-Mail bestätigen (Spam prüfen).'; status.className = 'auth-status success';
+    return;
   }
+  await bootApp();
 };
 
 $('authEmail').onkeydown = e => { if (e.key === 'Enter') $('authLoginBtn').click(); };
@@ -902,158 +892,81 @@ $('userChip').onclick = e => {
 // ─── Boot ─────────────────────────────────────────────────────
 async function bootApp() {
   showLoader(true, 'Lade…');
-  try {
-    const { data: { user }, error: userError } = await sb.auth.getUser();
-    if (userError || !user) { 
-      console.log('No user session:', userError);
-      showAuth(); 
-      showLoader(false); 
-      return; 
-    }
-    state.user = user;
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) { showAuth(); showLoader(false); return; }
+  state.user = user;
 
-    // Profile laden (Retry, da Trigger evtl. gerade erst läuft)
-    let profile = null;
-    for (let i = 0; i < 10; i++) {
-      try {
-        const { data, error } = await sb.from('profiles').select('*').eq('id', user.id).single();
-        if (data) { 
-          profile = data; 
-          break; 
-        }
-        if (error && error.code !== 'PGRST116') {
-          console.log('Profile load error:', error);
-        }
-      } catch (e) {
-        console.log('Profile load exception:', e);
-      }
-      await new Promise(r => setTimeout(r, 300));
-    }
-    
-    // Falls immer noch kein Profil, versuche es manuell zu erstellen
-    if (!profile) {
-      console.log('Creating profile manually for user:', user.id);
-      try {
-        // Prüfe ob Profil existiert
-        const { data: existing } = await sb.from('profiles').select('*').eq('id', user.id).single();
-        if (existing) {
-          profile = existing;
-        } else {
-          // Erstelle Profil manuell
-          const { count } = await sb.from('profiles').select('*', { count: 'exact', head: true });
-          const isFirstUser = count === 0;
-          
-          const { data: newProfile, error: createError } = await sb.from('profiles').insert({
-            id: user.id,
-            display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'User',
-            role: isFirstUser ? 'admin' : 'mitarbeiter'
-          }).select().single();
-          
-          if (createError) {
-            console.error('Manual profile creation failed:', createError);
-            throw createError;
-          }
-          profile = newProfile;
-        }
-      } catch (e) {
-        console.error('Profile creation failed:', e);
-        showToast('Profile konnte nicht erstellt werden: ' + e.message, 'error');
-        await sb.auth.signOut();
-        showAuth(); showLoader(false); return;
-      }
-    }
-    
-    state.profile = profile;
-
-    // UI
-    $('userName').textContent = profile.display_name;
-    $('userAvatar').textContent = profile.display_name[0].toUpperCase();
-    $('userMenuName').textContent = profile.display_name;
-    $('userMenuRole').textContent = { admin:'Administrator', editor:'Editor', mitarbeiter:'Mitarbeiter', viewer:'Betrachter' }[profile.role] || profile.role;
-
-    if (profile.role === 'viewer') { state.isLocked = true; updateLockUI(); }
-    if (profile.role === 'admin') $('tabUsers').style.display = '';
-
-    hideAuth();
-    await Promise.all([loadBuses(), loadGrid(), loadProjects(), loadTodos(), loadCustomers()]);
-    if (profile.role === 'admin') await loadCredentials();
-    await loadProfiles();
-    setupListeners();
-    renderAll();
-    showLoader(false);
-  } catch (e) {
-    console.error('Boot error:', e);
-    showToast('Fehler beim Laden: ' + e.message, 'error');
-    showLoader(false);
+  // Profile laden (Retry, da Trigger evtl. gerade erst läuft)
+  let profile = null;
+  for (let i = 0; i < 5; i++) {
+    const { data } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    if (data) { profile = data; break; }
+    await new Promise(r => setTimeout(r, 500));
   }
+  if (!profile) {
+    showToast('Profile konnte nicht geladen werden. Bitte neu anmelden.', 'error');
+    await sb.auth.signOut();
+    showAuth(); showLoader(false); return;
+  }
+  state.profile = profile;
+
+  // UI
+  $('userName').textContent = profile.display_name;
+  $('userAvatar').textContent = profile.display_name[0].toUpperCase();
+  $('userMenuName').textContent = profile.display_name;
+  $('userMenuRole').textContent = { admin:'Administrator', editor:'Editor', mitarbeiter:'Mitarbeiter', viewer:'Betrachter' }[profile.role] || profile.role;
+
+  if (profile.role === 'viewer') { state.isLocked = true; updateLockUI(); }
+  if (profile.role === 'admin') $('tabUsers').style.display = '';
+
+  hideAuth();
+  // Reihenfolge wichtig: Busse erst, dann Grid (Grid braucht Busse)
+  await loadBuses();
+  await Promise.all([loadGrid(), loadProjects(), loadTodos(), loadCustomers()]);
+  if (profile.role === 'admin') await loadCredentials();
+  await loadProfiles();
+  setupListeners();
+  renderAll();
+  showLoader(false);
 }
 
 async function loadBuses() {
-  try {
-    const { data, error } = await sb.from('buses').select('*').order('sort_order');
-    if (error) { showToast('Busse laden fehlgeschlagen: ' + error.message, 'error'); return; }
-    state.buses = data || [];
-  } catch (e) {
-    console.error('Load buses error:', e);
-    showToast('Fehler beim Laden der Busse', 'error');
-  }
+  const { data, error } = await sb.from('buses').select('*').order('sort_order');
+  if (error) { showToast('Busse laden fehlgeschlagen: ' + error.message, 'error'); return; }
+  state.buses = data || [];
 }
 async function loadGrid() {
-  try {
-    const { data, error } = await sb.from('grid_assignments').select('bus_id,work_date,project_id,kind,version');
-    if (error) return;
-    state.grid = {};
-    state.offlineBuses = new Set();
-    (data || []).forEach(r => {
-      const bus = state.buses.find(b => b.id === r.bus_id);
-      if (!bus) return;
-      state.grid[`CELL_${bus.slug}_${r.work_date}`] = r.project_id || r.kind;
-    });
-    state.buses.forEach(b => { if (b.is_offline) state.offlineBuses.add(b.slug); });
-  } catch (e) {
-    console.error('Load grid error:', e);
-  }
+  const { data, error } = await sb.from('grid_assignments').select('bus_id,work_date,project_id,kind,version');
+  if (error) return;
+  state.grid = {};
+  state.offlineBuses = new Set();
+  (data || []).forEach(r => {
+    const bus = state.buses.find(b => b.id === r.bus_id);
+    if (!bus) return;
+    state.grid[`CELL_${bus.slug}_${r.work_date}`] = r.project_id || r.kind;
+  });
+  state.buses.forEach(b => { if (b.is_offline) state.offlineBuses.add(b.slug); });
 }
 async function loadProjects() {
-  try {
-    const { data, error } = await sb.from('projects').select('*').order('updated_at', { ascending: false });
-    if (error) return;
-    state.projects = data || []; // Keine Filterung mehr - alle Projekte inklusive abgeschlossene
-  } catch (e) {
-    console.error('Load projects error:', e);
-  }
+  const { data, error } = await sb.from('projects').select('*').order('updated_at', { ascending: false });
+  if (error) return;
+  state.projects = (data || []).filter(p => !p.archived_at);
 }
 async function loadTodos() {
-  try {
-    const { data } = await sb.from('todos').select('*').order('created_at', { ascending: false });
-    state.todos = data || [];
-  } catch (e) {
-    console.error('Load todos error:', e);
-  }
+  const { data } = await sb.from('todos').select('*').order('created_at', { ascending: false });
+  state.todos = data || [];
 }
 async function loadCustomers() {
-  try {
-    const { data } = await sb.from('customers').select('*').order('updated_at', { ascending: false });
-    state.customers = data || [];
-  } catch (e) {
-    console.error('Load customers error:', e);
-  }
+  const { data } = await sb.from('customers').select('*').order('updated_at', { ascending: false });
+  state.customers = data || [];
 }
 async function loadCredentials() {
-  try {
-    const { data } = await sb.from('credentials').select('*').order('updated_at', { ascending: false });
-    state._credentials = data || [];
-  } catch (e) {
-    console.error('Load credentials error:', e);
-  }
+  const { data } = await sb.from('credentials').select('*').order('updated_at', { ascending: false });
+  state._credentials = data || [];
 }
 async function loadProfiles() {
-  try {
-    const { data } = await sb.from('profiles').select('*').order('display_name');
-    state.profiles = data || [];
-  } catch (e) {
-    console.error('Load profiles error:', e);
-  }
+  const { data } = await sb.from('profiles').select('*').order('display_name');
+  state.profiles = data || [];
 }
 
 // ─── Render ───────────────────────────────────────────────────
@@ -1242,17 +1155,11 @@ function renderPalette() {
   if (canEdit()) {
     const add = document.createElement('button');
     add.className = 'btn-add-chip'; add.textContent = '+';
-    add.onclick = () => {
-      // Quick-Create: Neuen Einsatz direkt erstellen
-      const name = prompt('Einsatz-Name (z.B. "Montage Müller"):');
-      if (name) {
-        quickCreateProject(name);
-      }
-    };
+    add.onclick = () => switchTab('orders');
     c.appendChild(add);
   }
-  // Alle Projekte in der Palette (inklusive archivierte/abgeschlossene)
-  const paletteProjects = state.projects;
+  // Nur Aufträge & im_einsatz Projekte in der Palette
+  const paletteProjects = state.projects.filter(p => ['auftrag','im_einsatz'].includes(p.status));
   paletteProjects.forEach(p => {
     const cnt = Object.values(state.grid).filter(v => v === p.id).length;
     const el = document.createElement('div');
@@ -1272,11 +1179,6 @@ function renderPalette() {
   va.textContent = '🌴 Urlaub';
   va.onclick = () => { state.activeProjId = 'VACATION'; renderPalette(); };
   c.appendChild(va);
-  const si = document.createElement('div');
-  si.className = 'pal-chip' + (state.activeProjId === 'SICK' ? ' active' : '');
-  si.textContent = '🤒 Krank';
-  si.onclick = () => { state.activeProjId = 'SICK'; renderPalette(); };
-  c.appendChild(si);
 }
 
 function setupGridPaint() {
@@ -1322,55 +1224,29 @@ function applyPaint() {
     const busSlug = el.dataset.bus, isoDate = el.dataset.date;
     const bus = state.buses.find(b => b.slug === busSlug);
     if (!bus) return null;
-    
-    let value = null;
-    let kind = 'project';
-    
-    if (state.activeProjId === 'ERASER') {
-      value = null;
-    } else if (state.activeProjId === 'VACATION') {
-      value = null;
-      kind = 'vacation';
-    } else if (state.activeProjId === 'SICK') {
-      value = null;
-      kind = 'sick';
-    } else {
-      value = state.activeProjId;
-      kind = 'project';
-    }
-    
-    if (value === null && kind === 'project') {
-      delete state.grid[cid];
-    } else {
-      state.grid[cid] = kind === 'project' ? value : kind;
-    }
-    
-    return { bus, isoDate, value, kind };
+    const value = state.activeProjId === 'ERASER' ? null : (state.activeProjId === 'VACATION' ? 'vacation' : state.activeProjId);
+    if (value === null) delete state.grid[cid];
+    else state.grid[cid] = value;
+    return { bus, isoDate, value };
   }).filter(Boolean);
   repaint();
   renderPalette();
   // Persist
   (async () => {
-    try {
-      for (const u of updates) {
-        if (u.value === null && u.kind === 'project') {
-          await sb.from('grid_assignments').delete().eq('bus_id', u.bus.id).eq('work_date', u.isoDate);
-        } else {
-          const row = {
-            bus_id: u.bus.id, 
-            work_date: u.isoDate,
-            project_id: u.kind === 'project' ? u.value : null,
-            kind: u.kind,
-            version: 1
-          };
-          await sb.from('grid_assignments').upsert(row, { onConflict: 'bus_id,work_date' });
-        }
+    for (const u of updates) {
+      if (u.value === null) {
+        await sb.from('grid_assignments').delete().eq('bus_id', u.bus.id).eq('work_date', u.isoDate);
+      } else {
+        const row = {
+          bus_id: u.bus.id, work_date: u.isoDate,
+          project_id: u.value === 'vacation' ? null : u.value,
+          kind: u.value === 'vacation' ? 'vacation' : 'project',
+          version: 1
+        };
+        await sb.from('grid_assignments').upsert(row, { onConflict: 'bus_id,work_date' });
       }
-      showToast(`${updates.length} Zellen aktualisiert`, 'success', 1500);
-    } catch (e) {
-      console.error('Paint error:', e);
-      showToast('Fehler beim Speichern: ' + e.message, 'error');
     }
+    showToast(`${updates.length} Zellen aktualisiert`, 'success', 1500);
   })();
   state.selectedCells = [];
 }
@@ -1386,24 +1262,19 @@ function undoAction() {
   state.grid = snap.grid;
   // Sync to DB: einfache Strategie – alle aktuellen DB-Einträge für sichtbare Busse löschen, dann reinsert
   (async () => {
-    try {
-      await Promise.all(state.buses.map(b => sb.from('grid_assignments').delete().eq('bus_id', b.id)));
-      for (const [cid, val] of Object.entries(state.grid)) {
-        const parts = cid.split('_'); parts.shift();
-        const dt = parts.pop(); const busSlug = parts.join('_');
-        const bus = state.buses.find(b => b.slug === busSlug); if (!bus) continue;
-        await sb.from('grid_assignments').upsert({
-          bus_id: bus.id, work_date: dt,
-          project_id: val === 'vacation' ? null : val,
-          kind: val === 'vacation' ? 'vacation' : 'project'
-        }, { onConflict: 'bus_id,work_date' });
-      }
-      repaint(); renderPalette();
-      showToast('Rückgängig', 'success');
-    } catch (e) {
-      console.error('Undo error:', e);
-      showToast('Fehler beim Rückgängig: ' + e.message, 'error');
+    await Promise.all(state.buses.map(b => sb.from('grid_assignments').delete().eq('bus_id', b.id)));
+    for (const [cid, val] of Object.entries(state.grid)) {
+      const parts = cid.split('_'); parts.shift();
+      const dt = parts.pop(); const busSlug = parts.join('_');
+      const bus = state.buses.find(b => b.slug === busSlug); if (!bus) continue;
+      await sb.from('grid_assignments').upsert({
+        bus_id: bus.id, work_date: dt,
+        project_id: val === 'vacation' ? null : val,
+        kind: val === 'vacation' ? 'vacation' : 'project'
+      }, { onConflict: 'bus_id,work_date' });
     }
+    repaint(); renderPalette();
+    showToast('Rückgängig', 'success');
   })();
 }
 
@@ -1411,15 +1282,10 @@ async function toggleBus(sf) {
   if (!canEdit()) { showToast('Sperre lösen', 'warn'); return; }
   const bus = state.buses.find(b => b.slug === sf); if (!bus) return;
   bus.is_offline = !bus.is_offline;
-  try {
-    await sb.from('buses').update({ is_offline: bus.is_offline }).eq('id', bus.id);
-    const r = document.getElementById('row_'+sf);
-    if (r) r.className = 'worker-row ' + (bus.is_offline ? 'is-offline' : 'is-active');
-    repaint();
-  } catch (e) {
-    console.error('Toggle bus error:', e);
-    showToast('Fehler beim Umschalten: ' + e.message, 'error');
-  }
+  await sb.from('buses').update({ is_offline: bus.is_offline }).eq('id', bus.id);
+  const r = document.getElementById('row_'+sf);
+  if (r) r.className = 'worker-row ' + (bus.is_offline ? 'is-offline' : 'is-active');
+  repaint();
 }
 
 function toggleLock() {
@@ -1431,28 +1297,6 @@ function toggleLock() {
 function updateLockUI() {
   $('lockText').textContent = state.isLocked ? 'Gesperrt' : 'Planen';
   document.body.classList.toggle('locked-view', state.isLocked);
-}
-
-// Quick-Create: Projekt direkt erstellen
-async function quickCreateProject(name) {
-  try {
-    const { data, error } = await sb.from('projects').insert({
-      name: name,
-      status: 'im_einsatz', // Direkt als Einsatz
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      kwp: 0
-    }).select().single();
-    
-    if (error) throw error;
-    
-    state.projects.unshift(data);
-    state.activeProjId = data.id;
-    renderPalette();
-    showToast('Einsatz "' + name + '" erstellt', 'success');
-  } catch (e) {
-    console.error('Quick create error:', e);
-    showToast('Fehler beim Erstellen: ' + e.message, 'error');
-  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1514,36 +1358,25 @@ async function saveCustomer() {
     telefon: $('custTelefon').value.trim() || null,
     email: $('custEmail').value.trim() || null
   };
-  try {
-    console.log('Saving customer:', data, 'ID:', id);
-    if (id) {
-      const { error } = await sb.from('customers').update(data).eq('id', id);
-      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Update error:', error); return; }
-    } else {
-      const { error } = await sb.from('customers').insert(data);
-      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Insert error:', error); return; }
-    }
-    await loadCustomers();
-    renderCustomers();
-    closeModal();
-    showToast('Kunde gespeichert', 'success');
-  } catch (e) {
-    console.error('Save customer error:', e);
-    showToast('Fehler beim Speichern: ' + e.message, 'error');
+  if (id) {
+    const { error } = await sb.from('customers').update(data).eq('id', id);
+    if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+  } else {
+    const { error } = await sb.from('customers').insert(data);
+    if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
   }
+  await loadCustomers();
+  renderCustomers();
+  closeModal();
+  showToast('Kunde gespeichert', 'success');
 }
 async function deleteCustomer() {
   const id = $('custId').value; if (!id) return;
   if (!confirm('Kunde wirklich löschen?')) return;
-  try {
-    const { error } = await sb.from('customers').delete().eq('id', id);
-    if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-    await loadCustomers(); renderCustomers(); closeModal();
-    showToast('Kunde gelöscht', 'success');
-  } catch (e) {
-    console.error('Delete customer error:', e);
-    showToast('Fehler beim Löschen: ' + e.message, 'error');
-  }
+  const { error } = await sb.from('customers').delete().eq('id', id);
+  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+  await loadCustomers(); renderCustomers(); closeModal();
+  showToast('Kunde gelöscht', 'success');
 }
 
 window.newProjectForCustomer = cid => {
@@ -1585,12 +1418,9 @@ function renderOrders() {
         <div class="list-card-actions">
           <button class="btn" onclick="editProject('${p.id}')">✏️</button>
           ${p.status === 'interessent' ? `<button class="btn success" onclick="setStatus('${p.id}','auftrag')">→ Auftrag</button>` : ''}
-          ${p.status === 'angebot' ? `<button class="btn success" onclick="setStatus('${p.id}','auftrag')">→ Auftrag</button>` : ''}
           ${p.status === 'auftrag' ? `<button class="btn warn" onclick="setStatus('${p.id}','im_einsatz')">→ Einsatz</button>` : ''}
           ${p.status === 'im_einsatz' ? `<button class="btn success" onclick="setStatus('${p.id}','abgeschlossen')">✓ Fertig</button>` : ''}
-          ${p.status === 'abgeschlossen' ? `<button class="btn warn" onclick="setStatus('${p.id}','im_einsatz')">↶ Reaktivieren</button>` : ''}
-          ${p.status === 'abgelehnt' ? `<button class="btn success" onclick="setStatus('${p.id}','interessent')">↶ Neu starten</button>` : ''}
-          ${p.status === 'auftrag' || p.status === 'im_einsatz' || p.status === 'abgeschlossen' ? `<button class="btn primary" onclick="switchTab('planner')">📅 Planen</button>` : ''}
+          ${p.status === 'auftrag' || p.status === 'im_einsatz' ? `<button class="btn primary" onclick="switchTab('planner')">📅 Planen</button>` : ''}
         </div>
       </div>`;
   }).join('');
@@ -1618,17 +1448,12 @@ function openProjectModal(p, preselectCustomer) {
 }
 window.editProject = id => openProjectModal(state.projects.find(p => p.id === id));
 window.setStatus = async (id, status) => {
-  try {
-    const { error } = await sb.from('projects').update({ status }).eq('id', id);
-    if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-    await loadProjects();
-    renderOrders();
-    renderPalette();
-    showToast('Status: ' + (STATUS_LABELS[status] || status), 'success');
-  } catch (e) {
-    console.error('Set status error:', e);
-    showToast('Fehler beim Status ändern: ' + e.message, 'error');
-  }
+  const { error } = await sb.from('projects').update({ status }).eq('id', id);
+  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+  await loadProjects();
+  renderOrders();
+  renderPalette();
+  showToast('Status: ' + (STATUS_LABELS[status] || status), 'success');
 };
 
 async function saveProjectFromCustomer() {
@@ -1650,35 +1475,24 @@ $('projSave').onclick = async () => {
     notizen: $('projNotizen').value.trim() || null,
     color: $('projColor').value
   };
-  try {
-    console.log('Saving project:', data, 'ID:', id);
-    if (id) {
-      const { error } = await sb.from('projects').update(data).eq('id', id);
-      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Update error:', error); return; }
-    } else {
-      const { error } = await sb.from('projects').insert(data);
-      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Insert error:', error); return; }
-    }
-    await loadProjects();
-    renderOrders(); renderPalette();
-    closeModal();
-    showToast('Projekt gespeichert', 'success');
-  } catch (e) {
-    console.error('Save project error:', e);
-    showToast('Fehler beim Speichern: ' + e.message, 'error');
+  if (id) {
+    const { error } = await sb.from('projects').update(data).eq('id', id);
+    if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+  } else {
+    const { error } = await sb.from('projects').insert(data);
+    if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
   }
+  await loadProjects();
+  renderOrders(); renderPalette();
+  closeModal();
+  showToast('Projekt gespeichert', 'success');
 };
 $('projDel').onclick = async () => {
   const id = $('projId').value; if (!id) return;
   if (!confirm('Projekt wirklich löschen?')) return;
-  try {
-    await sb.from('projects').delete().eq('id', id);
-    await loadProjects(); renderOrders(); renderPalette(); closeModal();
-    showToast('Projekt gelöscht', 'success');
-  } catch (e) {
-    console.error('Delete project error:', e);
-    showToast('Fehler beim Löschen: ' + e.message, 'error');
-  }
+  await sb.from('projects').delete().eq('id', id);
+  await loadProjects(); renderOrders(); renderPalette(); closeModal();
+  showToast('Projekt gelöscht', 'success');
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -1718,7 +1532,7 @@ async function handlePdfFile(file) {
     $('pdfDacheindeckung').value = fields.dacheindeckung || '';
     const filled = Object.values(fields).filter(Boolean).length;
     $('pdfSummary').innerHTML = filled
-      ? `<strong>${filled} Felder automatisch erkannt</strong> – bitte trotzdem prüfen & ergänzen, dann speichern.` 
+      ? `<strong>${filled} Felder automatisch erkannt</strong> – bitte trotzdem prüfen & ergänzen, dann speichern.`
       : `<strong style="color:var(--warn)">Keine Felder automatisch erkannt</strong> – das PDF hat wahrscheinlich keinen Textlayer (Scan). Bitte alle Felder manuell ausfüllen.`;
     $('pdfDrop').style.display = 'none';
     $('pdfExtractArea').style.display = '';
@@ -1726,7 +1540,6 @@ async function handlePdfFile(file) {
     state._pdfFileName = file.name;
     state._pdfSize = file.size;
   } catch (e) {
-    console.error('PDF error:', e);
     showToast('PDF-Fehler: ' + e.message, 'error');
   }
   showLoader(false);
@@ -1734,125 +1547,161 @@ async function handlePdfFile(file) {
 
 function extractFields(text) {
   const fields = {};
-  // Versuche, Felder über Pattern-Matching zu finden
-  // Patterns basieren auf dem SOLPRO-Aufnahmeblatt-Layout
-  const patterns = {
-    name:        /Name\s+([A-ZÄÖÜ][a-zäöüß]+(?:\s+[A-ZÄÖÜ][a-zäöüß]+)+)/,
-    firma:       /Firma\s+([A-ZÄÖÜ][^\n]{2,80})/,
-    plz_ort:     /PLZ\s*\/\s*Ort\s+(\d{4,5}\s+[A-ZÄÖÜ][^\n]{2,60})/,
-    telefon:     /Telefonnummer\s+([+\d][\d\s\-/()]{5,30})/,
-    email:       /E-Mail-Adresse\s+([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/,
-    datum:       /Datum\s+(\d{1,2}[.\-/]\d{1,2}[.\-/]\d{2,4})/,
-    projektname: /Projektname\s+([A-ZÄÖÜ][^\n]{2,80})/,
-    anlagengroesse: /(?:definierte Anlagengröße|anlagengröße)[:\s]+(\d+(?:[.,]\d+)?)\s*kWp/i,
-    speicher:    /Stromspeicher[^.\n]*?(\d+(?:[.,]\d+)?)\s*kW\s*\/?\s*h/i,
-    dachform:    /Dachform\s+([A-ZÄÖÜ][^\n]{2,40})/i,
-    dacheindeckung: /Dacheindeckung\s+([A-ZÄÖÜ][^\n]{2,40})/i
-  };
-  for (const [k, re] of Object.entries(patterns)) {
-    const m = text.match(re);
-    if (m) fields[k] = m[1].trim();
+  // Smart-Extraktion: finde Werte nach bekannten Labels
+  // Strategie: splitte Text in "Tokens" (jedes PDF-Item ist eins),
+  // suche nach Labels, nimm alles bis zum nächsten bekannten Label oder Sektion-Ende.
+
+  const KNOWN_LABELS = [
+    'Firma','Name','Straße / Nr.','PLZ / Ort','Telefonnummer','E-Mail-Adresse','Datum',
+    'Projektname','Straße / Nr.','PLZ / Ort',
+    'Dachform','Dacheindeckung','Dachunterkonstruktion',
+    'Sparrenmaterial','Sparrenabstand','Sparrenstärke','Gebäudemaße',
+    'Dachlänge (L)','Breite (B)','Traufenhöhe (T)','Firsthöhe (H)','Firstlänge (L1)','Dachneigung',
+    'Netzbetreiber','Zählernummer Licht','Zählernummer WP','Stromverbrauch pro Jahr',
+    'Photovoltaik','Ladestation','Stromspeicher','Notstrom','Wartungsvertrag',
+    'Garantieverlängerung','Inklusive Förderansuchen','definierte Anlagengröße'
+  ];
+  const SECTION_END = /^(Seite|Bestandsaufnahme|SOLPRO|☐|Kundendaten|Projektadresse|Angaben|Allgemein|Montage|Belegung|Sonstiges|Checkliste)/i;
+
+  // Tokens aus dem Text
+  const tokens = text.split(/\s+/).map(t => t.trim()).filter(Boolean);
+
+  for (let i = 0; i < tokens.length; i++) {
+    const tok = tokens[i];
+    // Suche nach "Name"-Token (alleinstehend)
+    if (tok === 'Name' && !fields.name) {
+      // Nimm alles bis zum nächsten bekannten Label
+      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
+      if (value) fields.name = value;
+    }
+    if (tok === 'Firma' && !fields.firma) {
+      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
+      if (value) fields.firma = value;
+    }
+    if (/^Projektname$/.test(tok) && !fields.projektname) {
+      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
+      if (value) fields.projektname = value;
+    }
+    if (/^Telefonnummer$/.test(tok) && !fields.telefon) {
+      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
+      if (value) fields.telefon = value;
+    }
+    if (/^E-Mail-Adresse$/.test(tok) && !fields.email) {
+      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
+      if (value && /@/.test(value)) fields.email = value;
+    }
+    if (/^Datum$/.test(tok) && !fields.datum) {
+      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
+      if (value) fields.datum = value;
+    }
+    if (/^Dachform$/.test(tok) && !fields.dachform) {
+      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
+      if (value) fields.dachform = value;
+    }
+    if (/^Dacheindeckung$/.test(tok) && !fields.dacheindeckung) {
+      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
+      if (value) fields.dacheindeckung = value;
+    }
+    // PLZ/Ort: suche nach "PLZ" gefolgt von "/" und "Ort"
+    if (tok === 'PLZ' && i + 1 < tokens.length && tokens[i+1] === '/' && i + 2 < tokens.length && tokens[i+2] === 'Ort' && !fields.plz_ort) {
+      const value = takeUntilLabel(tokens, i + 3, KNOWN_LABELS, SECTION_END);
+      if (value) fields.plz_ort = value;
+    }
+    // Straße / Nr.
+    if (tok === 'Straße' && i + 1 < tokens.length && tokens[i+1] === '/' && i + 2 < tokens.length && tokens[i+2] === 'Nr.' && !fields.strasse) {
+      const value = takeUntilLabel(tokens, i + 3, KNOWN_LABELS, SECTION_END);
+      if (value) fields.strasse = value;
+    }
+    // Anlagengröße
+    if (/^Anlagengröße$/.test(tok) && !fields.anlagengroesse) {
+      // Suche nach Zahl + kWp in den nächsten Tokens
+      for (let j = i + 1; j < Math.min(i + 20, tokens.length); j++) {
+        const m = tokens[j].match(/^(\d+(?:[.,]\d+)?)$/);
+        if (m) {
+          fields.anlagengroesse = m[1].replace(',', '.');
+          break;
+        }
+      }
+    }
+    // Speicher
+    if (/^Stromspeicher$/.test(tok) && !fields.speicher) {
+      for (let j = i + 1; j < Math.min(i + 30, tokens.length); j++) {
+        const m = tokens[j].match(/^(\d+(?:[.,]\d+)?)$/);
+        if (m) {
+          fields.speicher = m[1].replace(',', '.');
+          break;
+        }
+      }
+    }
   }
   return fields;
 }
 
+function takeUntilLabel(tokens, start, labels, sectionEnd) {
+  const out = [];
+  for (let i = start; i < tokens.length && i < start + 30; i++) {
+    const t = tokens[i];
+    if (labels.includes(t)) break;
+    if (sectionEnd.test(t)) break;
+    if (/^☐$/.test(t)) break;
+    out.push(t);
+  }
+  const v = out.join(' ').trim();
+  // Bereinige: wenn nur Sonderzeichen oder leer, return null
+  if (!v || /^[\s\W_]+$/.test(v)) return null;
+  return v;
+}
+
 async function savePdfExtract() {
-  const projName = $('pdfProjName').value.trim();
-  if (!projName) { showToast('Projektname erforderlich', 'error'); return; }
-  
   const custName = $('pdfCustName').value.trim();
+  const projName = $('pdfProjName').value.trim();
+  if (!custName || !projName) { showToast('Kunde und Projektname erforderlich', 'error'); return; }
   showLoader(true, 'Speichere…');
-  
   try {
-    console.log('Starting PDF extract save. Project:', projName, 'Customer:', custName);
-    
+    // 1. PDF in Storage hochladen
+    const fileName = `${Date.now()}_${state._pdfFileName.replace(/[^\w.\-]/g, '_')}`;
+    const { error: upErr } = await sb.storage.from('project-pdfs').upload(fileName, state._pdfBuffer, { contentType: 'application/pdf' });
+    if (upErr) throw upErr;
+    // 2. Kunde anlegen/verwenden
     let customerId = null;
-    
-    // 1. Kunde nur anlegen wenn Name angegeben
-    if (custName) {
-      const existing = state.customers.find(c => c.name.toLowerCase() === custName.toLowerCase());
-      if (existing) { 
-        customerId = existing.id; 
-        console.log('Using existing customer:', customerId);
-      } else {
-        console.log('Creating new customer:', custName);
-        const { data: newC, error: cErr } = await sb.from('customers').insert({
-          name: custName,
-          firma: $('pdfCustFirma').value.trim() || null,
-          plz_ort: $('pdfCustPlzOrt').value.trim() || null,
-          telefon: $('pdfCustTelefon').value.trim() || null
-        }).select().single();
-        if (cErr) throw cErr;
-        customerId = newC.id;
-        console.log('Customer created:', customerId);
-      }
+    const existing = state.customers.find(c => c.name.toLowerCase() === custName.toLowerCase());
+    if (existing) { customerId = existing.id; }
+    else {
+      const { data: newC, error: cErr } = await sb.from('customers').insert({
+        name: custName,
+        firma: $('pdfCustFirma').value.trim() || null,
+        plz_ort: $('pdfCustPlzOrt').value.trim() || null,
+        telefon: $('pdfCustTelefon').value.trim() || null
+      }).select().single();
+      if (cErr) throw cErr;
+      customerId = newC.id;
     }
-    
-    // 2. PDF in Storage hochladen (mit Fehlerbehandlung)
-    let fileName = null;
-    if (state._pdfBuffer) {
-      try {
-        fileName = `${Date.now()}_${state._pdfFileName.replace(/[^\w.\-]/g, '_')}`;
-        console.log('Uploading PDF to storage:', fileName);
-        const { error: upErr } = await sb.storage.from('project-pdfs').upload(fileName, state._pdfBuffer, { contentType: 'application/pdf' });
-        if (upErr) {
-          console.warn('PDF upload failed, continuing without storage:', upErr);
-          showToast('PDF-Upload fehlgeschlagen, Projekt wird ohne Datei erstellt', 'warn');
-          fileName = null; // Nicht fatal, weiter ohne Storage
-        } else {
-          console.log('PDF uploaded successfully');
-        }
-      } catch (e) {
-        console.warn('PDF upload exception, continuing without storage:', e);
-        showToast('PDF-Upload fehlgeschlagen, Projekt wird ohne Datei erstellt', 'warn');
-        fileName = null;
-      }
-    }
-    
-    // 3. Projekt anlegen - direkt als Einsatz möglich
-    console.log('Creating project:', projName);
+    // 3. Projekt anlegen als Interessent
     const { data: newP, error: pErr } = await sb.from('projects').insert({
       name: projName,
       customer_id: customerId,
-      status: 'im_einsatz', // Direkt als Einsatz statt Interessent
+      status: 'interessent',
       anlagengroesse: parseFloat($('pdfAnlagengröße').value) || null,
       speicher_kwh: parseFloat($('pdfSpeicher').value) || null,
       dachform: $('pdfDachform').value.trim() || null,
       dacheindeckung: $('pdfDacheindeckung').value.trim() || null,
       color: COLORS[Math.floor(Math.random()*COLORS.length)]
     }).select().single();
-    
     if (pErr) throw pErr;
-    console.log('Project created:', newP.id);
-    
-    // 4. Dokument-Eintrag nur wenn PDF hochgeladen
-    if (fileName) {
-      try {
-        console.log('Creating document entry');
-        await sb.from('project_documents').insert({
-          project_id: newP.id,
-          customer_id: customerId,
-          file_name: state._pdfFileName,
-          file_path: fileName,
-          file_size: state._pdfSize,
-          status: 'neu'
-        });
-      } catch (e) {
-        console.warn('Document entry failed:', e);
-      }
-    }
-    
+    // 4. Dokument-Eintrag
+    await sb.from('project_documents').insert({
+      project_id: newP.id,
+      customer_id: customerId,
+      file_name: state._pdfFileName,
+      file_path: fileName,
+      file_size: state._pdfSize,
+      status: 'neu'
+    });
     await loadCustomers(); await loadProjects();
     closeModal();
-    showToast('Einsatz "' + projName + '" erstellt - sofort im Planer verfügbar!', 'success', 5000);
-    switchTab('planner');
-    
-    // Automatisch zum neuen Projekt wechseln
-    state.activeProjId = newP.id;
-    renderPalette();
-    
+    showToast('Als Interessent gespeichert – im Tab "Aufträge" weiterverarbeiten', 'success', 5000);
+    switchTab('orders');
   } catch (e) {
-    console.error('Save PDF error:', e);
     showToast('Fehler: ' + e.message, 'error');
   }
   showLoader(false);
@@ -1875,18 +1724,12 @@ function buildProto() {
     const count = parseInt(m.trim());
     if (!count) return;
     for (let s = 0; s < count * 2; s++) {
-      strings.push({ 
-        no: idx++, 
-        wr: mi + 1, 
-        mppt: Math.floor(s/2) + 1, 
-        str: (s%2) + 1,
-        label: `${mi + 1}.${Math.floor(s/2) + 1}.${(s%2) + 1}` // WR.MPPT.String Format
-      });
+      strings.push({ no: idx++, wr: mi + 1, mppt: Math.floor(s/2) + 1, str: (s%2) + 1 });
     }
   });
   $('protoList').innerHTML = strings.map(s => `
     <div class="proto-string">
-      <div class="str-id">${s.label}</div>
+      <div class="str-id">S${s.no}</div>
       <div><div class="str-label">Uoc (V)</div><input type="number" step="0.1" data-no="${s.no}" data-field="uoc"></div>
       <div><div class="str-label">Isc (A)</div><input type="number" step="0.1" data-no="${s.no}" data-field="isc"></div>
       <div><div class="str-label">Umpp (V)</div><input type="number" step="0.1" data-no="${s.no}" data-field="umpp"></div>
@@ -1907,67 +1750,41 @@ async function saveProto() {
   const mppt_config = $('protoMppt').value.trim();
   const notizen = $('protoNotiz').value.trim() || null;
   const project_id = $('protoProject').value || null;
-  try {
-    console.log('Saving protocol:', { standort, pruefer, pruefdatum, mppt_config });
-    const { data: proto, error } = await sb.from('protocols').insert({
-      standort, pruefer, pruefdatum, modul_wp, mppt_config, notizen, project_id
-    }).select().single();
-    if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Protocol insert error:', error); return; }
-    console.log('Protocol created:', proto.id);
-    
-    const rows = state._protoStrings.map(s => {
-      const get = field => parseFloat(document.querySelector(`[data-no="${s.no}"][data-field="${field}"]`)?.value) || null;
-      return { 
-        protocol_id: proto.id, 
-        string_no: s.no, 
-        uoc: get('uoc'), 
-        isc: get('isc'), 
-        umpp: get('umpp'), 
-        impp: get('impp'), 
-        sort_order: s.no, 
-        is_active: true,
-        wr: s.wr,
-        mppt: s.mppt,
-        str: s.str,
-        label: s.label
-      };
-    });
-    console.log('Inserting protocol strings:', rows);
-    await sb.from('protocol_strings').insert(rows);
-    showToast('Protokoll gespeichert', 'success');
-    renderSavedProtos();
-  } catch (e) {
-    console.error('Save proto error:', e);
-    showToast('Fehler beim Speichern: ' + e.message, 'error');
-  }
+  const { data: proto, error } = await sb.from('protocols').insert({
+    standort, pruefer, pruefdatum, modul_wp, mppt_config, notizen, project_id
+  }).select().single();
+  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+  const rows = state._protoStrings.map(s => {
+    const get = field => parseFloat(document.querySelector(`[data-no="${s.no}"][data-field="${field}"]`)?.value) || null;
+    return { protocol_id: proto.id, string_no: s.no, uoc: get('uoc'), isc: get('isc'), umpp: get('umpp'), impp: get('impp'), sort_order: s.no, is_active: true };
+  });
+  await sb.from('protocol_strings').insert(rows);
+  showToast('Protokoll gespeichert', 'success');
+  renderSavedProtos();
 }
 
 async function renderSavedProtos() {
-  try {
-    const { data, error } = await sb.from('protocols').select('*').order('pruefdatum', { ascending: false }).limit(20);
-    if (error || !data) { $('savedProtos').innerHTML = ''; return; }
-    $('savedProtos').innerHTML = `
-      <h3 style="font-family:var(--font-display);font-size:18px;margin:30px 0 10px">Letzte Protokolle</h3>
-      <div class="list-grid">
-        ${data.map(p => `
-          <div class="list-card">
-            <div class="list-card-title">${escHtml(p.standort)}</div>
-            <div class="list-card-meta">${escHtml(p.pruefdatum)} · ${escHtml(p.pruefer)}</div>
-            ${p.modul_wp ? `<div class="list-card-row"><span class="lbl">Modul</span><span class="val">${p.modul_wp} Wp</span></div>` : ''}
-            ${p.mppt_config ? `<div class="list-card-row"><span class="lbl">MPPTs</span><span class="val">${escHtml(p.mppt_config)}</span></div>` : ''}
-          </div>
-        `).join('')}
-      </div>`;
-  } catch (e) {
-    console.error('Render saved protos error:', e);
-  }
+  const { data, error } = await sb.from('protocols').select('*').order('pruefdatum', { ascending: false }).limit(20);
+  if (error || !data) { $('savedProtos').innerHTML = ''; return; }
+  $('savedProtos').innerHTML = `
+    <h3 style="font-family:var(--font-display);font-size:18px;margin:30px 0 10px">Letzte Protokolle</h3>
+    <div class="list-grid">
+      ${data.map(p => `
+        <div class="list-card">
+          <div class="list-card-title">${escHtml(p.standort)}</div>
+          <div class="list-card-meta">${escHtml(p.pruefdatum)} · ${escHtml(p.pruefer)}</div>
+          ${p.modul_wp ? `<div class="list-card-row"><span class="lbl">Modul</span><span class="val">${p.modul_wp} Wp</span></div>` : ''}
+          ${p.mppt_config ? `<div class="list-card-row"><span class="lbl">MPPTs</span><span class="val">${escHtml(p.mppt_config)}</span></div>` : ''}
+        </div>
+      `).join('')}
+    </div>`;
 }
 
 function exportProtoExcel() {
   if (!state._protoStrings) { showToast('Erst Matrix laden', 'warn'); return; }
   const rows = state._protoStrings.map(s => {
     const get = field => document.querySelector(`[data-no="${s.no}"][data-field="${field}"]`)?.value || '';
-    return { String: s.label, WR: s.wr, MPPT: s.mppt, Uoc_V: get('uoc'), Isc_A: get('isc'), Umpp_V: get('umpp'), Impp_A: get('impp') };
+    return { String: s.no, WR: s.wr, MPPT: s.mppt, Uoc_V: get('uoc'), Isc_A: get('isc'), Umpp_V: get('umpp'), Impp_A: get('impp') };
   });
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
@@ -2063,45 +1880,24 @@ async function saveCredential() {
     notes: $('credNotes').value.trim() || null, rotation_days: parseInt($('credRotInt').value) || 0
   };
   const id = $('credId').value;
-  try {
-    console.log('Saving credential:', data, 'ID:', id);
-    if (id) {
-      const { error } = await sb.from('credentials').update(data).eq('id', id);
-      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Update error:', error); return; }
-    } else {
-      const { error } = await sb.from('credentials').insert(data);
-      if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Insert error:', error); return; }
-    }
-    await loadCredentials();
-    renderCredCats(); renderCredGrid();
-    closeModal();
-    showToast('Zugang gespeichert', 'success');
-  } catch (e) {
-    console.error('Save credential error:', e);
-    showToast('Fehler beim Speichern: ' + e.message, 'error');
-  }
+  if (id) await sb.from('credentials').update(data).eq('id', id);
+  else await sb.from('credentials').insert(data);
+  await loadCredentials();
+  renderCredCats(); renderCredGrid();
+  closeModal();
+  showToast('Zugang gespeichert', 'success');
 }
 async function deleteCredential() {
   const id = $('credId').value; if (!id) return;
   if (!confirm('Wirklich löschen?')) return;
-  try {
-    await sb.from('credentials').delete().eq('id', id);
-    await loadCredentials(); renderCredCats(); renderCredGrid(); closeModal();
-    showToast('Gelöscht', 'success');
-  } catch (e) {
-    console.error('Delete credential error:', e);
-    showToast('Fehler beim Löschen: ' + e.message, 'error');
-  }
+  await sb.from('credentials').delete().eq('id', id);
+  await loadCredentials(); renderCredCats(); renderCredGrid(); closeModal();
+  showToast('Gelöscht', 'success');
 }
 window.rotateCred = async id => {
-  try {
-    await sb.from('credentials').update({ last_rotated: new Date().toISOString() }).eq('id', id);
-    await loadCredentials(); renderCredGrid();
-    showToast('Rotation aktualisiert', 'success');
-  } catch (e) {
-    console.error('Rotate credential error:', e);
-    showToast('Fehler beim Rotieren: ' + e.message, 'error');
-  }
+  await sb.from('credentials').update({ last_rotated: new Date().toISOString() }).eq('id', id);
+  await loadCredentials(); renderCredGrid();
+  showToast('Rotation aktualisiert', 'success');
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -2125,38 +1921,22 @@ function renderTodos() {
 async function addTask() {
   const txt = $('taskInput').value.trim();
   if (!txt) return;
-  try {
-    console.log('Adding task:', txt);
-    const { data, error } = await sb.from('todos').insert({ text: txt, created_by: state.user.id }).select().single();
-    if (error) { showToast('Fehler: ' + error.message, 'error'); console.error('Insert error:', error); return; }
-    state.todos.unshift(data);
-    $('taskInput').value = '';
-    renderTodos();
-  } catch (e) {
-    console.error('Add task error:', e);
-    showToast('Fehler beim Hinzufügen: ' + e.message, 'error');
-  }
+  const { data, error } = await sb.from('todos').insert({ text: txt, created_by: state.user.id }).select().single();
+  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+  state.todos.unshift(data);
+  $('taskInput').value = '';
+  renderTodos();
 }
 async function toggleTask(id) {
   const t = state.todos.find(x => x.id === id); if (!t) return;
   t.done = !t.done;
-  try {
-    await sb.from('todos').update({ done: t.done }).eq('id', id);
-    renderTodos();
-  } catch (e) {
-    console.error('Toggle task error:', e);
-    showToast('Fehler beim Ändern: ' + e.message, 'error');
-  }
+  await sb.from('todos').update({ done: t.done }).eq('id', id);
+  renderTodos();
 }
 async function deleteTask(id) {
-  try {
-    await sb.from('todos').delete().eq('id', id);
-    state.todos = state.todos.filter(t => t.id !== id);
-    renderTodos();
-  } catch (e) {
-    console.error('Delete task error:', e);
-    showToast('Fehler beim Löschen: ' + e.message, 'error');
-  }
+  await sb.from('todos').delete().eq('id', id);
+  state.todos = state.todos.filter(t => t.id !== id);
+  renderTodos();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2220,36 +2000,26 @@ async function saveUser() {
     role: $('userRole').value,
     active: $('userActive').value === 'true'
   };
-  try {
-    const { error } = await sb.from('profiles').update(updates).eq('id', id);
-    if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-    // Bus-Zuweisung: alle Buses zurücksetzen, dann gewählten setzen
-    if (busChoice === 'ALL') {
-      await sb.from('buses').update({ visible_to_user_id: null }).neq('id', '00000000-0000-0000-0000-000000000000');
-    } else {
-      const targetId = busChoice || null;
-      await sb.from('buses').update({ visible_to_user_id: targetId }).neq('id', '00000000-0000-0000-0000-000000000000');
-    }
-    await loadProfiles(); await loadBuses();
-    renderUsers();
-    closeModal();
-    showToast('User aktualisiert', 'success');
-  } catch (e) {
-    console.error('Save user error:', e);
-    showToast('Fehler beim Speichern: ' + e.message, 'error');
+  const { error } = await sb.from('profiles').update(updates).eq('id', id);
+  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+  // Bus-Zuweisung: alle Buses zurücksetzen, dann gewählten setzen
+  if (busChoice === 'ALL') {
+    await sb.from('buses').update({ visible_to_user_id: null }).neq('id', '00000000-0000-0000-0000-000000000000');
+  } else {
+    const targetId = busChoice || null;
+    await sb.from('buses').update({ visible_to_user_id: targetId }).neq('id', '00000000-0000-0000-0000-000000000000');
   }
+  await loadProfiles(); await loadBuses();
+  renderUsers();
+  closeModal();
+  showToast('User aktualisiert', 'success');
 }
 async function inviteUser() {
   const email = prompt('E-Mail des neuen Users:');
   if (!email) return;
-  try {
-    const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: window.location.href } });
-    if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-    showToast('Einladung an ' + email + ' gesendet. User bekommt Magic Link per Mail.', 'success', 5000);
-  } catch (e) {
-    console.error('Invite user error:', e);
-    showToast('Fehler beim Einladen: ' + e.message, 'error');
-  }
+  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: window.location.href } });
+  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+  showToast('Einladung an ' + email + ' gesendet. User bekommt Magic Link per Mail.', 'success', 5000);
 }
 
 // ─── INIT ─────────────────────────────────────────────────────
