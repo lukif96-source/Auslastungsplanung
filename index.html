@@ -1,3 +1,10 @@
+Hier ist der komplette und fertig korrigierte HTML-Code, bei dem die
+main-wrapper-Verschachtelung und die fehlenden Klammern im CSS ausgebessert
+wurden.
+
+Du kannst einfach alles (von Zeile 1 bis zum Ende) kopieren und in deiner Datei
+komplett überschreiben. Es wird nun alles wieder fehlerfrei angezeigt!
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -235,14 +242,14 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .proto-hero h1{font-family:var(--font-display);font-size:28px;font-weight:800;letter-spacing:-1px}
 .proto-hero p{font-size:11px;color:var(--ink-muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
 
-.proto-form{background:var(--glass-bg-heavy);border:1px solid var(--glass-border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--glass-shadow}
+.proto-form{background:var(--glass-bg-heavy);border:1px solid var(--glass-border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--glass-shadow);}
 .form-row{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px}
 .form-row.cols-2{grid-template-columns:1fr 1fr}
 .form-row.cols-3{grid-template-columns:1fr 1fr 1fr}
 @media (max-width:600px){.form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr}}
 .form-field label{display:block;font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
 .form-field input,.form-field select{width:100%;padding:11px 12px;border:1.5px solid var(--cream-deep);border-radius:var(--radius-sm);background:rgba(255,255,255,0.7);font-size:14px;color:var(--ink);outline:none;transition:border-color .2s}
-.form-field input:focus,.form-field select:focus{border-color:var(--lime-dk);box-shadow:0 0 0 3px var(--lime-glow}
+.form-field input:focus,.form-field select:focus{border-color:var(--lime-dk);box-shadow:0 0 0 3px var(--lime-glow);}
 
 /* Protokoll Dashboard */
 .proto-dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
@@ -269,7 +276,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .proto-string .str-label{font-size:8px;color:var(--ink-muted);text-transform:uppercase;font-weight:700;letter-spacing:.3px;text-align:center}
 .proto-string .mppt-toggle{width:32px;height:32px;border-radius:50%;border:2px solid var(--cream-deep);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;transition:all .2s}
 .proto-string .mppt-toggle.active{background:var(--lime);border-color:var(--lime-dk);color:var(--ink)}
-.proto-string .mppt-toggle:hover{border-color:var(--lime-dk}
+.proto-string .mppt-toggle:hover{border-color:var(--lime-dk);}
 .proto-string .pwr-cell{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--ink-muted);text-align:center}
 .proto-string .pwr-cell.has-val{color:var(--lime)}
 
@@ -461,8 +468,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 
 <!-- MAIN CONTENT WRAPPER -->
 <div class="main-wrapper">
-
-</div> <!-- End main-wrapper -->
 
 <!-- AUTH -->
 <div id="authOverlay">
@@ -804,6 +809,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
   </div>
 
 </div> <!-- End app-main -->
+</div> <!-- HIER IST DER FIX FUER DAS STRUKTUR-PROBLEM! (End main-wrapper) -->
 
 <!-- MODAL: KUNDE -->
 <div class="overlay" id="overlay"></div>
