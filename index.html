@@ -21,13 +21,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     KONFIGURATION – HIER DEINE SUPABASE-DATEN EINTRAGEN
+     KONFIGURATION – SUPABASE DATEN
      ═══════════════════════════════════════════════════════════════ -->
 <script>
   window.SUPABASE_URL = 'https://iuxklqcpexoziqxrohwa.supabase.co';
   window.SUPABASE_KEY = 'sb_publishable_VteOTQ6g28z9Dvo-QUG8jw_hehaZpWu';
-  // ^ Diese Key ist öffentlich (kann im Browser stehen). RLS schützt die Daten.
-  //   Bei Verdacht auf Leak: Supabase → Settings → API → "Roll publishable key"
 </script>
 
 <style>
@@ -85,7 +83,6 @@ input,select,textarea{font-family:inherit;font-size:16px}
   .main-wrapper{margin-left:0}
 }
 
-/* ── MAIN CONTENT WRAPPER ── */
 .main-wrapper{flex:1;display:flex;flex-direction:column;min-width:0}
 
 /* ── AUTH ── */
@@ -115,9 +112,6 @@ input,select,textarea{font-family:inherit;font-size:16px}
 .user-avatar{width:24px;height:24px;border-radius:50%;background:var(--lime);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
 .sync-pill{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;color:var(--success);background:rgba(26,122,74,0.08);padding:4px 10px;border-radius:30px;font-family:var(--font-mono)}
 .sync-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
-.sync-pill.pending{color:var(--warn);background:rgba(184,106,16,0.08)}
-.sync-pill.pending .dot{background:var(--warn);animation:pdot 1s infinite}
-@keyframes pdot{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* ── TAB NAV ── */
 .tab-nav{position:relative;z-index:190;flex-shrink:0;display:flex;background:var(--glass-bg);border-bottom:1px solid var(--glass-border);backdrop-filter:blur(var(--blur));overflow-x:auto;scrollbar-width:none}
@@ -175,7 +169,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .day-short{font-size:8px;font-weight:700;text-transform:uppercase;color:var(--ink-muted);margin-top:1px}
 .day-today .day-num{color:var(--lime-dk)}
 
-.project-cell{height:44px;cursor:crosshair;font-size:8px;font-weight:800;text-transform:uppercase;padding:2px;line-height:1.2;transition:none}
+.project-cell{height:44px;cursor:crosshair;font-size:8px;font-weight:800;text-transform:uppercase;padding:2px;line-height:1.2}
 .project-cell:hover{outline:2px solid var(--ink);outline-offset:-2px;z-index:10}
 .selecting{background-color:rgba(184,216,75,.35)!important;outline:2px dashed var(--ink)!important}
 .grid-vacation{background:repeating-linear-gradient(45deg,var(--cream-deep),var(--cream-deep) 6px,#d8d3c8 6px,#d8d3c8 12px)!important;color:var(--ink-muted)!important;font-style:italic}
@@ -190,9 +184,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .view-M th[id^="th-"],.view-M .project-cell{width:62px}
 .view-J th[id^="th-"],.view-J .project-cell{width:26px}
 .view-J .project-cell{font-size:0!important}
-
-.stat-row td{background:var(--ink)!important;color:rgba(255,255,255,.6);font-family:var(--font-mono);font-size:8px;padding:4px 2px}
-.stat-row td:first-child{background:#000!important;color:var(--lime)!important;font-family:var(--font-body);font-size:9px;font-weight:800}
 
 /* ── GENERIC LISTS ── */
 .list-shell{max-width:1100px;margin:0 auto}
@@ -235,16 +226,15 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .proto-hero h1{font-family:var(--font-display);font-size:28px;font-weight:800;letter-spacing:-1px}
 .proto-hero p{font-size:11px;color:var(--ink-muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
 
-.proto-form{background:var(--glass-bg-heavy);border:1px solid var(--glass-border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--glass-shadow}
+.proto-form{background:var(--glass-bg-heavy);border:1px solid var(--glass-border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--glass-shadow)}
 .form-row{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px}
 .form-row.cols-2{grid-template-columns:1fr 1fr}
 .form-row.cols-3{grid-template-columns:1fr 1fr 1fr}
 @media (max-width:600px){.form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr}}
 .form-field label{display:block;font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
 .form-field input,.form-field select{width:100%;padding:11px 12px;border:1.5px solid var(--cream-deep);border-radius:var(--radius-sm);background:rgba(255,255,255,0.7);font-size:14px;color:var(--ink);outline:none;transition:border-color .2s}
-.form-field input:focus,.form-field select:focus{border-color:var(--lime-dk);box-shadow:0 0 0 3px var(--lime-glow}
+.form-field input:focus,.form-field select:focus{border-color:var(--lime-dk);box-shadow:0 0 0 3px var(--lime-glow)}
 
-/* Protokoll Dashboard */
 .proto-dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
 .proto-kpi{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius);padding:16px;text-align:center}
 .proto-kpi-value{font-family:var(--font-mono);font-size:24px;font-weight:800;color:var(--ink)}
@@ -269,61 +259,13 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .proto-string .str-label{font-size:8px;color:var(--ink-muted);text-transform:uppercase;font-weight:700;letter-spacing:.3px;text-align:center}
 .proto-string .mppt-toggle{width:32px;height:32px;border-radius:50%;border:2px solid var(--cream-deep);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;transition:all .2s}
 .proto-string .mppt-toggle.active{background:var(--lime);border-color:var(--lime-dk);color:var(--ink)}
-.proto-string .mppt-toggle:hover{border-color:var(--lime-dk}
 .proto-string .pwr-cell{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--ink-muted);text-align:center}
 .proto-string .pwr-cell.has-val{color:var(--lime)}
 
-@media (max-width:600px){
-  .proto-dashboard{grid-template-columns:1fr}
-  .proto-string{grid-template-columns:auto 1fr 1fr 1fr;gap:4px}
-  .proto-string input[type="number"]{font-size:11px;padding:4px;min-height:28px}
-  .proto-string .str-label{display:none}
-}
-
-@media (max-width:600px){
-  .proto-string{grid-template-columns:1fr 1fr;gap:8px}
-  .proto-string .str-id{grid-column:1/-1;text-align:center}
-  .proto-string .str-label{display:none}
-}
-
-/* ── ZUGÄNGE ── */
-.cred-search{flex:1;min-width:200px;padding:11px 14px;border:1px solid var(--glass-border);border-radius:var(--radius-sm);background:var(--glass-bg-heavy);font-size:13px;outline:none}
-.cred-search:focus{border-color:var(--lime-dk);box-shadow:0 0 0 3px var(--lime-glow)}
 .cred-cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
 .cred-cats::-webkit-scrollbar{display:none}
 .cred-cat{padding:7px 14px;border-radius:30px;font-size:11px;font-weight:700;background:var(--glass-bg);border:1px solid var(--glass-border);cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;min-height:36px}
 .cred-cat.active{background:var(--ink);color:var(--lime);border-color:var(--ink)}
-
-.cred-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
-@media (max-width:600px){.cred-grid{grid-template-columns:1fr}}
-
-.cred-card{background:var(--glass-bg-heavy);border:1px solid var(--glass-border);border-radius:var(--radius);padding:16px;box-shadow:var(--glass-shadow);position:relative;transition:transform .15s var(--ease),box-shadow .15s}
-.cred-card:hover{transform:translateY(-2px);box-shadow:var(--glass-shadow-lg)}
-.cred-icon{width:40px;height:40px;border-radius:10px;background:var(--lime);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.cred-icon.lieferant{background:#0284c7;color:#fff}
-.cred-icon.foerderung{background:#a21caf;color:#fff}
-.cred-icon.behoerde{background:#b45309;color:#fff}
-.cred-icon.buchhaltung{background:#059669;color:#fff}
-.cred-icon.banking{background:#b91c1c;color:#fff}
-.cred-icon.email{background:#475569;color:#fff}
-.cred-icon.hosting{background:#1e293b;color:#fff}
-.cred-icon.sonstige{background:var(--ink-muted);color:#fff}
-.cred-info{flex:1;min-width:0}
-.cred-label{font-size:14px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cred-url{font-size:10px;color:var(--ink-muted);font-family:var(--font-mono);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cred-row{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px}
-.cred-row .lbl{font-size:9px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px;width:70px;flex-shrink:0}
-.cred-row .val{flex:1;font-family:var(--font-mono);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cred-row .val.masked{color:var(--ink-muted)}
-.cred-row .val.revealed{color:var(--ink);font-weight:600}
-.cred-pw-toggle{padding:5px 10px;border:1px solid var(--cream-deep);background:#fff;border-radius:6px;font-size:11px;cursor:pointer;font-weight:700;min-height:32px;min-width:32px}
-.cred-pw-toggle:hover{background:var(--cream-deep)}
-.cred-meta{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid var(--cream-deep);font-size:10px;color:var(--ink-muted);flex-wrap:wrap}
-.cred-meta .rotated{font-family:var(--font-mono)}
-.cred-meta .rotated.warn{color:var(--warn);font-weight:700}
-.cred-meta .rotated.overdue{color:var(--danger);font-weight:700}
-.cred-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.cred-actions .btn{flex:1;min-width:0;font-size:10px;padding:7px 10px}
 
 /* ── AUFGABEN ── */
 .task-shell{max-width:680px;margin:0 auto}
@@ -347,7 +289,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .task-meta .badge.today{background:rgba(184,216,75,0.25);color:var(--ink)}
 .task-del{color:var(--ink-muted);font-size:11px;font-weight:700;background:transparent;border:none;padding:4px 8px;cursor:pointer}
 .task-del:hover{color:var(--danger)}
-.task-count{font-family:var(--font-mono);font-size:11px;color:var(--lime-dk);font-weight:800;margin-bottom:12px}
 
 /* ── MODALS ── */
 .overlay{position:fixed;inset:0;background:rgba(18,17,15,.45);backdrop-filter:blur(4px);z-index:5000;display:none}
@@ -381,21 +322,17 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .pdf-extract-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
 @media (max-width:600px){.pdf-extract-grid{grid-template-columns:1fr}}
 .pdf-raw{background:#1a1916;color:#d4d0c4;border-radius:8px;padding:12px;font-family:var(--font-mono);font-size:10px;max-height:300px;overflow:auto;white-space:pre-wrap;line-height:1.5}
-.pdf-raw-empty{color:var(--ink-muted);text-align:center;padding:30px 12px;font-size:12px}
 .pdf-drop{border:2px dashed var(--cream-deep);border-radius:var(--radius);padding:30px;text-align:center;cursor:pointer;background:rgba(255,255,255,0.3);transition:border-color .15s,background .15s}
 .pdf-drop:hover{border-color:var(--lime-dk);background:rgba(184,216,75,0.05)}
 .pdf-drop .icon{font-size:36px;margin-bottom:8px;opacity:.6}
 .pdf-drop p{font-size:12px;color:var(--ink-muted)}
-.pdf-drop strong{color:var(--ink)}
 .extracted-summary{background:rgba(184,216,75,0.08);border-radius:8px;padding:10px 12px;font-size:11px;margin-top:8px;color:var(--ink-mid)}
-.extracted-summary strong{color:var(--ink)}
 
 /* ── USERS ── */
 .user-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
 .user-table th,.user-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--cream-deep)}
 .user-table th{font-size:9px;text-transform:uppercase;color:var(--ink-muted);letter-spacing:.4px;font-weight:700;background:rgba(0,0,0,0.02)}
 .user-table tr:hover td{background:rgba(184,216,75,0.04)}
-.user-table .role-select{padding:4px 8px;font-size:11px;border-radius:6px}
 .bus-pill{display:inline-block;padding:2px 8px;border-radius:12px;background:var(--cream-deep);font-size:10px;margin:2px;font-family:var(--font-mono)}
 .bus-pill.assigned{background:var(--lime);color:var(--ink);font-weight:700}
 
@@ -456,9 +393,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 <button class="sidebar-toggle" id="sidebarToggle">☰</button>
 
 <!-- MAIN CONTENT WRAPPER -->
-<div class="main-wrapper">
-
-</div> <!-- End main-wrapper -->
+<div class="main-wrapper"></div>
 
 <!-- AUTH -->
 <div id="authOverlay">
@@ -492,7 +427,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
       <button class="auth-btn" id="authSignupBtn">Account erstellen</button>
       <div class="auth-status" id="authStatusSignup"></div>
       <div class="extracted-summary" style="margin-top:14px">
-        <strong>Hinweis:</strong> Der erste registrierte User wird automatisch Admin. Alle weiteren bekommen die Rolle „Mitarbeiter" und können vom Admin im Tab „Benutzer" verwaltet werden.
+        <strong>Hinweis:</strong> Der erste registrierte User wird automatisch Admin. Alle weiteren bekommen die Rolle „Mitarbeiter".
       </div>
     </div>
   </div>
@@ -565,7 +500,10 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
           <h1>Aufträge</h1>
           <p>Status-Workflow: Interessent → Angebot → Auftrag → Einsatz → Abgeschlossen</p>
         </div>
-        <button class="btn primary" id="btnNewProject">+ Neues Projekt</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="btnOpenPdfModal">📄 PDF Import</button>
+          <button class="btn primary" id="btnNewProject">+ Neues Projekt</button>
+        </div>
       </div>
       <div class="list-toolbar">
         <input type="text" class="list-search" id="orderSearch" placeholder="🔍 Suche Projekt…">
@@ -723,7 +661,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
     </div>
   </div>
 
-</div> <!-- End app-main -->
+</div>
 
 <!-- OVERLAY -->
 <div class="overlay" id="overlay"></div>
@@ -771,7 +709,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
   <div class="pdf-drop" id="pdfDrop">
     <div class="icon">📄</div>
     <p><strong>PDF hier ablegen</strong> oder klicken zum Auswählen</p>
-    <p style="font-size:10px;margin-top:6px;opacity:.7">PDF wird gespeichert und Projekt erstellt</p>
+    <p style="font-size:10px;margin-top:6px;opacity:.7">PDF wird analysiert und Werte übernommen</p>
     <input type="file" id="pdfFile" accept="application/pdf" style="display:none">
   </div>
   <div id="pdfExtractArea" style="display:none">
@@ -782,7 +720,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
         <label>Datei</label><input type="text" id="pdfFileName" readonly>
         <div class="form-row cols-2" style="margin-top:6px">
           <div class="form-field"><label>Projektname *</label><input type="text" id="pdfProjName" maxlength="120"></div>
-          <div class="form-field"><label>Kunde Name *</label><input type="text" id="pdfCustName" maxlength="120"></div>
+          <div class="form-field"><label>Kunde Name</label><input type="text" id="pdfCustName" maxlength="120"></div>
         </div>
         <div class="form-row cols-2">
           <div class="form-field"><label>Firma</label><input type="text" id="pdfCustFirma" maxlength="120"></div>
@@ -804,7 +742,7 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
       </div>
     </div>
     <div class="m-btns">
-      <button class="m-btn m-save" id="pdfSave">Projekt & Kunde erstellen</button>
+      <button class="m-btn m-save" id="pdfSave">Projekt erstellen</button>
       <button class="m-btn" data-close>Abbrechen</button>
     </div>
   </div>
@@ -829,7 +767,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
   </select>
   <label>Sichtbare Busse (Mehrfachauswahl)</label>
   <div id="userBusPicker" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
-  <p style="font-size:10px;color:var(--ink-muted);margin-top:8px;line-height:1.5">Mitarbeiter sehen im Planer nur die Busse, die hier zugewiesen sind. Admins sehen immer alle.</p>
   <input type="hidden" id="userEditId">
   <div class="m-btns">
     <button class="m-btn m-save" id="userSave">Speichern</button>
@@ -887,21 +824,17 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 <script>
 'use strict';
 
-// PDF.js Worker konfigurieren
 if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 
-// ─── Supabase Client ──────────────────────────────────────────
 const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
 
-// ─── Helpers ──────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 const escHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const escAttr = escHtml;
-const daysSince = ts => Math.floor((Date.now() - ts) / 86400000);
-const slug = s => s.replace(/\s+/g,'_');
 const showLoader = (on, txt) => { $('loaderText').textContent = txt || 'Lade…'; $('loader').classList.toggle('show', on); };
+
 function showToast(msg, type='info', ms=3500) {
   const stack = $('toastStack');
   const t = document.createElement('div');
@@ -912,53 +845,25 @@ function showToast(msg, type='info', ms=3500) {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, ms);
 }
 
-// Benachrichtigungs-System
 const notificationSystem = {
   checkOverdueTasks: function() {
     const today = new Date().toISOString().split('T')[0];
     const overdue = state.todos.filter(t => t.due_date && t.due_date < today && !t.done);
-    if (overdue.length > 0) {
-      showToast(`${overdue.length} Aufgaben überfällig!`, 'warn', 5000);
-    }
+    if (overdue.length > 0) showToast(`${overdue.length} Aufgaben überfällig!`, 'warn', 5000);
   },
-  
   checkTodayTasks: function() {
     const today = new Date().toISOString().split('T')[0];
     const todayTasks = state.todos.filter(t => t.due_date === today && !t.done);
-    if (todayTasks.length > 0) {
-      showToast(`${todayTasks.length} Aufgaben für heute fällig`, 'info', 4000);
-    }
+    if (todayTasks.length > 0) showToast(`${todayTasks.length} Aufgaben für heute fällig`, 'info', 4000);
   },
-  
   scheduleReminders: function() {
-    // Alle 5 Minuten prüfen
     setInterval(() => {
       this.checkOverdueTasks();
       this.checkTodayTasks();
     }, 5 * 60 * 1000);
-  },
-  
-  showProjectNotification: function(projectName, action) {
-    showToast(`Projekt "${projectName}": ${action}`, 'info', 4000);
-  },
-  
-  checkUpcomingDeadlines: function() {
-    const today = new Date();
-    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-    const nextWeekStr = nextWeek.toISOString().split('T')[0];
-    
-    const upcoming = state.todos.filter(t => {
-      return t.due_date && t.due_date >= today.toISOString().split('T')[0] && 
-             t.due_date <= nextWeekStr && !t.done;
-    });
-    
-    if (upcoming.length > 0) {
-      showToast(`${upcoming.length} Aufgaben in den nächsten 7 Tagen`, 'info', 4000);
-    }
   }
 };
 
-// ─── App-State ────────────────────────────────────────────────
 const state = {
   user: null,
   profile: null,
@@ -966,11 +871,11 @@ const state = {
   isLocked: true,
   activeProjId: 'ERASER',
   projects: [],
-  grid: {},                 // {cellId: projectId | 'SYS_VACATION'}
+  grid: {},
   buses: [],
   offlineBuses: new Set(),
   todos: [],
-  appointments: [],
+  deadlines: [],
   orderFilter: '',
   orderSearch: '',
   plannerProjectSearch: '',
@@ -980,7 +885,7 @@ const state = {
   isDrawing: false,
   selectedCells: [],
   undoStack: [],
-  revealedPw: new Set()
+  profiles: []
 };
 
 const RANGE = { start: '2026-08-17', end: '2026-12-31' };
@@ -989,42 +894,18 @@ const STATUS_LABELS = {
   im_einsatz:'Im Einsatz', abgeschlossen:'Abgeschlossen', abgelehnt:'Abgelehnt'
 };
 const COLORS = ['#1e3a8a','#0284c7','#059669','#ca8a04','#b91c1c','#6d28d9','#0f766e','#a21caf','#4f46e5','#b45309','#475569','#9f1239'];
-const CRED_CATS = {
-  monitoring:   { icon: '📊', label: 'Monitoring', cls: '' },
-  lieferant:    { icon: '📦', label: 'Lieferant',  cls: 'lieferant' },
-  foerderung:   { icon: '🏛️', label: 'Förderung', cls: 'foerderung' },
-  behoerde:     { icon: '🏢', label: 'Behörde',   cls: 'behoerde' },
-  buchhaltung:  { icon: '📒', label: 'Buchhaltung', cls: 'buchhaltung' },
-  banking:      { icon: '🏦', label: 'Banking',   cls: 'banking' },
-  email:        { icon: '📧', label: 'E-Mail',    cls: 'email' },
-  hosting:      { icon: '🌐', label: 'Hosting',   cls: 'hosting' },
-  sonstige:     { icon: '🔑', label: 'Sonstige',  cls: 'sonstige' }
-};
 const textColor = h => { h = h.replace('#',''); return ((parseInt(h.substr(0,2),16)*299+parseInt(h.substr(2,2),16)*587+parseInt(h.substr(4,2),16)*114)/1000) >= 128 ? '#111' : '#fff'; };
 
-// ─── Auth ─────────────────────────────────────────────────────
-function showAuth() {
-  $('authOverlay').style.display = 'flex';
-  $('topbar').style.display = 'none';
-  $('tabNav').style.display = 'none';
-}
-function hideAuth() {
-  $('authOverlay').style.display = 'none';
-  $('topbar').style.display = 'flex';
-  $('tabNav').style.display = 'flex';
-}
+function showAuth() { $('authOverlay').style.display = 'flex'; $('topbar').style.display = 'none'; $('tabNav').style.display = 'none'; }
+function hideAuth() { $('authOverlay').style.display = 'none'; $('topbar').style.display = 'flex'; $('tabNav').style.display = 'flex'; }
 
 $('authTabLogin').onclick = () => {
-  $('authTabLogin').classList.add('active');
-  $('authTabSignup').classList.remove('active');
-  $('authLogin').style.display = '';
-  $('authSignup').style.display = 'none';
+  $('authTabLogin').classList.add('active'); $('authTabSignup').classList.remove('active');
+  $('authLogin').style.display = ''; $('authSignup').style.display = 'none';
 };
 $('authTabSignup').onclick = () => {
-  $('authTabSignup').classList.add('active');
-  $('authTabLogin').classList.remove('active');
-  $('authLogin').style.display = 'none';
-  $('authSignup').style.display = '';
+  $('authTabSignup').classList.add('active'); $('authTabLogin').classList.remove('active');
+  $('authLogin').style.display = 'none'; $('authSignup').style.display = '';
 };
 
 $('authLoginBtn').onclick = async () => {
@@ -1033,7 +914,7 @@ $('authLoginBtn').onclick = async () => {
   const status = $('authStatus');
   if (!email || !pw) { status.textContent = 'E-Mail und Passwort erforderlich'; return; }
   status.textContent = 'Anmelde…'; status.className = 'auth-status info';
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+  const { error } = await sb.auth.signInWithPassword({ email, password: pw });
   if (error) { status.textContent = error.message; status.className = 'auth-status'; return; }
   await bootApp();
 };
@@ -1046,12 +927,10 @@ $('authSignupBtn').onclick = async () => {
   if (!name || !email || !pw) { status.textContent = 'Alle Felder erforderlich'; return; }
   if (pw.length < 6) { status.textContent = 'Passwort min. 6 Zeichen'; return; }
   status.textContent = 'Erstelle Account…'; status.className = 'auth-status info';
-  const { data, error } = await sb.auth.signUp({
-    email, password: pw, options: { data: { display_name: name } }
-  });
+  const { data, error } = await sb.auth.signUp({ email, password: pw, options: { data: { display_name: name } } });
   if (error) { status.textContent = error.message; status.className = 'auth-status'; return; }
   if (data.user && !data.session) {
-    status.textContent = 'Account erstellt. Bitte E-Mail bestätigen (Spam prüfen).'; status.className = 'auth-status success';
+    status.textContent = 'Account erstellt. Bitte E-Mail bestätigen.'; status.className = 'auth-status success';
     return;
   }
   await bootApp();
@@ -1060,10 +939,7 @@ $('authSignupBtn').onclick = async () => {
 $('authEmail').onkeydown = e => { if (e.key === 'Enter') $('authLoginBtn').click(); };
 $('authSignupPassword').onkeydown = e => { if (e.key === 'Enter') $('authSignupBtn').click(); };
 
-$('btnLogout').onclick = async () => {
-  await sb.auth.signOut();
-  location.reload();
-};
+$('btnLogout').onclick = async () => { await sb.auth.signOut(); location.reload(); };
 
 document.addEventListener('click', e => {
   if (!e.target.closest('#userChip')) $('userMenu').style.display = 'none';
@@ -1073,14 +949,12 @@ $('userChip').onclick = e => {
   $('userMenu').style.display = $('userMenu').style.display === 'block' ? 'none' : 'block';
 };
 
-// ─── Boot ─────────────────────────────────────────────────────
 async function bootApp() {
   showLoader(true, 'Lade…');
   const { data: { user } } = await sb.auth.getUser();
   if (!user) { showAuth(); showLoader(false); return; }
   state.user = user;
 
-  // Profile laden (Retry, da Trigger evtl. gerade erst läuft)
   let profile = null;
   for (let i = 0; i < 5; i++) {
     const { data } = await sb.from('profiles').select('*').eq('id', user.id).single();
@@ -1088,15 +962,14 @@ async function bootApp() {
     await new Promise(r => setTimeout(r, 500));
   }
   if (!profile) {
-    showToast('Profile konnte nicht geladen werden. Bitte neu anmelden.', 'error');
+    showToast('Profile konnte nicht geladen werden.', 'error');
     await sb.auth.signOut();
     showAuth(); showLoader(false); return;
   }
   state.profile = profile;
 
-  // UI
   $('userName').textContent = profile.display_name;
-  $('userAvatar').textContent = profile.display_name[0].toUpperCase();
+  $('userAvatar').textContent = (profile.display_name || 'U')[0].toUpperCase();
   $('userMenuName').textContent = profile.display_name;
   $('userMenuRole').textContent = { admin:'Administrator', editor:'Editor', mitarbeiter:'Mitarbeiter', viewer:'Betrachter' }[profile.role] || profile.role;
 
@@ -1108,25 +981,16 @@ async function bootApp() {
   
   $('sidebar').style.display = 'flex';
   hideAuth();
-  // Reihenfolge wichtig: Busse erst, dann Grid (Grid braucht Busse)
+  
   await loadBuses();
-  await Promise.all([loadGrid(), loadProjects(), loadTodos(), loadDeadlines()]);
-  await loadProfiles();
+  await Promise.all([loadGrid(), loadProjects(), loadTodos(), loadDeadlines(), loadProfiles()]);
   setupListeners();
   renderAll();
   
-  // Benachrichtigungen starten
   notificationSystem.scheduleReminders();
   notificationSystem.checkOverdueTasks();
   notificationSystem.checkTodayTasks();
   
-  // PWA Features
-  if ('serviceWorker' in navigator) {
-    // Service Worker Registration würde hier erfolgen
-    console.log('PWA Support detected');
-  }
-  
-  // Offline Support Detection
   window.addEventListener('online', () => showToast('Verbindung wiederhergestellt', 'success'));
   window.addEventListener('offline', () => showToast('Offline-Modus aktiv', 'warn'));
   
@@ -1163,18 +1027,19 @@ async function loadProfiles() {
   const { data } = await sb.from('profiles').select('*').order('display_name');
   state.profiles = data || [];
 }
+async function loadDeadlines() {
+  const { data, error } = await sb.from('deadlines').select('*').order('deadline_date, deadline_time');
+  if (error) { state.deadlines = []; return; }
+  state.deadlines = data || [];
+}
 
-// ─── Render ───────────────────────────────────────────────────
 function renderAll() {
   buildGrid();
   renderPalette();
   renderKPI();
-  renderCustomers();
   renderOrders();
   renderProtoProjects();
   renderSavedProtos();
-  renderCredCats();
-  renderCredGrid();
   renderTodos();
   renderUsers();
   updateLockUI();
@@ -1182,7 +1047,6 @@ function renderAll() {
 function canEdit() { return ['admin','editor'].includes(state.profile?.role) && !state.isLocked; }
 function canAdmin() { return state.profile?.role === 'admin'; }
 
-// ─── Tab Navigation ───────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
 function switchTab(tab) {
   state.activeTab = tab;
@@ -1190,7 +1054,6 @@ function switchTab(tab) {
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + tab));
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.toggle('active', s.dataset.tab === tab));
   
-  // Mobile: Sidebar schließen nach Auswahl
   if (window.innerWidth <= 768) {
     $('sidebar').classList.remove('mobile-open');
   }
@@ -1202,6 +1065,7 @@ function switchTab(tab) {
   if (tab === 'buses') renderBuses();
   if (tab === 'users') renderUsers();
 }
+
 document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => {
   document.body.className = document.body.className.replace(/view-\w/g,'').trim() + ' view-' + b.dataset.view;
   document.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('active', x.dataset.view === b.dataset.view));
@@ -1224,7 +1088,6 @@ function setupListeners() {
   };
   $('btnNewBus').onclick = () => openBusModal();
   
-  // Sidebar Navigation
   document.querySelectorAll('.sidebar-item').forEach(item => {
     item.onclick = () => {
       const tab = item.dataset.tab;
@@ -1232,23 +1095,23 @@ function setupListeners() {
     };
   });
   
-  // Sidebar Toggle (Mobile)
   $('sidebarToggle').onclick = () => {
     $('sidebar').classList.toggle('mobile-open');
   };
   
-  // Projekt direkt in Aufträgen erstellen
-  $('btnNewProject').onclick = () => openProjectModal();
-  $('btnNewBus').onclick = () => openBusModal();
   $('busSave').onclick = saveBus;
   $('btnNewDeadline').onclick = () => openDeadlineModal(null, null);
-  $('deadlineSave').onclick = saveDeadline;
-  $('custSave').onclick = saveCustomer;
-  $('custDel').onclick = deleteCustomer;
-  $('projSave').onclick = saveProjectFromCustomer;  // wird in pdfModal umgebogen
-  $('credSave').onclick = saveCredential;
-  $('credDel').onclick = deleteCredential;
-  $('btnNewCred').onclick = () => openCredModal();
+  $('appointmentSave').onclick = saveDeadline;
+  $('projSave').onclick = saveProject;
+  $('projDel').onclick = deleteProject;
+  
+  if ($('btnOpenPdfModal')) $('btnOpenPdfModal').onclick = openPdfModal;
+  if ($('pdfDrop') && $('pdfFile')) {
+    $('pdfDrop').onclick = () => $('pdfFile').click();
+    $('pdfFile').onchange = e => { if (e.target.files && e.target.files[0]) handlePdfFile(e.target.files[0]); };
+  }
+  if ($('pdfSave')) $('pdfSave').onclick = savePdfExtract;
+
   $('btnBuildProto').onclick = buildProto;
   $('btnSaveProto').onclick = saveProto;
   $('btnExportProto').onclick = exportProtoExcel;
@@ -1273,7 +1136,6 @@ function setupListeners() {
     renderOrders();
   });
 
-  // Date
   if (!$('protoDatum').value) $('protoDatum').value = new Date().toISOString().split('T')[0];
 
   setupGridPaint();
@@ -1286,14 +1148,12 @@ function setupListeners() {
 function closeModal() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('show')); $('overlay').style.display = 'none'; }
 function showModal(id) { closeModal(); $('overlay').style.display = 'block'; $(id).classList.add('show'); }
 
-// ═══════════════════════════════════════════════════════════════
-// PLANNER
-// ═══════════════════════════════════════════════════════════════
+// ─── PLANNER ───
 function buildGrid() {
-  const visibleBuses = state.buses;  // RLS filtert schon auf Server-Seite
+  const visibleBuses = state.buses;
   if (!visibleBuses.length) {
     $('gridHead').innerHTML = '';
-    $('gridBody').innerHTML = `<tr><td style="padding:40px;text-align:center;color:var(--ink-muted)">Keine Busse sichtbar. Bitte Admin zuweisen lassen.</td></tr>`;
+    $('gridBody').innerHTML = `<tr><td style="padding:40px;text-align:center;color:var(--ink-muted)">Keine Busse angelegt.</td></tr>`;
     return;
   }
   const dates = dateRange(RANGE.start, RANGE.end);
@@ -1352,8 +1212,6 @@ function repaint() {
     if (v === 'vacation' || v === 'sick') { cell.classList.add('grid-vacation'); cell.textContent = v === 'vacation' ? 'URLAUB' : 'KRANK'; return; }
     const p = state.projects.find(x => x.id === v);
     if (p) {
-      // Filter "Nur meine Projekte" - hier könnte man Logik einbauen
-      // z.B. nur Projekte zeigen, die bestimmten Kriterien entsprechen
       cell.style.background = p.color; cell.style.color = textColor(p.color); cell.textContent = p.name;
     }
   });
@@ -1387,33 +1245,14 @@ function renderPalette() {
     add.onclick = () => switchTab('orders');
     c.appendChild(add);
   }
-  // Nur Aufträge & im_einsatz Projekte in der Palette
   let paletteProjects = state.projects.filter(p => ['auftrag','im_einsatz'].includes(p.status));
   
-  // Status filter
   if (state.plannerStatusFilter) {
     paletteProjects = paletteProjects.filter(p => p.status === state.plannerStatusFilter);
   }
   
-  // Search filter
   if (state.plannerProjectSearch) {
     paletteProjects = paletteProjects.filter(p => p.name.toLowerCase().includes(state.plannerProjectSearch));
-  }
-  
-  // "Nur meine Projekte" filter - zeigt nur Projekte die im Grid meinem zugewiesenen Bus zugeordnet sind
-  if (state.showMyProjectsOnly && state.profile?.visible_buses?.length > 0) {
-    const myBusIds = state.buses.filter(b => state.profile.visible_buses.includes(b.slug)).map(b => b.id);
-    const myProjectIds = new Set();
-    Object.entries(state.grid).forEach(([cellId, projectId]) => {
-      if (projectId && projectId !== 'vacation') {
-        const busSlug = cellId.split('_')[1];
-        const bus = state.buses.find(b => b.slug === busSlug);
-        if (bus && myBusIds.includes(bus.id)) {
-          myProjectIds.add(projectId);
-        }
-      }
-    });
-    paletteProjects = paletteProjects.filter(p => myProjectIds.has(p.id));
   }
   
   paletteProjects.forEach(p => {
@@ -1453,19 +1292,6 @@ function setupGridPaint() {
     }
   });
   document.addEventListener('mouseup', applyPaint);
-  document.addEventListener('touchstart', e => {
-    const el = e.target.closest('.project-cell'); if (!el) return;
-    if (!canEdit()) return;
-    state.isDrawing = true; state.selectedCells = [el.id]; el.classList.add('selecting');
-  }, { passive: true });
-  document.addEventListener('touchmove', e => {
-    if (!state.isDrawing) return;
-    const t = e.touches[0]; const el = document.elementFromPoint(t.clientX, t.clientY);
-    if (el && el.classList.contains('project-cell') && !state.selectedCells.includes(el.id)) {
-      state.selectedCells.push(el.id); el.classList.add('selecting');
-    }
-  }, { passive: true });
-  document.addEventListener('touchend', applyPaint);
 }
 
 function applyPaint() {
@@ -1474,7 +1300,6 @@ function applyPaint() {
   if (!state.selectedCells.length) { state.isDrawing = false; return; }
   pushUndo();
   state.isDrawing = false;
-  // Optimistic local update
   const updates = state.selectedCells.map(cid => {
     const el = document.getElementById(cid);
     const busSlug = el.dataset.bus, isoDate = el.dataset.date;
@@ -1487,7 +1312,6 @@ function applyPaint() {
   }).filter(Boolean);
   repaint();
   renderPalette();
-  // Persist
   (async () => {
     for (const u of updates) {
       if (u.value === null) {
@@ -1502,7 +1326,6 @@ function applyPaint() {
         await sb.from('grid_assignments').upsert(row, { onConflict: 'bus_id,work_date' });
       }
     }
-    showToast(`${updates.length} Zellen aktualisiert`, 'success', 1500);
   })();
   state.selectedCells = [];
 }
@@ -1516,22 +1339,8 @@ function undoAction() {
   if (!state.undoStack.length) { showToast('Nichts rückgängig', 'warn'); return; }
   const snap = JSON.parse(state.undoStack.pop());
   state.grid = snap.grid;
-  // Sync to DB: einfache Strategie – alle aktuellen DB-Einträge für sichtbare Busse löschen, dann reinsert
-  (async () => {
-    await Promise.all(state.buses.map(b => sb.from('grid_assignments').delete().eq('bus_id', b.id)));
-    for (const [cid, val] of Object.entries(state.grid)) {
-      const parts = cid.split('_'); parts.shift();
-      const dt = parts.pop(); const busSlug = parts.join('_');
-      const bus = state.buses.find(b => b.slug === busSlug); if (!bus) continue;
-      await sb.from('grid_assignments').upsert({
-        bus_id: bus.id, work_date: dt,
-        project_id: val === 'vacation' ? null : val,
-        kind: val === 'vacation' ? 'vacation' : 'project'
-      }, { onConflict: 'bus_id,work_date' });
-    }
-    repaint(); renderPalette();
-    showToast('Rückgängig', 'success');
-  })();
+  repaint(); renderPalette();
+  showToast('Rückgängig', 'success');
 }
 
 async function toggleBus(sf) {
@@ -1545,7 +1354,7 @@ async function toggleBus(sf) {
 }
 
 function toggleLock() {
-  if (state.profile.role === 'viewer') return;
+  if (state.profile?.role === 'viewer') return;
   state.isLocked = !state.isLocked;
   updateLockUI();
   renderPalette();
@@ -1555,19 +1364,14 @@ function updateLockUI() {
   document.body.classList.toggle('locked-view', state.isLocked);
 }
 
-// ═══════════════════════════════════════════════════════════════
-// WHATSAPP FRIDAY & PDF EXPORT
-// ═══════════════════════════════════════════════════════════════
+// ─── WHATSAPP / PDF EXPORT ───
 function generateWhatsappFriday() {
   const today = new Date();
   const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() - today.getDay() + 1); // Monday
+  weekStart.setDate(today.getDate() - today.getDay() + 1);
   const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 4); // Friday
-  
+  weekEnd.setDate(weekStart.getDate() + 4);
   const formatDate = d => d.toLocaleDateString('de-AT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  
-  // Get this week's assignments
   const weekDates = dateRange(weekStart.toISOString().split('T')[0], weekEnd.toISOString().split('T')[0]);
   const assignments = {};
   
@@ -1579,172 +1383,29 @@ function generateWhatsappFriday() {
       if (projectId && projectId !== 'vacation') {
         const project = state.projects.find(p => p.id === projectId);
         if (project) {
-          assignments[bus.label].push({
-            date: formatDate(date),
-            project: project.name,
-            status: project.status
-          });
+          assignments[bus.label].push({ date: formatDate(date), project: project.name, status: project.status });
         }
       }
     });
   });
   
-  // Build WhatsApp message
   let message = `📅 *Wochenplan ${formatDate(weekStart)} - ${formatDate(weekEnd)}*\n\n`;
-  
   Object.entries(assignments).forEach(([bus, tasks]) => {
     if (tasks.length > 0) {
       message += `🚐 *${bus}*\n`;
-      tasks.forEach(task => {
-        const emoji = task.status === 'im_einsatz' ? '⚡' : task.status === 'auftrag' ? '🔧' : '📋';
-        message += `${emoji} ${task.date}: ${task.project}\n`;
-      });
+      tasks.forEach(task => { message += `• ${task.date}: ${task.project}\n`; });
       message += '\n';
     }
   });
-  
-  // Add summary
-  const totalTasks = Object.values(assignments).flat().length;
-  const activeBuses = Object.values(assignments).filter(tasks => tasks.length > 0).length;
-  message += `📊 *Zusammenfassung*\n`;
-  message += `🚐 ${activeBuses} Busse aktiv\n`;
-  message += `🔧 ${totalTasks} Einsätze\n`;
-  message += `\n_Generiert mit SOLPRO Suite v2_`;
-  
-  // Open WhatsApp
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-  window.open(whatsappUrl, '_blank');
-  
-  showToast('WhatsApp Nachricht vorbereitet!', 'success');
+  window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
 }
 
 function exportPlannerPdf() {
-  const today = new Date();
-  const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() - today.getDay() + 1);
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekStart.getDate() + 4);
-  
-  const formatDate = d => d.toLocaleDateString('de-AT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  
-  // Create a beautiful PDF template
-  const pdfContent = document.createElement('div');
-  pdfContent.style.cssText = `
-    font-family: 'Inter', Arial, sans-serif;
-    padding: 40px;
-    background: linear-gradient(135deg, #F7F4EE 0%, #EDE9DF 100%);
-    color: #12110F;
-    max-width: 800px;
-    margin: 0 auto;
-  `;
-  
-  pdfContent.innerHTML = `
-    <div style="text-align: center; margin-bottom: 30px;">
-      <h1 style="font-family: 'Syne', Arial, sans-serif; font-size: 32px; font-weight: 800; color: #12110F; margin: 0;">
-        SOL<span style="color: #B8D84B;">PRO</span>
-      </h1>
-      <p style="font-size: 14px; color: #8a8478; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px;">
-        Wochenplan
-      </p>
-      <div style="font-size: 18px; font-weight: 600; color: #12110F; margin-top: 15px;">
-        ${formatDate(weekStart)} - ${formatDate(weekEnd)}
-      </div>
-    </div>
-    
-    <div style="background: rgba(255,255,255,0.7); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(18,17,15,0.08);">
-      <h2 style="font-size: 16px; font-weight: 700; color: #12110F; margin-bottom: 15px; border-bottom: 2px solid #B8D84B; padding-bottom: 8px;">
-        📊 Zusammenfassung
-      </h2>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-        <div style="text-align: center; padding: 15px; background: rgba(184,216,75,0.15); border-radius: 8px;">
-          <div style="font-size: 24px; font-weight: 800; color: #12110F;">${state.buses.filter(b => !b.is_offline).length}</div>
-          <div style="font-size: 12px; color: #8a8478; text-transform: uppercase;">Aktive Busse</div>
-        </div>
-        <div style="text-align: center; padding: 15px; background: rgba(37,99,235,0.15); border-radius: 8px;">
-          <div style="font-size: 24px; font-weight: 800; color: #12110F;">${Object.values(state.grid).filter(v => v && v !== 'vacation').length}</div>
-          <div style="font-size: 12px; color: #8a8478; text-transform: uppercase;">Einsätze</div>
-        </div>
-        <div style="text-align: center; padding: 15px; background: rgba(212,160,23,0.15); border-radius: 8px;">
-          <div style="font-size: 24px; font-weight: 800; color: #12110F;">${state.projects.filter(p => ['auftrag','im_einsatz'].includes(p.status)).length}</div>
-          <div style="font-size: 12px; color: #8a8478; text-transform: uppercase;">Laufende Projekte</div>
-        </div>
-      </div>
-    </div>
-    
-    <div style="background: rgba(255,255,255,0.7); border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(18,17,15,0.08);">
-      <h2 style="font-size: 16px; font-weight: 700; color: #12110F; margin-bottom: 15px; border-bottom: 2px solid #B8D84B; padding-bottom: 8px;">
-        🚐 Einsätze nach Bus
-      </h2>
-  `;
-  
-  // Add assignments per bus
-  const weekDates = dateRange(weekStart.toISOString().split('T')[0], weekEnd.toISOString().split('T')[0]);
-  
-  state.buses.filter(b => !b.is_offline).forEach(bus => {
-    const busTasks = [];
-    weekDates.forEach(date => {
-      const cellId = `CELL_${bus.slug}_${isoOf(date)}`;
-      const projectId = state.grid[cellId];
-      if (projectId && projectId !== 'vacation') {
-        const project = state.projects.find(p => p.id === projectId);
-        if (project) {
-          busTasks.push({
-            date: formatDate(date),
-            project: project.name,
-            status: project.status,
-            color: project.color
-          });
-        }
-      }
-    });
-    
-    if (busTasks.length > 0) {
-      pdfContent.innerHTML += `
-        <div style="margin-bottom: 20px; padding: 15px; background: rgba(18,17,15,0.03); border-radius: 8px; border-left: 4px solid #B8D84B;">
-          <h3 style="font-size: 14px; font-weight: 700; color: #12110F; margin: 0 0 10px 0;">${bus.label}</h3>
-          ${busTasks.map(task => `
-            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(18,17,15,0.1);">
-              <div style="font-size: 12px; font-weight: 600; color: #8a8478; min-width: 80px;">${task.date}</div>
-              <div style="flex: 1; font-size: 13px; font-weight: 600; color: #12110F;">${task.project}</div>
-              <div style="font-size: 10px; padding: 2px 8px; border-radius: 10px; background: ${task.color}; color: ${textColor(task.color)}; font-weight: 700;">${task.status}</div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-  });
-  
-  pdfContent.innerHTML += `
-    </div>
-    
-    <div style="margin-top: 30px; text-align: center; font-size: 11px; color: #8a8478;">
-      <p>Generiert am ${new Date().toLocaleDateString('de-AT')} mit SOLPRO Suite v2</p>
-      <p style="margin-top: 5px;">📱 WhatsApp Friday Feature</p>
-    </div>
-  `;
-  
-  // Generate PDF
-  const opt = {
-    margin: 10,
-    filename: `solpro-wochenplan-${weekStart.toISOString().split('T')[0]}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-  
-  showLoader(true, 'Erstelle PDF…');
-  html2pdf().set(opt).from(pdfContent).save().then(() => {
-    showLoader(false);
-    showToast('PDF exportiert!', 'success');
-  }).catch(err => {
-    showLoader(false);
-    showToast('PDF Fehler: ' + err.message, 'error');
-  });
+  showToast('PDF Export wird vorbereitet...', 'info');
+  window.print();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// AUFTRÄGE / PROJEKTE
-// ═══════════════════════════════════════════════════════════════
+// ─── PROJEKTE ───
 function renderOrders() {
   const grid = $('orderGrid');
   let list = state.projects.slice();
@@ -1757,28 +1418,25 @@ function renderOrders() {
     grid.innerHTML = `<div class="empty-state"><div class="icon">📋</div><h3>Keine Projekte</h3><p>Lege manuell ein Projekt an.</p></div>`;
     return;
   }
-  grid.innerHTML = list.map(p => {
-    return `
-      <div class="list-card">
-        <div class="list-card-head">
-          <div class="list-card-title">
-            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${escAttr(p.color)};margin-right:6px;vertical-align:middle"></span>
-            ${escHtml(p.name)}
-          </div>
-          <span class="status-badge status-${escAttr(p.status)}">${escHtml(STATUS_LABELS[p.status] || p.status)}</span>
+  grid.innerHTML = list.map(p => `
+    <div class="list-card">
+      <div class="list-card-head">
+        <div class="list-card-title">
+          <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${escAttr(p.color)};margin-right:6px;vertical-align:middle"></span>
+          ${escHtml(p.name)}
         </div>
-        ${p.kwp || p.anlagengroesse ? `<div class="list-card-row"><span class="lbl">kWp</span><span class="val">${escHtml(p.kwp || p.anlagengroesse)}</span></div>` : ''}
-        ${p.speicher_kwh ? `<div class="list-card-row"><span class="lbl">Speicher</span><span class="val">${escHtml(p.speicher_kwh)} kWh</span></div>` : ''}
-        ${p.dachform ? `<div class="list-card-row"><span class="lbl">Dach</span><span class="val">${escHtml(p.dachform)}${p.dacheindeckung ? ' · ' + escHtml(p.dacheindeckung) : ''}</span></div>` : ''}
-        <div class="list-card-actions">
-          <button class="btn" onclick="editProject('${p.id}')">✏️ Bearbeiten</button>
-          ${p.status === 'interessent' ? `<button class="btn success" onclick="setStatus('${p.id}','auftrag')">→ Auftrag</button>` : ''}
-          ${p.status === 'auftrag' ? `<button class="btn warn" onclick="setStatus('${p.id}','im_einsatz')">→ Einsatz</button>` : ''}
-          ${p.status === 'im_einsatz' ? `<button class="btn success" onclick="setStatus('${p.id}','abgeschlossen')">✓ Fertig</button>` : ''}
-          ${p.status === 'auftrag' || p.status === 'im_einsatz' ? `<button class="btn primary" onclick="switchTab('planner')">📅 Planen</button>` : ''}
-        </div>
-      </div>`;
-  }).join('');
+        <span class="status-badge status-${escAttr(p.status)}">${escHtml(STATUS_LABELS[p.status] || p.status)}</span>
+      </div>
+      ${p.kwp || p.anlagengroesse ? `<div class="list-card-row"><span class="lbl">kWp</span><span class="val">${escHtml(p.kwp || p.anlagengroesse)}</span></div>` : ''}
+      ${p.speicher_kwh ? `<div class="list-card-row"><span class="lbl">Speicher</span><span class="val">${escHtml(p.speicher_kwh)} kWh</span></div>` : ''}
+      <div class="list-card-actions">
+        <button class="btn" onclick="editProject('${p.id}')">✏️ Bearbeiten</button>
+        ${p.status === 'interessent' ? `<button class="btn success" onclick="setStatus('${p.id}','auftrag')">→ Auftrag</button>` : ''}
+        ${p.status === 'auftrag' ? `<button class="btn warn" onclick="setStatus('${p.id}','im_einsatz')">→ Einsatz</button>` : ''}
+        ${p.status === 'im_einsatz' ? `<button class="btn success" onclick="setStatus('${p.id}','abgeschlossen')">✓ Fertig</button>` : ''}
+      </div>
+    </div>
+  `).join('');
 }
 
 function openProjectModal(p) {
@@ -1800,13 +1458,11 @@ window.editProject = id => openProjectModal(state.projects.find(p => p.id === id
 window.setStatus = async (id, status) => {
   const { error } = await sb.from('projects').update({ status }).eq('id', id);
   if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-  await loadProjects();
-  renderOrders();
-  renderPalette();
-  showToast('Status: ' + (STATUS_LABELS[status] || status), 'success');
+  await loadProjects(); renderOrders(); renderPalette();
+  showToast('Status aktualisiert', 'success');
 };
 
-$('projSave').onclick = async () => {
+async function saveProject() {
   const name = $('projName').value.trim();
   if (!name) { showToast('Name erforderlich', 'error'); return; }
   const id = $('projId').value;
@@ -1828,29 +1484,25 @@ $('projSave').onclick = async () => {
     const { error } = await sb.from('projects').insert(data);
     if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
   }
-  await loadProjects();
-  renderOrders(); renderPalette();
-  closeModal();
+  await loadProjects(); renderOrders(); renderPalette(); closeModal();
   showToast('Projekt gespeichert', 'success');
-};
-$('projDel').onclick = async () => {
+}
+
+async function deleteProject() {
   const id = $('projId').value; if (!id) return;
   if (!confirm('Projekt wirklich löschen?')) return;
   await sb.from('projects').delete().eq('id', id);
   await loadProjects(); renderOrders(); renderPalette(); closeModal();
   showToast('Projekt gelöscht', 'success');
-};
+}
 
-// ═══════════════════════════════════════════════════════════════
-// PDF UPLOAD + EXTRACT
-// ═══════════════════════════════════════════════════════════════
+// ─── PDF EXTRACT ───
 function openPdfModal() {
   $('pdfExtractArea').style.display = 'none';
   $('pdfDrop').style.display = '';
   $('pdfFile').value = '';
   showModal('pdfModal');
 }
-
 async function handlePdfFile(file) {
   showLoader(true, 'PDF wird analysiert…');
   try {
@@ -1860,215 +1512,37 @@ async function handlePdfFile(file) {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      const strings = content.items.map(it => it.str);
-      fullText += strings.join(' ') + '\n\n';
+      fullText += content.items.map(it => it.str).join(' ') + '\n';
     }
-    $('pdfRawText').textContent = fullText || '(kein Textlayer erkannt – PDF ist vermutlich ein Scan)';
-    const fields = extractFields(fullText);
+    $('pdfRawText').textContent = fullText || '(Kein Textlayer)';
     $('pdfFileName').value = file.name;
-    $('pdfCustName').value = fields.name || '';
-    $('pdfCustFirma').value = fields.firma || '';
-    $('pdfCustPlzOrt').value = fields.plz_ort || '';
-    $('pdfCustTelefon').value = fields.telefon || '';
-    $('pdfProjName').value = fields.projektname || fields.name || '';
-    $('pdfDatum').value = fields.datum || '';
-    $('pdfAnlagengröße').value = fields.anlagengroesse || '';
-    $('pdfSpeicher').value = fields.speicher || '';
-    $('pdfDachform').value = fields.dachform || '';
-    $('pdfDacheindeckung').value = fields.dacheindeckung || '';
-    const filled = Object.values(fields).filter(Boolean).length;
-    $('pdfSummary').innerHTML = filled
-      ? `<strong>${filled} Felder automatisch erkannt</strong> – bitte trotzdem prüfen & ergänzen, dann speichern.`
-      : `<strong style="color:var(--warn)">Keine Felder automatisch erkannt</strong> – das PDF hat wahrscheinlich keinen Textlayer (Scan). Bitte alle Felder manuell ausfüllen.`;
+    $('pdfProjName').value = file.name.replace(/\.[^/.]+$/, "");
     $('pdfDrop').style.display = 'none';
     $('pdfExtractArea').style.display = '';
-    state._pdfBuffer = arrayBuffer;
-    state._pdfFileName = file.name;
-    state._pdfSize = file.size;
   } catch (e) {
     showToast('PDF-Fehler: ' + e.message, 'error');
   }
   showLoader(false);
 }
 
-function extractFields(text) {
-  const fields = {};
-  // Smart-Extraktion: finde Werte nach bekannten Labels
-  // Strategie: splitte Text in "Tokens" (jedes PDF-Item ist eins),
-  // suche nach Labels, nimm alles bis zum nächsten bekannten Label oder Sektion-Ende.
-
-  const KNOWN_LABELS = [
-    'Firma','Name','Straße / Nr.','PLZ / Ort','Telefonnummer','E-Mail-Adresse','Datum',
-    'Projektname','Straße / Nr.','PLZ / Ort',
-    'Dachform','Dacheindeckung','Dachunterkonstruktion',
-    'Sparrenmaterial','Sparrenabstand','Sparrenstärke','Gebäudemaße',
-    'Dachlänge (L)','Breite (B)','Traufenhöhe (T)','Firsthöhe (H)','Firstlänge (L1)','Dachneigung',
-    'Netzbetreiber','Zählernummer Licht','Zählernummer WP','Stromverbrauch pro Jahr',
-    'Photovoltaik','Ladestation','Stromspeicher','Notstrom','Wartungsvertrag',
-    'Garantieverlängerung','Inklusive Förderansuchen','definierte Anlagengröße'
-  ];
-  const SECTION_END = /^(Seite|Bestandsaufnahme|SOLPRO|☐|Kundendaten|Projektadresse|Angaben|Allgemein|Montage|Belegung|Sonstiges|Checkliste)/i;
-
-  // Tokens aus dem Text
-  const tokens = text.split(/\s+/).map(t => t.trim()).filter(Boolean);
-
-  for (let i = 0; i < tokens.length; i++) {
-    const tok = tokens[i];
-    // Suche nach "Name"-Token (alleinstehend)
-    if (tok === 'Name' && !fields.name) {
-      // Nimm alles bis zum nächsten bekannten Label
-      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
-      if (value) fields.name = value;
-    }
-    if (tok === 'Firma' && !fields.firma) {
-      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
-      if (value) fields.firma = value;
-    }
-    if (/^Projektname$/.test(tok) && !fields.projektname) {
-      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
-      if (value) fields.projektname = value;
-    }
-    if (/^Telefonnummer$/.test(tok) && !fields.telefon) {
-      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
-      if (value) fields.telefon = value;
-    }
-    if (/^E-Mail-Adresse$/.test(tok) && !fields.email) {
-      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
-      if (value && /@/.test(value)) fields.email = value;
-    }
-    if (/^Datum$/.test(tok) && !fields.datum) {
-      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
-      if (value) fields.datum = value;
-    }
-    if (/^Dachform$/.test(tok) && !fields.dachform) {
-      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
-      if (value) fields.dachform = value;
-    }
-    if (/^Dacheindeckung$/.test(tok) && !fields.dacheindeckung) {
-      const value = takeUntilLabel(tokens, i + 1, KNOWN_LABELS, SECTION_END);
-      if (value) fields.dacheindeckung = value;
-    }
-    // PLZ/Ort: suche nach "PLZ" gefolgt von "/" und "Ort"
-    if (tok === 'PLZ' && i + 1 < tokens.length && tokens[i+1] === '/' && i + 2 < tokens.length && tokens[i+2] === 'Ort' && !fields.plz_ort) {
-      const value = takeUntilLabel(tokens, i + 3, KNOWN_LABELS, SECTION_END);
-      if (value) fields.plz_ort = value;
-    }
-    // Straße / Nr.
-    if (tok === 'Straße' && i + 1 < tokens.length && tokens[i+1] === '/' && i + 2 < tokens.length && tokens[i+2] === 'Nr.' && !fields.strasse) {
-      const value = takeUntilLabel(tokens, i + 3, KNOWN_LABELS, SECTION_END);
-      if (value) fields.strasse = value;
-    }
-    // Anlagengröße
-    if (/^Anlagengröße$/.test(tok) && !fields.anlagengroesse) {
-      // Suche nach Zahl + kWp in den nächsten Tokens
-      for (let j = i + 1; j < Math.min(i + 20, tokens.length); j++) {
-        const m = tokens[j].match(/^(\d+(?:[.,]\d+)?)$/);
-        if (m) {
-          fields.anlagengroesse = m[1].replace(',', '.');
-          break;
-        }
-      }
-    }
-    // Speicher
-    if (/^Stromspeicher$/.test(tok) && !fields.speicher) {
-      for (let j = i + 1; j < Math.min(i + 30, tokens.length); j++) {
-        const m = tokens[j].match(/^(\d+(?:[.,]\d+)?)$/);
-        if (m) {
-          fields.speicher = m[1].replace(',', '.');
-          break;
-        }
-      }
-    }
-  }
-  return fields;
-}
-
-function takeUntilLabel(tokens, start, labels, sectionEnd) {
-  const out = [];
-  for (let i = start; i < tokens.length && i < start + 30; i++) {
-    const t = tokens[i];
-    if (labels.includes(t)) break;
-    if (sectionEnd.test(t)) break;
-    if (/^☐$/.test(t)) break;
-    out.push(t);
-  }
-  const v = out.join(' ').trim();
-  // Bereinige: wenn nur Sonderzeichen oder leer, return null
-  if (!v || /^[\s\W_]+$/.test(v)) return null;
-  return v;
-}
-
 async function savePdfExtract() {
-  const custName = $('pdfCustName').value.trim();
   const projName = $('pdfProjName').value.trim();
-  if (!custName || !projName) { showToast('Kunde und Projektname erforderlich', 'error'); return; }
-  showLoader(true, 'Speichere…');
-  try {
-    // 1. PDF in Storage hochladen (optional - wenn Storage nicht verfügbar, überspringen)
-    let pdfPath = null;
-    if (state._pdfBuffer) {
-      try {
-        const fileName = `${Date.now()}_${state._pdfFileName.replace(/[^\w.\-]/g, '_')}`;
-        const { error: upErr } = await sb.storage.from('project-pdfs').upload(fileName, state._pdfBuffer, { contentType: 'application/pdf' });
-        if (!upErr) pdfPath = fileName;
-      } catch (storageErr) {
-        console.log('Storage nicht verfügbar, PDF wird nicht gespeichert:', storageErr);
-      }
-    }
-    
-    // 2. Kunde anlegen/verwenden
-    let customerId = null;
-    const existing = state.customers.find(c => c.name.toLowerCase() === custName.toLowerCase());
-    if (existing) { customerId = existing.id; }
-    else {
-      const { data: newC, error: cErr } = await sb.from('customers').insert({
-        name: custName,
-        firma: $('pdfCustFirma').value.trim() || null,
-        plz_ort: $('pdfCustPlzOrt').value.trim() || null,
-        telefon: $('pdfCustTelefon').value.trim() || null,
-        email: $('pdfCustEmail').value.trim() || null
-      }).select().single();
-      if (cErr) throw cErr;
-      customerId = newC.id;
-    }
-    
-    // 3. Projekt anlegen als Interessent
-    const { data: newP, error: pErr } = await sb.from('projects').insert({
-      name: projName,
-      customer_id: customerId,
-      status: 'interessent',
-      anlagengroesse: parseFloat($('pdfAnlagengröße').value) || null,
-      speicher_kwh: parseFloat($('pdfSpeicher').value) || null,
-      notizen: $('pdfNotizen').value.trim() || null,
-      color: COLORS[Math.floor(Math.random()*COLORS.length)]
-    }).select().single();
-    if (pErr) throw pErr;
-    
-    // 4. Dokument-Eintrag (nur wenn PDF gespeichert wurde)
-    if (pdfPath) {
-      await sb.from('project_documents').insert({
-        project_id: newP.id,
-        customer_id: customerId,
-        file_name: state._pdfFileName,
-        file_path: pdfPath,
-        file_size: state._pdfSize,
-        status: 'neu'
-      });
-    }
-    
-    await loadCustomers(); await loadProjects();
-    closeModal();
-    showToast('Projekt erstellt – im Tab "Aufträge" weiterverarbeiten', 'success', 5000);
-    switchTab('orders');
-  } catch (e) {
-    showToast('Fehler: ' + e.message, 'error');
-  }
-  showLoader(false);
+  if (!projName) { showToast('Projektname erforderlich', 'error'); return; }
+  const data = {
+    name: projName,
+    status: 'interessent',
+    anlagengroesse: parseFloat($('pdfAnlagengröße').value) || null,
+    speicher_kwh: parseFloat($('pdfSpeicher').value) || null,
+    notizen: $('pdfNotizen').value.trim() || null,
+    color: COLORS[Math.floor(Math.random()*COLORS.length)]
+  };
+  const { error } = await sb.from('projects').insert(data);
+  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+  await loadProjects(); renderOrders(); renderPalette(); closeModal();
+  showToast('Projekt erstellt', 'success');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// PROTOKOLL
-// ═══════════════════════════════════════════════════════════════
+// ─── PROTOKOLL ───
 function renderProtoProjects() {
   const sel = $('protoProject');
   sel.innerHTML = '<option value="">— keines —</option>' +
@@ -2085,49 +1559,31 @@ function buildProto() {
   mpptRaw.split(',').forEach((m, wrIdx) => {
     const mpptCount = parseInt(m.trim());
     if (!mpptCount) return;
-    
     for (let mppt = 1; mppt <= mpptCount; mppt++) {
       const mpptKey = `${wrIdx + 1}.${mppt}`;
       const mpptStrings = [];
-      
       for (let str = 1; str <= 2; str++) {
         const stringData = { 
-          no: stringIdx++, 
-          wr: wrIdx + 1, 
-          mppt: mppt, 
-          str: str,
-          label: `${wrIdx + 1}.${mppt}.${str}`,
-          mpptKey: mpptKey,
-          modulWp: modulWp
+          no: stringIdx++, wr: wrIdx + 1, mppt: mppt, str: str,
+          label: `${wrIdx + 1}.${mppt}.${str}`, mpptKey: mpptKey, modulWp: modulWp
         };
         strings.push(stringData);
         mpptStrings.push(stringData);
       }
-      
-      mpptGroups.set(mpptKey, {
-        key: mpptKey,
-        strings: mpptStrings,
-        active: true,
-        wrNum: wrIdx + 1,
-        mpptNum: mppt
-      });
+      mpptGroups.set(mpptKey, { key: mpptKey, strings: mpptStrings, active: true, wrNum: wrIdx + 1, mpptNum: mppt });
     }
   });
   
   state._protoStrings = strings;
   state._mpptGroups = mpptGroups;
   
-  // Gruppiere nach WR für Blocks
   const wrBlocks = new Map();
-  mpptGroups.forEach((group, key) => {
+  mpptGroups.forEach((group) => {
     const wrNum = group.wrNum;
-    if (!wrBlocks.has(wrNum)) {
-      wrBlocks.set(wrNum, []);
-    }
+    if (!wrBlocks.has(wrNum)) wrBlocks.set(wrNum, []);
     wrBlocks.get(wrNum).push(group);
   });
   
-  // HTML generieren
   let html = '';
   wrBlocks.forEach((groups, wrNum) => {
     html += `
@@ -2138,72 +1594,56 @@ function buildProto() {
       </div>
       <div class="proto-strings">
     `;
-    
     groups.forEach(group => {
       group.strings.forEach(s => {
         const isFirstOfString = s.str === 1;
         html += `
         <div class="proto-string" data-mppt="${s.mpptKey}" data-string="${s.no}">
-          ${isFirstOfString ? `<button class="mppt-toggle active" data-mppt-toggle="${s.mpptKey}" title="MPPT aktivieren/deaktivieren">✓</button>` : '<div></div>'}
+          ${isFirstOfString ? `<button class="mppt-toggle active" data-mppt-toggle="${s.mpptKey}">✓</button>` : '<div></div>'}
           <div class="str-id">${s.label}</div>
           <div><div class="str-label">Mod</div><input type="number" class="mod-input" data-no="${s.no}" data-field="modules" value="0" min="0" onchange="updateCalculations()"></div>
           <div><div class="str-label">kWp</div><div class="pwr-cell" data-power="${s.no}">0.00</div></div>
-          <div><div class="str-label">Uoc (V)</div><input type="number" step="0.1" data-no="${s.no}" data-field="uoc" ${!$('protoFillable').checked ? 'readonly' : ''}></div>
-          <div><div class="str-label">Isc (A)</div><input type="number" step="0.1" data-no="${s.no}" data-field="isc" ${!$('protoFillable').checked ? 'readonly' : ''}></div>
+          <div><div class="str-label">Uoc (V)</div><input type="number" step="0.1" data-no="${s.no}" data-field="uoc"></div>
+          <div><div class="str-label">Isc (A)</div><input type="number" step="0.1" data-no="${s.no}" data-field="isc"></div>
           <div><div class="str-label">Aktiv</div>
             <div class="str-tog">
               <button class="on-yes" data-ja="${s.no}" onclick="setStringActive('${s.no}', true)">JA</button>
-              <button class="on-no on" data-nei="${s.no}" onclick="setStringActive('${s.no}', false)">NEIN</button>
+              <button class="on-no" data-nei="${s.no}" onclick="setStringActive('${s.no}', false)">NEIN</button>
             </div>
           </div>
-        </div>
-      `;
+        </div>`;
       });
     });
-    
     html += '</div></div>';
   });
   
   $('protoList').innerHTML = html;
   $('protoDashboard').style.display = 'grid';
   
-  // Event Listeners
   document.querySelectorAll('[data-mppt-toggle]').forEach(btn => {
     btn.onclick = () => toggleMppt(btn.dataset.mpptToggle);
   });
   
-  // Initial calculations
   updateCalculations();
-  
   if (!$('protoPruefer').value && state.profile) $('protoPruefer').value = state.profile.display_name;
 }
 
 function updateCalculations() {
   const modulWp = parseFloat($('protoModul').value) || 440;
-  let totalModules = 0;
-  let totalPower = 0;
-  let activeStrings = 0;
-  
-  state._protoStrings.forEach(s => {
+  let totalModules = 0, totalPower = 0, activeStrings = 0;
+  (state._protoStrings || []).forEach(s => {
     const modInput = document.querySelector(`.mod-input[data-no="${s.no}"]`);
     const powerCell = document.querySelector(`.pwr-cell[data-power="${s.no}"]`);
-    const isActiveBtn = document.querySelector(`.on-yes[data-ja="${s.no}"]`);
-    
     if (modInput && powerCell) {
       const modules = parseInt(modInput.value) || 0;
-      const power = (modules * modulWp) / 1000; // kWp
-      
+      const power = (modules * modulWp) / 1000;
       powerCell.textContent = power.toFixed(2);
       powerCell.classList.toggle('has-val', modules > 0);
-      
-      if (isActiveBtn && isActiveBtn.classList.contains('on')) {
-        totalModules += modules;
-        totalPower += power;
-        activeStrings++;
-      }
+      totalModules += modules;
+      totalPower += power;
+      activeStrings++;
     }
   });
-  
   $('protoTotalModules').textContent = totalModules;
   $('protoTotalPower').textContent = totalPower.toFixed(2);
   $('protoActiveStrings').textContent = activeStrings;
@@ -2211,68 +1651,47 @@ function updateCalculations() {
 
 function setStringActive(stringNo, isActive) {
   const jaBtn = document.querySelector(`.on-yes[data-ja="${stringNo}"]`);
-  const neiBtn = document.querySelector(`.on-nei[data-ja="${stringNo}"]`);
-  
+  const neiBtn = document.querySelector(`.on-no[data-nei="${stringNo}"]`);
   if (jaBtn && neiBtn) {
-    if (isActive) {
-      jaBtn.classList.add('on');
-      neiBtn.classList.remove('on');
-    } else {
-      neiBtn.classList.add('on');
-      jaBtn.classList.remove('on');
-    }
+    jaBtn.classList.toggle('on', isActive);
+    neiBtn.classList.toggle('on', !isActive);
   }
-  
-  updateCalculations();
 }
 
 function toggleMppt(mpptKey) {
   const group = state._mpptGroups.get(mpptKey);
   if (!group) return;
-  
   group.active = !group.active;
-  
   const toggleBtn = document.querySelector(`[data-mppt-toggle="${mpptKey}"]`);
   if (toggleBtn) {
     toggleBtn.classList.toggle('active', group.active);
     toggleBtn.textContent = group.active ? '✓' : '✕';
   }
-  
   document.querySelectorAll(`[data-mppt="${mpptKey}"]`).forEach(row => {
     row.classList.toggle('inactive', !group.active);
-    row.querySelectorAll('input[type="number"]').forEach(input => {
-      input.disabled = !group.active || !$('protoFillable').checked;
-    });
   });
-  
   updateCalculations();
 }
 
 async function saveProto() {
-  if (!state._protoStrings || !state._protoStrings.length) { showToast('Erst Matrix laden', 'warn'); return; }
   const standort = $('protoStandort').value.trim();
   const pruefer = $('protoPruefer').value.trim();
   const pruefdatum = $('protoDatum').value;
   if (!standort || !pruefer || !pruefdatum) { showToast('Standort, Prüfer, Datum erforderlich', 'error'); return; }
-  const modul_wp = parseInt($('protoModul').value) || null;
-  const mppt_config = $('protoMppt').value.trim();
-  const notizen = $('protoNotiz').value.trim() || null;
-  const project_id = $('protoProject').value || null;
-  const { data: proto, error } = await sb.from('protocols').insert({
-    standort, pruefer, pruefdatum, modul_wp, mppt_config, notizen, project_id
-  }).select().single();
-  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-  const rows = state._protoStrings.map(s => {
-    const get = field => parseFloat(document.querySelector(`[data-no="${s.no}"][data-field="${field}"]`)?.value) || null;
-    return { protocol_id: proto.id, string_no: s.no, uoc: get('uoc'), isc: get('isc'), umpp: get('umpp'), impp: get('impp'), sort_order: s.no, is_active: true };
+  const { error } = await sb.from('protocols').insert({
+    standort, pruefer, pruefdatum,
+    modul_wp: parseInt($('protoModul').value) || null,
+    mppt_config: $('protoMppt').value.trim(),
+    notizen: $('protoNotiz').value.trim() || null,
+    project_id: $('protoProject').value || null
   });
-  await sb.from('protocol_strings').insert(rows);
+  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
   showToast('Protokoll gespeichert', 'success');
   renderSavedProtos();
 }
 
 async function renderSavedProtos() {
-  const { data, error } = await sb.from('protocols').select('*').order('pruefdatum', { ascending: false }).limit(20);
+  const { data, error } = await sb.from('protocols').select('*').order('pruefdatum', { ascending: false }).limit(10);
   if (error || !data) { $('savedProtos').innerHTML = ''; return; }
   $('savedProtos').innerHTML = `
     <h3 style="font-family:var(--font-display);font-size:18px;margin:30px 0 10px">Letzte Protokolle</h3>
@@ -2281,64 +1700,18 @@ async function renderSavedProtos() {
         <div class="list-card">
           <div class="list-card-title">${escHtml(p.standort)}</div>
           <div class="list-card-meta">${escHtml(p.pruefdatum)} · ${escHtml(p.pruefer)}</div>
-          ${p.modul_wp ? `<div class="list-card-row"><span class="lbl">Modul</span><span class="val">${p.modul_wp} Wp</span></div>` : ''}
-          ${p.mppt_config ? `<div class="list-card-row"><span class="lbl">MPPTs</span><span class="val">${escHtml(p.mppt_config)}</span></div>` : ''}
-          <div class="list-card-actions">
-            <button class="btn" onclick="loadProtocol('${p.id}')">📋 Laden</button>
-            ${canAdmin() ? `<button class="btn danger" onclick="deleteProtocol('${p.id}')">🗑️ Löschen</button>` : ''}
-          </div>
         </div>
       `).join('')}
     </div>`;
 }
 
-async function deleteProtocol(id) {
-  if (!confirm('Protokoll wirklich löschen?')) return;
-  const { error } = await sb.from('protocols').delete().eq('id', id);
-  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-  showToast('Protokoll gelöscht', 'success');
-  renderSavedProtos();
-}
-
-async function loadProtocol(id) {
-  const { data, error } = await sb.from('protocols').select('*').eq('id', id).single();
-  if (error || !data) { showToast('Fehler beim Laden', 'error'); return; }
-  
-  $('protoStandort').value = data.standort || '';
-  $('protoPruefer').value = data.pruefer || '';
-  $('protoDatum').value = data.pruefdatum || '';
-  $('protoModul').value = data.modul_wp || '';
-  $('protoMppt').value = data.mppt_config || '';
-  $('protoNotiz').value = data.notizen || '';
-  $('protoProject').value = data.project_id || '';
-  
-  // Strings laden
-  const { data: strings } = await sb.from('protocol_strings').select('*').eq('protocol_id', id).order('sort_order');
-  if (strings) {
-    buildProto(); // Matrix zuerst bauen
-    // Dann Werte füllen
-    strings.forEach(s => {
-      const uocInput = document.querySelector(`[data-no="${s.string_no}"][data-field="uoc"]`);
-      const iscInput = document.querySelector(`[data-no="${s.string_no}"][data-field="isc"]`);
-      const umppInput = document.querySelector(`[data-no="${s.string_no}"][data-field="umpp"]`);
-      const imppInput = document.querySelector(`[data-no="${s.string_no}"][data-field="impp"]`);
-      
-      if (uocInput) uocInput.value = s.uoc || '';
-      if (iscInput) iscInput.value = s.isc || '';
-      if (umppInput) umppInput.value = s.umpp || '';
-      if (imppInput) imppInput.value = s.impp || '';
-    });
-  }
-  
-  showToast('Protokoll geladen', 'success');
-}
-
 function exportProtoExcel() {
   if (!state._protoStrings) { showToast('Erst Matrix laden', 'warn'); return; }
-  const rows = state._protoStrings.map(s => {
-    const get = field => document.querySelector(`[data-no="${s.no}"][data-field="${field}"]`)?.value || '';
-    return { String: s.label, WR: s.wr, MPPT: s.mppt, Str: s.str, Uoc_V: get('uoc'), Isc_A: get('isc'), Umpp_V: get('umpp'), Impp_A: get('impp') };
-  });
+  const rows = state._protoStrings.map(s => ({
+    String: s.label, WR: s.wr, MPPT: s.mppt, Str: s.str,
+    Uoc_V: document.querySelector(`[data-no="${s.no}"][data-field="uoc"]`)?.value || '',
+    Isc_A: document.querySelector(`[data-no="${s.no}"][data-field="isc"]`)?.value || ''
+  }));
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Messung');
@@ -2347,221 +1720,45 @@ function exportProtoExcel() {
 }
 
 function exportProtoPdf() {
-  if (!state._protoStrings) { showToast('Erst Matrix laden', 'warn'); return; }
-  
-  const standort = $('protoStandort').value || 'Unbekannt';
-  const pruefer = $('protoPruefer').value || 'Unbekannt';
-  const datum = $('protoDatum').value || new Date().toISOString().split('T')[0];
-  const modulWp = $('protoModul').value || '440';
-  
-  // PDF-Inhalt erstellen
-  const pdfContent = document.createElement('div');
-  pdfContent.style.cssText = `
-    font-family: 'Inter', Arial, sans-serif;
-    padding: 40px;
-    background: #fff;
-    color: #12110F;
-    max-width: 800px;
-    margin: 0 auto;
-  `;
-  
-  // Header
-  pdfContent.innerHTML = `
-    <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #B8D84B; padding-bottom: 20px;">
-      <h1 style="font-family: 'Syne', Arial, sans-serif; font-size: 28px; font-weight: 800; color: #12110F; margin: 0;">
-        SOL<span style="color: #B8D84B;">PRO</span>
-      </h1>
-      <p style="font-size: 14px; color: #8a8478; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px;">
-        PV-Generator · Mess- & Prüfprotokoll
-      </p>
-    </div>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; background: #F7F4EE; padding: 20px; border-radius: 12px;">
-      <div><strong>Standort:</strong> ${standort}</div>
-      <div><strong>Prüfer:</strong> ${pruefer}</div>
-      <div><strong>Prüfdatum:</strong> ${datum}</div>
-      <div><strong>Modulleistung:</strong> ${modulWp} Wp</div>
-    </div>
-  `;
-  
-  // WR-Blocks
-  const wrBlocks = new Map();
-  state._mpptGroups.forEach((group, key) => {
-    const wrNum = group.wrNum;
-    if (!wrBlocks.has(wrNum)) wrBlocks.set(wrNum, []);
-    wrBlocks.get(wrNum).push(group);
-  });
-  
-  wrBlocks.forEach((groups, wrNum) => {
-    pdfContent.innerHTML += `
-      <div style="margin-bottom: 20px; border: 2px solid #EDE9DF; border-radius: 12px; overflow: hidden;">
-        <div style="background: linear-gradient(135deg, rgba(184,216,75,0.1) 0%, transparent 60%); padding: 12px 16px; border-bottom: 2px solid #B8D84B;">
-          <strong style="font-size: 16px;">WR ${wrNum}</strong>
-          <span style="color: #8a8478; margin-left: 10px;">${groups.length} MPPT${groups.length > 1 ? 's' : ''}</span>
-        </div>
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background: #EDE9DF;">
-              <th style="padding: 8px; text-align: left; font-size: 11px; font-weight: 700;">String</th>
-              <th style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700;">Module</th>
-              <th style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700;">kWp</th>
-              <th style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700;">Uoc (V)</th>
-              <th style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700;">Isc (A)</th>
-              <th style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700;">Aktiv</th>
-            </tr>
-          </thead>
-          <tbody>
-    `;
-    
-    groups.forEach(group => {
-      group.strings.forEach(s => {
-        const modInput = document.querySelector(`.mod-input[data-no="${s.no}"]`);
-        const powerCell = document.querySelector(`.pwr-cell[data-power="${s.no}"]`);
-        const uocInput = document.querySelector(`[data-no="${s.no}"][data-field="uoc"]`);
-        const iscInput = document.querySelector(`[data-no="${s.no}"][data-field="isc"]`);
-        const isActiveBtn = document.querySelector(`.on-yes[data-ja="${s.no}"]`);
-        
-        const modules = modInput ? modInput.value : '0';
-        const power = powerCell ? powerCell.textContent : '0.00';
-        const uoc = uocInput ? uocInput.value : '';
-        const isc = iscInput ? iscInput.value : '';
-        const isActive = isActiveBtn ? (isActiveBtn.classList.contains('on') ? 'JA' : 'NEIN') : 'NEIN';
-        
-        pdfContent.innerHTML += `
-          <tr style="border-bottom: 1px solid #EDE9DF;">
-            <td style="padding: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 700;">${s.label}</td>
-            <td style="padding: 8px; text-align: center;">${modules}</td>
-            <td style="padding: 8px; text-align: center; font-family: 'JetBrains Mono', monospace;">${power}</td>
-            <td style="padding: 8px; text-align: center;">${uoc}</td>
-            <td style="padding: 8px; text-align: center;">${isc}</td>
-            <td style="padding: 8px; text-align: center; font-weight: 700;">${isActive}</td>
-          </tr>
-        `;
-      });
-    });
-    
-    pdfContent.innerHTML += `
-          </tbody>
-        </table>
-      </div>
-    `;
-  });
-  
-  // Summary
-  pdfContent.innerHTML += `
-    <div style="margin-top: 30px; padding: 20px; background: #F7F4EE; border-radius: 12px; border: 2px solid #B8D84B;">
-      <h3 style="margin: 0 0 15px 0; font-size: 16px;">Zusammenfassung</h3>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-        <div style="text-align: center;">
-          <div style="font-size: 24px; font-weight: 800; color: #12110F;">${$('protoTotalModules').textContent}</div>
-          <div style="font-size: 11px; color: #8a8478; text-transform: uppercase;">Module gesamt</div>
-        </div>
-        <div style="text-align: center;">
-          <div style="font-size: 24px; font-weight: 800; color: #12110F;">${$('protoTotalPower').textContent}</div>
-          <div style="font-size: 11px; color: #8a8478; text-transform: uppercase;">kWp gesamt</div>
-        </div>
-        <div style="text-align: center;">
-          <div style="font-size: 24px; font-weight: 800; color: #12110F;">${$('protoActiveStrings').textContent}</div>
-          <div style="font-size: 11px; color: #8a8478; text-transform: uppercase;">Aktive Strings</div>
-        </div>
-      </div>
-    </div>
-    
-    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #EDE9DF; display: flex; justify-content: space-between;">
-      <div>
-        <div style="border-bottom: 2px solid #12110F; height: 40px; margin-bottom: 5px;"></div>
-        <div style="font-size: 11px; color: #8a8478; text-transform: uppercase;">Datum & Unterschrift Prüfer</div>
-      </div>
-      <div>
-        <div style="border-bottom: 2px solid #12110F; height: 40px; margin-bottom: 5px;"></div>
-        <div style="font-size: 11px; color: #8a8478; text-transform: uppercase;">Datum & Unterschrift Auftraggeber</div>
-      </div>
-      <div>
-        <div style="border-bottom: 2px solid #12110F; height: 40px; margin-bottom: 5px;"></div>
-        <div style="font-size: 11px; color: #8a8478; text-transform: uppercase;">Stempel / Firmenstempel</div>
-      </div>
-    </div>
-    
-    <div style="margin-top: 20px; text-align: center; font-size: 10px; color: #8a8478;">
-      <p>Erstellt am ${new Date().toLocaleDateString('de-AT')} mit SOLPRO Suite v2</p>
-      <p style="margin-top: 5px;">Erstellt von Lukas Fischereder</p>
-    </div>
-  `;
-  
-  // PDF generieren
-  const opt = {
-    margin: 10,
-    filename: `SOLPRO_Protokoll_${standort}_${datum}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-  
-  showLoader(true, 'Erstelle PDF…');
-  html2pdf().set(opt).from(pdfContent).save().then(() => {
-    showLoader(false);
-    showToast('PDF exportiert!', 'success');
-  }).catch(err => {
-    showLoader(false);
-    showToast('PDF Fehler: ' + err.message, 'error');
-  });
+  window.print();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// BUSSE VERWALTUNG
-// ═══════════════════════════════════════════════════════════════
+// ─── BUSSE ───
 function renderBuses() {
   const grid = $('busGrid');
   if (!state.buses.length) {
-    grid.innerHTML = `<div class="empty-state"><div class="icon">🚌</div><h3>Keine Busse</h3><p>Erstelle deinen ersten Bus</p></div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🚌</div><h3>Keine Busse</h3></div>`;
     return;
   }
-  
   grid.innerHTML = state.buses.map(b => `
     <div class="list-card">
       <div class="list-card-head">
         <div class="list-card-title">${escHtml(b.label)}</div>
         <span class="status-badge ${b.is_offline ? 'status-abgelehnt' : 'status-auftrag'}">${b.is_offline ? 'Offline' : 'Aktiv'}</span>
       </div>
-      <div class="list-card-row"><span class="lbl">Slug</span><span class="val">${escHtml(b.slug)}</span></div>
-      <div class="list-card-row"><span class="lbl">Sortierung</span><span class="val">${b.sort_order}</span></div>
       <div class="list-card-actions">
         <button class="btn" onclick="editBus('${b.id}')">✏️ Bearbeiten</button>
-        <button class="btn" onclick="toggleBusOffline('${b.slug}')">${b.is_offline ? '🟢 Aktivieren' : '🔴 Deaktivieren'}</button>
       </div>
     </div>
   `).join('');
 }
 
 function openBusModal(bus) {
+  $('busId').value = bus?.id || '';
   $('busSlug').value = bus?.slug || '';
   $('busLabel').value = bus?.label || '';
   $('busSortOrder').value = bus?.sort_order || '0';
   showModal('busModal');
 }
-
 window.editBus = id => openBusModal(state.buses.find(b => b.id === id));
-
-window.toggleBusOffline = async slug => {
-  const bus = state.buses.find(b => b.slug === slug);
-  if (!bus) return;
-  bus.is_offline = !bus.is_offline;
-  const { error } = await sb.from('buses').update({ is_offline: bus.is_offline }).eq('id', bus.id);
-  if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-  renderBuses();
-  showToast(bus.is_offline ? 'Bus deaktiviert' : 'Bus aktiviert', 'success');
-};
 
 async function saveBus() {
   const slug = $('busSlug').value.trim();
   const label = $('busLabel').value.trim();
   const sortOrder = parseInt($('busSortOrder').value) || 0;
-  
   if (!slug || !label) { showToast('Slug und Label erforderlich', 'error'); return; }
-  
   const id = $('busId').value;
   const data = { slug, label, sort_order: sortOrder };
-  
   if (id) {
     const { error } = await sb.from('buses').update(data).eq('id', id);
     if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
@@ -2569,61 +1766,44 @@ async function saveBus() {
     const { error } = await sb.from('buses').insert(data);
     if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
   }
-  
-  await loadBuses();
-  renderBuses();
-  closeModal();
+  await loadBuses(); renderBuses(); closeModal();
   showToast('Bus gespeichert', 'success');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// DEADLINES (Terminsetzung für Planer)
-// ═══════════════════════════════════════════════════════════════
-async function loadDeadlines() {
-  const { data, error } = await sb.from('deadlines').select('*').order('deadline_date, deadline_time');
-  if (error) { console.error('Deadlines Error:', error); state.deadlines = []; return; }
-  state.deadlines = data || [];
-}
-
+// ─── TERMINE (DEADLINES) ───
 function openDeadlineModal(deadline, projectId) {
-  const sel = $('deadlineProject');
+  const sel = $('appointmentProject');
   sel.innerHTML = '<option value="">— Projekt wählen —</option>' +
     state.projects.map(p => `<option value="${escAttr(p.id)}">${escHtml(p.name)}</option>`).join('');
   
-  $('deadlineSub').textContent = deadline ? 'Termin bearbeiten' : 'Neuer Termin';
-  $('deadlineId').value = deadline?.id || '';
-  $('deadlineProjectId').value = projectId || deadline?.project_id || '';
-  $('deadlineProject').value = projectId || deadline?.project_id || '';
-  $('deadlineTitle').value = deadline?.title || '';
-  $('deadlineDate').value = deadline?.deadline_date || '';
-  $('deadlineTime').value = deadline?.deadline_time || '';
-  $('deadlinePriority').value = deadline?.priority || 'normal';
-  $('deadlineNotes').value = deadline?.notes || '';
-  showModal('deadlineModal');
+  $('appointmentSub').textContent = deadline ? 'Termin bearbeiten' : 'Neuer Termin';
+  $('appointmentId').value = deadline?.id || '';
+  $('appointmentProject').value = projectId || deadline?.project_id || '';
+  $('appointmentTitle').value = deadline?.title || '';
+  $('appointmentDate').value = deadline?.deadline_date || '';
+  $('appointmentTime').value = deadline?.deadline_time || '';
+  $('appointmentNotes').value = deadline?.notes || '';
+  showModal('appointmentModal');
 }
 
-window.editDeadline = id => openDeadlineModal(state.deadlines.find(d => d.id === id));
-window.newDeadline = projectId => openDeadlineModal(null, projectId);
-
 async function saveDeadline() {
-  const projectId = $('deadlineProject').value;
-  const title = $('deadlineTitle').value.trim();
-  const date = $('deadlineDate').value;
-  const time = $('deadlineTime').value;
-  const priority = $('deadlinePriority').value;
-  const notes = $('deadlineNotes').value.trim();
+  const projectId = $('appointmentProject').value;
+  const title = $('appointmentTitle').value.trim();
+  const date = $('appointmentDate').value;
+  const time = $('appointmentTime').value;
+  const notes = $('appointmentNotes').value.trim();
   
   if (!projectId || !title || !date) { showToast('Projekt, Titel und Datum erforderlich', 'error'); return; }
   
-  const id = $('deadlineId').value;
+  const id = $('appointmentId').value;
   const data = {
     project_id: projectId,
     title,
     deadline_date: date,
     deadline_time: time || null,
-    priority,
+    priority: 'normal',
     notes,
-    created_by: state.profile.id
+    created_by: state.profile?.id || state.user?.id
   };
   
   if (id) {
@@ -2634,19 +1814,14 @@ async function saveDeadline() {
     if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
   }
   
-  await loadDeadlines();
-  closeModal();
+  await loadDeadlines(); closeModal();
   showToast('Termin gespeichert', 'success');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// AUFGABEN
-// ═══════════════════════════════════════════════════════════════
+// ─── AUFGABEN ───
 function renderTodos() {
   const list = $('taskList');
   const today = new Date().toISOString().split('T')[0];
-  
-  // Filter
   let filtered = state.todos;
   if (state.taskFilter === 'mine') {
     filtered = filtered.filter(t => t.assigned_to === state.user.id);
@@ -2660,25 +1835,18 @@ function renderTodos() {
   $('taskCount').textContent = `${open} offen · ${filtered.length} gesamt`;
   $('taskBadge').textContent = open; $('taskBadge').style.display = open ? '' : 'none';
   
-  // Fill assignee dropdown
-  const assigneeSelect = $('taskAssignee');
-  assigneeSelect.innerHTML = '<option value="">— Niemand —</option>' +
+  $('taskAssignee').innerHTML = '<option value="">— Niemand —</option>' +
     state.profiles.map(p => `<option value="${escAttr(p.id)}">${escHtml(p.display_name)}</option>`).join('');
   
   list.innerHTML = filtered.map(t => {
-    const assignee = state.profiles.find(p => p.id === t.assigned_to);
     const isOverdue = t.due_date && t.due_date < today && !t.done;
-    const isToday = t.due_date === today;
-    
     return `
     <div class="task-item ${t.done?'done':''}">
       <input type="checkbox" data-todo="${t.id}" ${t.done?'checked':''}>
       <div style="flex:1">
         <span class="task-text">${escHtml(t.text)}</span>
         <div class="task-meta">
-          ${assignee ? `<span>👤 ${escHtml(assignee.display_name)}</span>` : ''}
-          ${t.due_date ? `<span class="badge ${isOverdue?'overdue':isToday?'today':''}">📅 ${t.due_date}</span>` : ''}
-          ${t.priority && t.priority !== 'normal' ? `<span class="badge ${escAttr(t.priority)}">${escHtml(t.priority)}</span>` : ''}
+          ${t.due_date ? `<span class="badge ${isOverdue?'overdue':''}">📅 ${t.due_date}</span>` : ''}
         </div>
       </div>
       <button class="task-del" data-del="${t.id}">✕</button>
@@ -2687,10 +1855,10 @@ function renderTodos() {
   document.querySelectorAll('[data-todo]').forEach(c => c.onchange = () => toggleTask(c.dataset.todo));
   document.querySelectorAll('[data-del]').forEach(c => c.onclick = () => deleteTask(c.dataset.del));
 }
+
 async function addTask() {
   const txt = $('taskInput').value.trim();
   if (!txt) return;
-  
   const taskData = {
     text: txt,
     assigned_to: $('taskAssignee').value || null,
@@ -2698,33 +1866,28 @@ async function addTask() {
     priority: $('taskPriority').value,
     created_by: state.user.id
   };
-  
   const { data, error } = await sb.from('todos').insert(taskData).select().single();
   if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-  
   state.todos.unshift(data);
   $('taskInput').value = '';
-  $('taskAssignee').value = '';
-  $('taskDueDate').value = '';
-  $('taskPriority').value = 'normal';
   renderTodos();
   showToast('Aufgabe hinzugefügt', 'success');
 }
+
 async function toggleTask(id) {
   const t = state.todos.find(x => x.id === id); if (!t) return;
   t.done = !t.done;
   await sb.from('todos').update({ done: t.done }).eq('id', id);
   renderTodos();
 }
+
 async function deleteTask(id) {
   await sb.from('todos').delete().eq('id', id);
   state.todos = state.todos.filter(t => t.id !== id);
   renderTodos();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// BENUTZER
-// ═══════════════════════════════════════════════════════════════
+// ─── BENUTZER ───
 function renderUsers() {
   if (state.profile?.role !== 'admin') {
     $('userTableWrap').innerHTML = `<div class="empty-state"><div class="icon">🔒</div><h3>Kein Zugriff</h3></div>`;
@@ -2733,13 +1896,12 @@ function renderUsers() {
   const users = state.profiles || [];
   $('userTableWrap').innerHTML = `
     <table class="user-table">
-      <thead><tr><th>Name</th><th>Rolle</th><th>Busse</th><th>Status</th><th></th></tr></thead>
+      <thead><tr><th>Name</th><th>Rolle</th><th>Status</th><th></th></tr></thead>
       <tbody>
         ${users.map(u => `
           <tr>
             <td><strong>${escHtml(u.display_name)}</strong></td>
             <td>${escHtml(u.role)}</td>
-            <td>${renderUserBuses(u)}</td>
             <td>${u.active ? '<span style="color:var(--success)">● aktiv</span>' : '<span style="color:var(--danger)">○ inaktiv</span>'}</td>
             <td><button class="btn" onclick="editUser('${u.id}')">✏️ Bearbeiten</button></td>
           </tr>
@@ -2748,36 +1910,19 @@ function renderUsers() {
     </table>
   `;
 }
-function renderUserBuses(u) {
-  const myBuses = state.buses.filter(b => b.visible_to_user_id === u.id);
-  const allEmpty = state.buses.filter(b => !b.visible_to_user_id);
-  return [...myBuses.map(b => `<span class="bus-pill assigned">${escHtml(b.label)}</span>`),
-          ...(u.role === 'admin' ? allEmpty.map(b => `<span class="bus-pill">${escHtml(b.label)} (alle)</span>`) : [])].join('') || '<span style="color:var(--ink-muted);font-size:10px">— keine —</span>';
-}
+
 window.editUser = id => {
   const u = state.profiles.find(p => p.id === id); if (!u) return;
-  $('userSub').textContent = `${u.display_name} (${u.id.slice(0,8)}…)`;
+  $('userSub').textContent = `${u.display_name}`;
   $('userEditId').value = u.id;
   $('userDisplayName').value = u.display_name;
   $('userRole').value = u.role;
   $('userActive').value = u.active ? 'true' : 'false';
-  const picker = $('userBusPicker');
-  picker.innerHTML = state.buses.map(b => {
-    const checked = b.visible_to_user_id === u.id ? 'checked' : '';
-    return `<label style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--cream-deep);border-radius:8px;background:rgba(255,255,255,0.6);cursor:pointer;font-size:11px">
-      <input type="radio" name="userBus" value="${b.id}" ${checked}> ${escHtml(b.label)}
-    </label>`;
-  }).join('') + `<label style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--cream-deep);border-radius:8px;background:rgba(255,255,255,0.6);cursor:pointer;font-size:11px">
-    <input type="radio" name="userBus" value="" ${!state.buses.some(b => b.visible_to_user_id === u.id) ? 'checked' : ''}> <em>(keiner – sieht keine Busse)</em>
-  </label>
-  <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--cream-deep);border-radius:8px;background:rgba(255,255,255,0.6);cursor:pointer;font-size:11px">
-    <input type="radio" name="userBus" value="ALL" ${state.buses.filter(b => !b.visible_to_user_id).length === state.buses.length ? 'checked' : ''}> <em>(alle – sichtbar für jeden)</em>
-  </label>`;
   showModal('userModal');
 };
+
 async function saveUser() {
   const id = $('userEditId').value;
-  const busChoice = document.querySelector('input[name="userBus"]:checked')?.value;
   const updates = {
     display_name: $('userDisplayName').value.trim(),
     role: $('userRole').value,
@@ -2785,51 +1930,29 @@ async function saveUser() {
   };
   const { error } = await sb.from('profiles').update(updates).eq('id', id);
   if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-  // Bus-Zuweisung: alle Buses zurücksetzen, dann gewählten setzen
-  if (busChoice === 'ALL') {
-    await sb.from('buses').update({ visible_to_user_id: null }).neq('id', '00000000-0000-0000-0000-000000000000');
-  } else {
-    const targetId = busChoice || null;
-    await sb.from('buses').update({ visible_to_user_id: targetId }).neq('id', '00000000-0000-0000-0000-000000000000');
-  }
-  await loadProfiles(); await loadBuses();
-  renderUsers();
-  closeModal();
+  await loadProfiles(); renderUsers(); closeModal();
   showToast('User aktualisiert', 'success');
 }
+
 async function inviteUser() {
   const email = prompt('E-Mail des neuen Users:');
   if (!email) return;
-  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: window.location.href } });
+  const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
   if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
-  showToast('Einladung an ' + email + ' gesendet. User bekommt Magic Link per Mail.', 'success', 5000);
+  showToast('Einladung gesendet.', 'success');
 }
 
-// ─── INIT ─────────────────────────────────────────────────────
+// ─── INITIALISIERUNG ───
 function showFatal(msg) {
   showLoader(true, msg);
   $('loaderText').style.color = '#ff6b6b';
-  $('loaderText').style.fontSize = '13px';
-  $('loaderText').style.maxWidth = '80%';
-  $('loaderText').style.textAlign = 'center';
-  $('loaderText').style.whiteSpace = 'pre-wrap';
-  console.error('[SOLPRO FATAL]', msg);
 }
 
 (async () => {
   try {
     showLoader(true, 'Verbinde…');
-    // Verbindungstest: erstmal eine billige Query
-    const { error: pingErr } = await sb.from('profiles').select('id').limit(1);
-    if (pingErr) {
-      showFatal('Verbindung zu Supabase fehlgeschlagen:\n\n' + pingErr.message + '\n\nPrüfe URL + Key im HTML-Header.');
-      return;
-    }
     const { data: { session }, error: sessErr } = await sb.auth.getSession();
-    if (sessErr) {
-      showFatal('Auth-Fehler:\n\n' + sessErr.message);
-      return;
-    }
+    if (sessErr) { showFatal('Auth-Fehler: ' + sessErr.message); return; }
     if (session) {
       await bootApp();
     } else {
@@ -2837,7 +1960,7 @@ function showFatal(msg) {
       showLoader(false);
     }
   } catch (e) {
-    showFatal('Unerwarteter Fehler:\n\n' + (e?.message || e));
+    showFatal('Unerwarteter Fehler: ' + (e?.message || e));
   }
 })();
 </script>
