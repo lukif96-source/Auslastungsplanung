@@ -10,12 +10,12 @@
 <meta name="description" content="SOLPRO PV & Bau — Einsatzplanung für Photovoltaik-Montage, Elektrik und Bauleitung">
 <title>SOLPRO · Operations Suite</title>
 
-<!-- Google Fonts: Archivo (Industrial) + JetBrains Mono -->
+<!-- Google Fonts: Outfit (Ayocin-Stil) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://iuxklqcpexoziqxrohwa.supabase.co">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Supabase Lib -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -31,39 +31,39 @@
    1. 1:1 AYOCIN LUXURY DESIGN TOKENS
    ═══════════════════════════════════════════════════════════════ */
 :root {
-  /* SOLPRO INDUSTRIAL — PV & Bau Palette */
-  --ayocin-cream: #F4F3EE;          /* Beton hell */
-  --ayocin-surface: #E9E7E0;        /* Beton */
-  --ayocin-sand: #D6D3C9;
-  --ayocin-sand-subtle: #E9E7E0;
-  --ayocin-sand-dark: #A9A59A;
-  --ayocin-bronze: #FF4D00;         /* Safety Orange */
-  --ayocin-deep-bronze: #111111;
-  --ayocin-dark: #111111;           /* Anthrazit */
-  --ayocin-dark-surface: #1E1E1C;
-  --solar-yellow: #FFD400;          /* PV-Gelb */
-  --ayocin-border: rgba(17, 17, 17, 0.18);
-  --ayocin-border-strong: rgba(17, 17, 17, 0.45);
-  --ink-primary: #111111;
-  --ink-secondary: rgba(17, 17, 17, 0.66);
-  --ink-muted: rgba(17, 17, 17, 0.45);
-  --bg-sand-subtle: #E9E7E0;
-  --accent-glow-yellow: transparent;
-  --accent-glow-coral: transparent;
+  /* AYOCIN LUXURY PALETTE (ayocin.com) */
+  --ayocin-cream: #FCF6EC;
+  --ayocin-surface: #EFE9DF;
+  --ayocin-sand: #CEC1B2;
+  --ayocin-sand-subtle: #EFE9DF;
+  --ayocin-sand-dark: #B2A28B;
+  --ayocin-bronze: #8C7358;
+  --ayocin-deep-bronze: #2E2521;
+  --ayocin-dark: #2E2521;
+  --ayocin-dark-surface: #2C2722;
+  --solar-yellow: #E8B84B;          /* warmes Heute-Amber */
+  --ayocin-border: rgba(46, 37, 33, 0.14);
+  --ayocin-border-strong: rgba(46, 37, 33, 0.28);
+  --ink-primary: #2E2521;
+  --ink-secondary: rgba(46, 37, 33, 0.62);
+  --ink-muted: rgba(46, 37, 33, 0.42);
+  --bg-sand-subtle: #EFE9DF;
+  --accent-glow-yellow: rgba(255, 231, 143, 0.4);
+  --accent-glow-coral: rgba(255, 125, 94, 0.35);
 
-  /* Status — kräftige Industriefarben */
-  --status-dc: #0B5FB0;     /* DC Montage = Blau */
-  --status-ac: #E84A00;     /* AC Elektrik = Orange */
-  --status-done: #1E7A34;   /* Fertig = Grün */
-  --status-danger: #C81E1E;
-  --status-danger-bg: rgba(200, 30, 30, 0.08);
+  /* Status */
+  --status-dc: #1F6F8B;
+  --status-ac: #B85834;
+  --status-done: #5A6B52;
+  --status-danger: #A84848;
+  --status-danger-bg: rgba(168, 72, 72, 0.08);
 
-  --radius-card: 2px;
-  --radius-sm: 2px;
-  --radius-pill: 3px;
-  --font-display: 'Archivo', 'Roboto', -apple-system, sans-serif;
-  --font-body: 'Archivo', 'Roboto', -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --radius-card: 20px;
+  --radius-sm: 10px;
+  --radius-pill: 9999px;
+  --font-display: 'Outfit', 'Roboto', -apple-system, sans-serif;
+  --font-body: 'Outfit', 'Roboto', -apple-system, sans-serif;
+  --font-mono: 'Outfit', 'Roboto', sans-serif;
   --ease-ayocin: cubic-bezier(0.16, 1, 0.3, 1);
 
   --project-sidebar-w: 300px;
@@ -81,7 +81,9 @@ body{
   display: flex;
   flex-direction: row;
   user-select: none;
-  background-image: none;
+  background-image:
+    radial-gradient(ellipse 70% 50% at 12% 8%, var(--accent-glow-yellow) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 88% 92%, var(--accent-glow-coral) 0%, transparent 50%);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -114,12 +116,12 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   padding: 8px 18px;
   border-radius: var(--radius-pill);
   font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border: 2px solid var(--ayocin-dark);
-  background: var(--ayocin-cream);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  border: 1px solid var(--ayocin-dark);
+  background: var(--ayocin-surface);
   color: var(--ayocin-dark);
   cursor: pointer;
   transition: background 0.35s var(--ease-ayocin), transform 0.35s var(--ease-ayocin), border-color 0.35s var(--ease-ayocin);
@@ -128,10 +130,9 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   text-decoration: none;
 }
 .btn-ayocin:hover {
-  transform: translate(-1px, -1px);
-  background: var(--solar-yellow);
+  transform: translateY(-1px);
+  background: var(--ayocin-cream);
   border-color: var(--ayocin-dark);
-  box-shadow: 3px 3px 0 var(--ayocin-dark);
 }
 .btn-ayocin:active { transform: translateY(0); }
 
@@ -205,7 +206,7 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
 .login-card {
   position: relative; z-index: 1;
   background: var(--ayocin-cream); padding: 48px 40px; border-radius: var(--radius-card);
-  border: 3px solid var(--solar-yellow);
+  border: 1px solid rgba(252, 246, 236, 0.12);
   width: 400px; max-width: 92vw; text-align: center;
   animation: loginIn 0.8s var(--ease-ayocin) both;
 }
@@ -219,7 +220,7 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   letter-spacing: 0.08em; margin-bottom: 20px; text-transform: uppercase;
 }
 .login-headline {
-  font-family: var(--font-display); font-size: 34px; font-weight: 900;
+  font-family: var(--font-display); font-size: 32px; font-weight: 500;
   line-height: 1; letter-spacing: -0.02em; color: var(--ayocin-dark); margin-bottom: 8px;
 }
 .login-sub {
@@ -273,13 +274,13 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
 
 /* REITER: [ 📁 ZU PLANEN ] vs [ ✅ EINGETEILT ] */
 .pool-segment-wrap {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
   background: var(--ayocin-cream); padding: 2px; border-radius: var(--radius-pill);
   border: 1px solid var(--ayocin-border); margin: 0 14px 12px;
 }
 .pool-segment-btn {
-  padding: 7px 10px; border: none; border-radius: var(--radius-pill);
-  font-family: var(--font-body); font-size: 11px; font-weight: 500;
+  padding: 7px 4px; border: none; border-radius: var(--radius-pill);
+  font-family: var(--font-body); font-size: 10px; font-weight: 500;
   background: transparent; color: var(--ink-secondary); cursor: pointer;
   transition: all 0.3s var(--ease-ayocin); text-align: center; white-space: nowrap;
 }
@@ -346,10 +347,10 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   display: flex; align-items: center; padding: 0 24px; gap: 16px;
 }
 .logo{
-  font-family: var(--font-display); font-size: 20px; font-weight: 900;
+  font-family: var(--font-display); font-size: 20px; font-weight: 500;
   letter-spacing: -0.02em; color: var(--ayocin-dark); display: flex; align-items: center; gap: 10px;
 }
-.logo span{ color: var(--ayocin-bronze); font-weight: 900; }
+.logo span{ color: var(--ayocin-bronze); font-weight: 500; }
 .logo-badge {
   font-family: var(--font-body); font-size: 10px; background: var(--ayocin-dark); color: var(--ayocin-cream);
   padding: 3px 10px; border-radius: var(--radius-pill); letter-spacing: 0.06em;
@@ -366,15 +367,15 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   overflow-x: auto; padding: 8px 16px; gap: 4px; -webkit-overflow-scrolling: touch;
 }
 .tab{
-  padding: 8px 18px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer;
+  padding: 8px 18px; font-size: 12px; font-weight: 500; cursor: pointer;
   color: var(--ink-secondary); border-radius: var(--radius-pill); letter-spacing: 0;
   white-space: nowrap; display: flex; align-items: center; gap: 6px;
   transition: all 0.3s var(--ease-ayocin); border: 1px solid transparent; min-height: 36px;
 }
 .tab:hover{ background: var(--ayocin-cream); color: var(--ink-primary); }
 .tab.active{
-  color: var(--ayocin-dark); background: var(--solar-yellow); border-color: var(--ayocin-dark);
-  font-weight: 800;
+  color: var(--ayocin-dark); background: var(--ayocin-cream); border-color: var(--ayocin-border-strong);
+  font-weight: 500;
 }
 
 .app-main{ flex: 1; position: relative; overflow: hidden; }
@@ -418,7 +419,7 @@ th, td{ border: 1px solid rgba(178, 162, 139, 0.35); text-align: center; font-si
   position: sticky; top: 28px; z-index: 99; height: 42px; background: var(--ayocin-surface); color: var(--ayocin-dark);
 }
 
-th.is-today-head { background: var(--solar-yellow) !important; color: #111111 !important; border-bottom: 3px solid #111111 !important; }
+th.is-today-head { background: var(--solar-yellow) !important; color: #2E2521 !important; border-bottom: 3px solid #2E2521 !important; }
 td.is-today-col { border-left: 2px solid rgba(179, 57, 57, 0.35) !important; border-right: 2px solid rgba(179, 57, 57, 0.35) !important; }
 
 td:first-child{
@@ -485,6 +486,12 @@ td:first-child{
   outline: 2px solid var(--ayocin-cream) !important;
 }
 .cell-item-name{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+/* MEHRTÄGIGE PROJEKTE: EIN DURCHGEHENDER BLOCK ÜBER ALLE TAGE */
+.cell-item-card.run-start{ border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; overflow: visible !important; }
+.cell-item-card.run-start .cell-item-name{ overflow: visible; text-overflow: clip; position: relative; z-index: 6; }
+.cell-item-card.run-cont{ border-radius: 0 !important; margin-left: -7px; }
+.cell-item-card.run-end{ border-top-right-radius: 6px !important; border-bottom-right-radius: 6px !important; }
 .cell-item-del{
   background: rgba(0,0,0,0.25); border: none; color: #fff; font-size: 10px;
   width: 14px; height: 14px; border-radius: 3px; display: flex; align-items: center;
@@ -506,12 +513,12 @@ body.view-W .cell-phone-link { display: inline-flex; }
 
 /* URLAUB & KRANK */
 .grid-block-vacation{
-  background: repeating-linear-gradient(45deg, #FFF6C4, #FFF6C4 6px, #FFE566 6px, #FFE566 12px) !important;
-  color: #6B5800 !important; font-weight: 800 !important; border-radius: 2px; padding: 6px; font-size: 11px;
+  background: repeating-linear-gradient(45deg, #FAF7F0, #FAF7F0 4px, #F5E9D3 4px, #F5E9D3 8px) !important;
+  color: #8C6A30 !important; font-weight: 800 !important; border-radius: 6px; padding: 6px; font-size: 11px;
 }
 .grid-block-sick{
-  background: repeating-linear-gradient(45deg, #FDEDED, #FDEDED 6px, #F5C4C4 6px, #F5C4C4 12px) !important;
-  color: var(--status-danger) !important; font-weight: 800 !important; border-radius: 2px; padding: 6px; font-size: 11px;
+  background: repeating-linear-gradient(45deg, #FAF7F0, #FAF7F0 4px, #F7DCDA 4px, #F7DCDA 8px) !important;
+  color: var(--status-danger) !important; font-weight: 800 !important; border-radius: 6px; padding: 6px; font-size: 11px;
 }
 
 table tr.team-divider td{
@@ -595,26 +602,28 @@ body.role-monteur .project-sidebar { display: none !important; }
 
 #printSheet { display: none; }
 @media print {
+  @page { size: A4 portrait; margin: 12mm; }
   body * { visibility: hidden; }
   #printSheet, #printSheet * { visibility: visible; }
   #printSheet {
     display: block !important; position: absolute; left: 0; top: 0; width: 100%;
-    background: #FFFFFF; color: #111111; padding: 24px; font-family: 'Archivo', 'Roboto', sans-serif;
+    background: #FCF6EC; color: #2E2521; padding: 6mm; font-family: 'Outfit', 'Roboto', sans-serif;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
   .print-header-explorer {
-    border-bottom: 2px solid #2E2521; padding-bottom: 12px; margin-bottom: 16px;
+    border-bottom: 3px solid #2E2521; padding-bottom: 12px; margin-bottom: 14px;
     display: flex; justify-content: space-between; align-items: flex-end;
   }
-  .print-tag { background: #111111; color: #FFD400; font-family: 'Archivo', sans-serif; font-size: 11px; padding: 3px 8px; border-radius: 2px; font-weight: 800; }
-  .print-banner { background: #FFF6C4; border-left: 4px solid #111111; padding: 10px 14px; margin-bottom: 16px; border-radius: 2px; font-size: 13px; }
-  .print-table { width: 100%; border-collapse: collapse; margin-top: 12px; background: #fff; }
-  .print-table th, .print-table td { border: 1px solid #c4bcac; padding: 10px; text-align: left; font-size: 12px; vertical-align: top; }
-  .print-table th { background: #F0EFEA; font-weight: 700; }
+  .print-tag { background: #2E2521; color: #FCF6EC; font-family: 'Outfit', sans-serif; font-size: 10px; padding: 4px 12px; border-radius: 999px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  .print-banner { background: #EFE9DF; border-left: 4px solid #8C7358; padding: 10px 14px; margin-bottom: 14px; border-radius: 8px; font-size: 12px; }
+  .print-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; }
+  .print-table th, .print-table td { border: 1px solid #D8D0C0; padding: 8px 10px; text-align: left; font-size: 11px; vertical-align: top; word-break: break-word; }
+  .print-table th { background: #2E2521; color: #FCF6EC; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 9.5px; }
+  .print-table tr:nth-child(even) td { background: #FAF5EB; }
 }
 
 .task-shell{ max-width: 720px; margin: 0 auto; }
-.task-shell h2{ font-family: var(--font-display); font-size: 28px; font-weight: 900; line-height: 1; margin-bottom: 6px; letter-spacing: -0.02em; text-transform: uppercase; }
+.task-shell h2{ font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1; margin-bottom: 6px; letter-spacing: -0.02em; }
 .task-sub{ font-size: 11px; color: var(--ink-muted); letter-spacing: 0.06em; margin-bottom: 20px; text-transform: uppercase; font-weight: 500; }
 .task-monitor{ display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
 .task-stat{ background: var(--ayocin-surface); border: 1px solid var(--ayocin-border); border-radius: var(--radius-card); padding: 16px 10px; text-align: center; }
@@ -660,7 +669,7 @@ body.role-monteur .project-sidebar { display: none !important; }
   to { opacity: 1; transform: translate(-50%, -50%); }
 }
 .modal.show{ display: block; }
-.modal h2{ font-family: var(--font-display); font-size: 22px; font-weight: 800; line-height: 1.1; margin-bottom: 16px; letter-spacing: -0.02em; }
+.modal h2{ font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.1; margin-bottom: 16px; letter-spacing: -0.02em; }
 .form-field label{ display: block; font-size: 10px; font-weight: 500; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
 .form-field input, .form-field select, .form-field textarea{
   width: 100%; padding: 10px 12px; border: 1px solid var(--ayocin-border-strong); border-radius: var(--radius-sm);
@@ -719,6 +728,7 @@ body.role-monteur .project-sidebar { display: none !important; }
   <div class="pool-segment-wrap">
     <button class="pool-segment-btn active" id="btnPoolOpen" onclick="setPoolTab('open')">Zu Planen (<span id="countOpen">0</span>)</button>
     <button class="pool-segment-btn" id="btnPoolDone" onclick="setPoolTab('done')">Eingeteilt (<span id="countDone">0</span>)</button>
+    <button class="pool-segment-btn" id="btnPoolAc" onclick="setPoolTab('ac')">⚡ AC fehlt (<span id="countAc">0</span>)</button>
   </div>
 
   <div class="project-sidebar-body">
@@ -1082,8 +1092,18 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const RANGE = { start: '2026-08-17', end: '2026-12-31' };
-const COLORS = ['#0B5FB0','#E84A00','#1E7A34','#6D28D9','#0E7490','#B45309','#BE185D','#374151','#166534','#7C2D12'];
-function getAutoColor() { return COLORS[Math.floor(Math.random() * COLORS.length)]; }
+const COLORS = [
+  '#1F6F8B','#B85834','#5A6B52','#7A4E8C','#356859','#A63D57','#2F5D9E','#8C6A30',
+  '#C15A2B','#4A6FA5','#6B8E4E','#9E4A7A','#2E7D6B','#B04A4A','#5E548E','#946846',
+  '#3E7CB1','#7D6608','#A34F9E','#457B9D','#8A5A44','#588157','#B5651D','#6D597A'
+];
+// Nimmt immer die am wenigsten benutzte Farbe – keine Zufalls-Doppler mehr
+function getAutoColor() {
+  const usage = {};
+  COLORS.forEach(c => usage[c] = 0);
+  (state?.projects || []).forEach(p => { if (usage[p.color] !== undefined) usage[p.color]++; });
+  return COLORS.reduce((best, c) => usage[c] < usage[best] ? c : best, COLORS[0]);
+}
 
 function naturalSort(a, b) {
   return (a.label || '').localeCompare((b.label || ''), 'de', { numeric: true, sensitivity: 'base' });
@@ -1135,6 +1155,17 @@ function extractShortName(rawName, subProject) {
   }
 
   return subProject ? `${name} (${subProject})` : name;
+}
+
+function prevWorkdayIso(iso) {
+  const d = new Date(iso);
+  d.setDate(d.getDate() - (d.getDay() === 1 ? 3 : 1));
+  return d.toISOString().split('T')[0];
+}
+function nextWorkdayIso(iso) {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + (d.getDay() === 5 ? 3 : 1));
+  return d.toISOString().split('T')[0];
 }
 
 function getKW(d) {
@@ -1338,6 +1369,7 @@ function setPoolTab(mode) {
   state.poolTab = mode;
   $('btnPoolOpen').classList.toggle('active', mode === 'open');
   $('btnPoolDone').classList.toggle('active', mode === 'done');
+  $('btnPoolAc').classList.toggle('active', mode === 'ac');
   renderPalette();
 }
 
@@ -1543,8 +1575,9 @@ function parseTaifun(htmlContent) {
             }
           }
 
-          const displayName = extractShortName(rawName, subProject);
-          const fullNotes = noteLines.join('\n');
+          // Nur der Name im Planer – Zusatzinfos (Speicher, IBN, ...) wandern in die Notizen-Box
+          const displayName = extractShortName(rawName, null);
+          const fullNotes = [subProject, ...noteLines].filter(Boolean).join('\n');
 
           let initialScope = 'both';
           const fullTextLower = text.toLowerCase();
@@ -1717,17 +1750,20 @@ function renderPalette() {
   const statusData = analyzeProjectsStatus();
   const warnings = getProjectWarnings();
 
-  let countOpen = 0, countDone = 0;
+  let countOpen = 0, countDone = 0, countAc = 0;
   state.projects.forEach(p => {
     if (p.status === 'abgeschlossen' || p.status === 'eingeteilt' || p.status === 'bestaetigt') countDone++;
     else countOpen++;
+    if (warnings[p.id]) countAc++;
   });
   $('countOpen').textContent = countOpen;
   $('countDone').textContent = countDone;
+  $('countAc').textContent = countAc;
 
   let filtered = state.projects.filter(p => {
     const isDone = (p.status === 'abgeschlossen' || p.status === 'eingeteilt' || p.status === 'bestaetigt');
     if (state.poolTab === 'open') return !isDone;
+    if (state.poolTab === 'ac') return !!warnings[p.id];
     return isDone;
   });
 
@@ -1769,10 +1805,10 @@ function renderPalette() {
       `;
     }
 
-    let badge = warnings[p.id] && !isConfirmed ? `<span class="ac-warn">⚠️ AC fehlt</span>` : '';
+    let badge = warnings[p.id] ? `<span class="ac-warn">${warnings[p.id] === 'late_ac' ? '⚠️ AC zu spät' : '⚠️ AC fehlt'}</span>` : '';
 
     let actionButtons = '';
-    if (state.poolTab === 'open') {
+    if (!isConfirmed) {
       actionButtons = `
         <button class="chip-btn btn-confirm" title="Einteilung bestätigen (In 'Eingeteilt' verschieben)" onclick="event.stopPropagation(); confirmAndMoveToDone('${p.id}')">✓</button>
       `;
@@ -1987,6 +2023,15 @@ function repaint() {
         if (p) {
           workCount++;
           const isHighlighted = (state.activeProjId === p.id);
+
+          // Mehrtägige Projekte als EIN durchgehender Block erkennen
+          const kParts = k.split('_');
+          const runPrev = ((state.grid['CELL_' + kParts[1] + '_' + prevWorkdayIso(kParts[2])]) || []).some(x => x.project_id === item.project_id);
+          const runNext = ((state.grid['CELL_' + kParts[1] + '_' + nextWorkdayIso(kParts[2])]) || []).some(x => x.project_id === item.project_id);
+          let runClass = '';
+          if (runPrev && runNext) runClass = 'run-cont';
+          else if (runPrev) runClass = 'run-cont run-end';
+          else if (runNext) runClass = 'run-start';
           
           let ibnBadge = '';
           if (p.order_id && p.order_id.toLowerCase().includes('ibn')) {
@@ -1998,17 +2043,18 @@ function repaint() {
           const phoneHtml = phone ? `<a href="tel:${cleanPhone(phone)}" class="cell-phone-link" onclick="event.stopPropagation()">📞${phone}</a>` : '';
 
           const card = document.createElement('div');
-          card.className = `cell-item-card ${isHighlighted ? 'is-highlighted' : ''}`;
+          card.className = `cell-item-card ${isHighlighted ? 'is-highlighted' : ''} ${runClass}`;
           card.style.background = p.color;
           card.dataset.projId = p.id;
           card.dataset.assignId = item.id;
           
-          // Wenn nur 1 Termin: Voller Name | Wenn 2+ Termine: Kürzen
-          const displayName = list.length === 1 ? esc(p.name) : esc(p.name.substring(0, 9));
+          // Blockanfang: voller Name (läuft über den ganzen Block) | Fortsetzung: leer | Einzeltag: Name mit Ellipsis
+          const displayName = runClass.includes('run-cont') ? '' : esc(p.name);
+          const nameOverflow = runClass === 'run-start' ? 'visible' : 'hidden';
 
           card.innerHTML = `
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;min-width:0">
-              <div style="display:flex;align-items:center;gap:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">
+              <div style="display:flex;align-items:center;gap:3px;overflow:${nameOverflow};text-overflow:ellipsis;white-space:nowrap;flex:1">
                 ${ibnBadge}
                 <span class="cell-item-name">${displayName}</span>
               </div>
