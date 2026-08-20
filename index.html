@@ -307,6 +307,24 @@ table tr.team-divider td{border:none;text-align:left!important;font-family:var(-
 /* ── EXTRACTED SUMMARY (allgemein) ── */
 .extracted-summary{background:rgba(184,216,75,0.08);border-radius:8px;padding:10px 12px;font-size:11px;margin-top:8px;color:var(--ink-mid)}
 
+/* ── IMPORT STYLES ── */
+.import-section.dragover{border-color:var(--lime-dk);background:rgba(184,216,75,0.1)}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.project-card{background:var(--glass-bg-heavy);border:1px solid var(--glass-border);border-radius:var(--radius);padding:16px;transition:transform .2s,box-shadow .2s}
+.project-card:hover{transform:translateY(-2px);box-shadow:var(--glass-shadow-lg)}
+.project-name{font-weight:600;color:var(--ink);margin-bottom:8px;font-size:14px}
+.project-details{font-size:12px;color:var(--ink-muted);margin-bottom:12px}
+.kwp-input{width:100%;padding:8px 12px;border:1px solid var(--cream-deep);border-radius:var(--radius-sm);font-size:13px;background:rgba(255,255,255,0.7)}
+.kwp-input:focus{outline:none;border-color:var(--lime-dk);box-shadow:0 0 0 3px var(--lime-glow)}
+.project-actions{display:flex;gap:8px}
+.view-btn{background:var(--ink);color:var(--lime);border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500}
+.view-btn:hover{background:var(--ink-mid)}
+.delete-btn{background:var(--danger);color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500}
+.delete-btn:hover{background:#c82333}
+.status-connected{color:var(--success);font-weight:600}
+.status-disconnected{color:var(--danger);font-weight:600}
+.status-loading{color:var(--info);font-weight:600}
+
 /* ── RESPONSIVE ── */
 @media (max-width:768px){
   .topbar{padding:0 12px;min-height:56px;gap:8px}
@@ -377,6 +395,7 @@ table tr.team-divider td{border:none;text-align:left!important;font-family:var(-
   <div class="tab-nav" id="tabNav" style="display:none">
     <div class="tab active" data-tab="planner">📅 Planer</div>
     <div class="tab" data-tab="tasks">✓ Aufgaben <span class="badge" id="taskBadge" style="display:none">0</span></div>
+    <div class="tab" data-tab="import">📥 Projekt Import</div>
   </div>
 
   <!-- MAIN APP VIEWS -->
@@ -476,6 +495,62 @@ table tr.team-divider td{border:none;text-align:left!important;font-family:var(-
         <button class="btn" id="btnToggleAdvanced" style="margin-top:8px;font-size:10px">⚙️ Erweiterte Optionen</button>
         
         <div class="task-list" id="taskList"></div>
+      </div>
+    </div>
+
+    <!-- PROJEKT IMPORT -->
+    <div id="view-import" class="view">
+      <div class="task-shell">
+        <h2>📥 Projekt Import</h2>
+        <div class="task-sub">Projekte aus HTML-Vorplanung importieren</div>
+        
+        <!-- Import Section -->
+        <div class="import-section" id="importSection" style="background:var(--glass-bg);border:2px dashed var(--cream-deep);border-radius:var(--radius);padding:30px;text-align:center;margin-bottom:20px">
+          <div style="margin-bottom:16px;font-size:32px">📁</div>
+          <h3 style="margin-bottom:8px;color:var(--ink);font-size:14px">HTML-Datei importieren</h3>
+          <p style="color:var(--ink-muted);margin-bottom:16px;font-size:12px">Ziehen Sie Ihre SOLPRO-suite-v2-index.html hierher oder klicken Sie zum Auswählen</p>
+          <input type="file" id="fileInput" class="file-input" accept=".html" style="display:none">
+          <button class="btn primary" onclick="document.getElementById('fileInput').click()">Datei auswählen</button>
+        </div>
+        
+        <!-- Projects Section -->
+        <div id="projectsSection" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <h3 style="font-size:16px;color:var(--ink)">Importierte Projekte</h3>
+            <span class="badge" id="projectsCount" style="background:var(--lime);color:var(--ink)">0 Projekte</span>
+          </div>
+          
+          <input type="text" id="searchBox" placeholder="Projekte durchsuchen..." style="width:100%;padding:10px 14px;border:1px solid var(--cream-deep);border-radius:var(--radius-sm);background:var(--glass-bg-heavy);font-size:13px;margin-bottom:20px">
+          
+          <div class="projects-grid" id="projectsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"></div>
+          
+          <div id="emptyState" style="display:none;text-align:center;padding:40px;color:var(--ink-muted)">
+            <p>Keine Projekte gefunden</p>
+          </div>
+        </div>
+        
+        <!-- Supabase Sync -->
+        <div style="margin-top:30px;padding:20px;background:var(--glass-bg);border-radius:var(--radius);border:1px solid var(--cream-deep)">
+          <h3 style="font-size:14px;color:var(--ink);margin-bottom:16px">☁️ Supabase Synchronisation</h3>
+          <div id="supabaseStatus" style="margin-bottom:16px;font-size:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span style="color:var(--ink-muted)">Status:</span>
+              <span id="dbStatus" style="font-weight:600">Wird geprüft...</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span style="color:var(--ink-muted)">Projekte in DB:</span>
+              <span id="dbProjectCount">-</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="color:var(--ink-muted)">Teams in DB:</span>
+              <span id="dbTeamCount">-</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn" onclick="syncToSupabase()">🔄 Synchronisieren</button>
+            <button class="btn" onclick="loadFromSupabase()">📥 Laden</button>
+          </div>
+        </div>
       </div>
     </div>
 
