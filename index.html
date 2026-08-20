@@ -507,8 +507,8 @@ table tr.team-divider td{border:none;text-align:left!important;font-family:var(-
         <!-- Import Section -->
         <div class="import-section" id="importSection" style="background:var(--glass-bg);border:2px dashed var(--cream-deep);border-radius:var(--radius);padding:30px;text-align:center;margin-bottom:20px">
           <div style="margin-bottom:16px;font-size:32px">📁</div>
-          <h3 style="margin-bottom:8px;color:var(--ink);font-size:14px">HTML-Datei importieren</h3>
-          <p style="color:var(--ink-muted);margin-bottom:16px;font-size:12px">Ziehen Sie Ihre SOLPRO-suite-v2-index.html hierher oder klicken Sie zum Auswählen</p>
+          <h3 style="margin-bottom:8px;color:var(--ink);font-size:14px">Taifun HTML-Datei importieren</h3>
+          <p style="color:var(--ink-muted);margin-bottom:16px;font-size:12px">Ziehen Sie Ihre Taifun Vorplanung hierher oder klicken Sie zum Auswählen</p>
           <input type="file" id="fileInput" class="file-input" accept=".html" style="display:none">
           <button class="btn primary" onclick="document.getElementById('fileInput').click()">Datei auswählen</button>
         </div>
@@ -550,6 +550,12 @@ table tr.team-divider td{border:none;text-align:left!important;font-family:var(-
             <button class="btn" onclick="syncToSupabase()">🔄 Synchronisieren</button>
             <button class="btn" onclick="loadFromSupabase()">📥 Laden</button>
           </div>
+        </div>
+        
+        <!-- Imported Buses List -->
+        <div style="margin-top:30px;padding:20px;background:var(--glass-bg);border-radius:var(--radius);border:1px solid var(--cream-deep">
+          <h3 style="font-size:14px;color:var(--ink);margin-bottom:16px">🚌 Importierte Busse</h3>
+          <div id="importedBusesList"></div>
         </div>
         
         <!-- Team Management -->
@@ -1783,30 +1789,61 @@ function extractProjectsFromHTML(htmlContent) {
   const doc = parser.parseFromString(htmlContent, 'text/html');
   const extractedProjects = [];
   
-  const cells = doc.querySelectorAll('td[valign="Top"]');
+  // Flexiblere Taifun HTML Struktur-Erkennung
+  const rows = doc.querySelectorAll('tr');
   
-  cells.forEach(cell => {
-    const content = cell.innerHTML;
-    const nameMatch = content.match(/<div[^>]*><span[^>]*>([^<]+)<\/span><\/div>/);
-    const addressMatch = content.match(/<div[^>]*><span[^>]*>([^<]+)<\/span><\/div>/);
-    const projectMatch = content.match(/Projekt:\s*([^\s<]+)/);
-    const orderMatch = content.match(/Auftrag:\s*([^\s<]+)/);
-    
-    if (nameMatch && nameMatch[1].trim()) {
-      const projectName = nameMatch[1].trim();
-      const address = addressMatch ? addressMatch[1].trim() : '';
-      const projectId = projectMatch ? projectMatch[1].trim() : '';
-      const orderId = orderMatch ? orderMatch[1].trim() : '';
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length >= 2) {
+      // Verschiedene Möglichkeiten zu erkennen
+      let address = '';
+      let projectName = '';
       
-      if (!extractedProjects.find(p => p.name === projectName)) {
-        extractedProjects.push({
-          id: Date.now() + Math.random(),
-          name: projectName,
-          address: address,
-          projectId: projectId,
-          orderId: orderId,
-          kwp: 0
-        });
+      // Methode 1: Erste Zelle = Adresse, Zweite = Projektname
+      if (cells.length >= 2) {
+        address = cells[0].textContent.trim();
+        projectName = cells[1].textContent.trim();
+      }
+      
+      // Methode 2: Suche nach Adress-Indikatoren (Straße, Hausnummer)
+      if (!address || address.length < 5) {
+        for (let i = 0; i < cells.length; i++) {
+          const text = cells[i].textContent.trim();
+          if (text.match(/\d+/) && text.length > 5) { // Enthält Zahl und ist lang genug
+            address = text;
+            projectName = cells[i + 1] ? cells[i + 1].textContent.trim() : '';
+            break;
+          }
+        }
+      }
+      
+      // Methode 3: Fallback - längster Text als Adresse
+      if (!address || address.length < 5) {
+        const allTexts = Array.from(cells).map(c => c.textContent.trim());
+        const longest = allTexts.sort((a, b) => b.length - a.length)[0];
+        if (longest && longest.length > 5) {
+          address = longest;
+          projectName = allTexts.find(t => t !== longest) || '';
+        }
+      }
+      
+      // Nur importieren wenn Adresse vorhanden (eindeutige Zuordnung)
+      if (address && address.length > 5 && projectName) {
+        // Bereinigung von unnötigen Whitespace
+        address = address.replace(/\s+/g, ' ').trim();
+        projectName = projectName.replace(/\s+/g, ' ').trim();
+        
+        // Prüfe auf Duplikate basierend auf Adresse (monatsübergreifend)
+        if (!extractedProjects.find(p => p.address === address)) {
+          extractedProjects.push({
+            id: Date.now() + Math.random(),
+            name: projectName,
+            address: address,
+            projectId: '',
+            orderId: '',
+            kwp: null // kWP wird erst nach Einplanung eingegeben
+          });
+        }
       }
     }
   });
@@ -1896,13 +1933,63 @@ function renderImportedProjects(filter = '') {
   projectsGrid.innerHTML = filteredProjects.map(project => `
     <div class="project-card">
       <div class="project-name">${escHtml(project.name)}</div>
-      <input type="number" class="kwp-input" placeholder="kWP eingeben..." value="${project.kwp || ''}" onchange="updateProjectKWP(${project.id}, this.value)">
+      <div class="project-details">📍 ${escHtml(project.address)}</div>
       <div class="project-actions">
         <button class="view-btn" onclick="viewProjectDetails(${project.id})">Details</button>
         <button class="delete-btn" onclick="deleteImportedProject(${project.id})">Löschen</button>
       </div>
     </div>
   `).join('');
+}
+
+function renderImportedBuses() {
+  const container = document.getElementById('importedBusesList');
+  if (!container) return;
+  
+  if (importedBuses.length === 0) {
+    container.innerHTML = '<p style="color:var(--ink-muted);font-size:12px;padding:20px">Keine Busse importiert</p>';
+    return;
+  }
+  
+  container.innerHTML = `
+    <div style="margin-bottom:16px">
+      <h4 style="font-size:13px;color:var(--ink);margin-bottom:12px">Importierte Busse (${importedBuses.length})</h4>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px">
+      ${importedBuses.map(bus => `
+        <div style="background:rgba(255,255,255,0.5);border:1px solid var(--cream-deep);border-radius:6px;padding:12px">
+          <div style="font-weight:600;color:var(--ink);font-size:13px;margin-bottom:6px">${escHtml(bus.label)}</div>
+          <div style="font-size:11px;color:var(--ink-muted);margin-bottom:8px">
+            Team: <span style="color:var(--ink);font-weight:500">${escHtml(bus.team || 'Nicht zugeordnet')}</span>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn" style="padding:4px 8px;font-size:10px" onclick="editImportedBus(${bus.id})">Bearbeiten</button>
+            <button class="btn danger" style="padding:4px 8px;font-size:10px" onclick="deleteImportedBus(${bus.id})">Löschen</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function editImportedBus(busId) {
+  const bus = importedBuses.find(b => b.id === busId);
+  if (!bus) return;
+  
+  const newTeam = prompt('Team ändern (montage, bauleitung, elektriker):', bus.team);
+  if (newTeam !== null) {
+    bus.team = newTeam;
+    renderImportedBuses();
+    showToast('Team aktualisiert!', 'success');
+  }
+}
+
+function deleteImportedBus(busId) {
+  if (confirm('Möchten Sie diesen Bus wirklich löschen?')) {
+    importedBuses = importedBuses.filter(b => b.id !== busId);
+    renderImportedBuses();
+    showToast('Bus gelöscht!', 'success');
+  }
 }
 
 function updateProjectKWP(projectId, value) {
@@ -2130,6 +2217,7 @@ function saveHiddenBuses() {
 setTimeout(() => {
   renderImportedTeams();
   renderHiddenBusesList();
+  renderImportedBuses();
 }, 1500);
 </script>
 </body>
