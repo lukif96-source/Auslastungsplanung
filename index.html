@@ -3,17 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#2E2521">
+<meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SOLPRO">
-<meta name="description" content="SOLPRO Operations Suite — Solar & Resource Scheduling im Ayocin-Design">
+<meta name="description" content="SOLPRO PV & Bau — Einsatzplanung für Photovoltaik-Montage, Elektrik und Bauleitung">
 <title>SOLPRO · Operations Suite</title>
 
-<!-- Google Fonts: Outfit (Systemia-ähnlich) + Roboto Fallback -->
+<!-- Google Fonts: Archivo (Industrial) + JetBrains Mono -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://iuxklqcpexoziqxrohwa.supabase.co">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
 
 <!-- Supabase Lib -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -29,38 +31,39 @@
    1. 1:1 AYOCIN LUXURY DESIGN TOKENS
    ═══════════════════════════════════════════════════════════════ */
 :root {
-  /* Ayocin 1:1 Palette (ayocin.com / Obys) */
-  --ayocin-cream: #FCF6EC;
-  --ayocin-surface: #EFE9DF;
-  --ayocin-sand: #CEC1B2;
-  --ayocin-sand-subtle: #EFE9DF;
-  --ayocin-sand-dark: #B2A28B;
-  --ayocin-bronze: #8C7358;
-  --ayocin-deep-bronze: #2E2521;
-  --ayocin-dark: #2E2521;
-  --ayocin-dark-surface: #2C2722;
-  --ayocin-border: rgba(46, 37, 33, 0.14);
-  --ayocin-border-strong: rgba(46, 37, 33, 0.28);
-  --ink-primary: #2E2521;
-  --ink-secondary: rgba(46, 37, 33, 0.62);
-  --ink-muted: rgba(46, 37, 33, 0.42);
-  --bg-sand-subtle: #EFE9DF;
-  --accent-glow-yellow: rgba(255, 231, 143, 0.4);
-  --accent-glow-coral: rgba(255, 125, 94, 0.35);
+  /* SOLPRO INDUSTRIAL — PV & Bau Palette */
+  --ayocin-cream: #F4F3EE;          /* Beton hell */
+  --ayocin-surface: #E9E7E0;        /* Beton */
+  --ayocin-sand: #D6D3C9;
+  --ayocin-sand-subtle: #E9E7E0;
+  --ayocin-sand-dark: #A9A59A;
+  --ayocin-bronze: #FF4D00;         /* Safety Orange */
+  --ayocin-deep-bronze: #111111;
+  --ayocin-dark: #111111;           /* Anthrazit */
+  --ayocin-dark-surface: #1E1E1C;
+  --solar-yellow: #FFD400;          /* PV-Gelb */
+  --ayocin-border: rgba(17, 17, 17, 0.18);
+  --ayocin-border-strong: rgba(17, 17, 17, 0.45);
+  --ink-primary: #111111;
+  --ink-secondary: rgba(17, 17, 17, 0.66);
+  --ink-muted: rgba(17, 17, 17, 0.45);
+  --bg-sand-subtle: #E9E7E0;
+  --accent-glow-yellow: transparent;
+  --accent-glow-coral: transparent;
 
-  /* Status — warme Erdtöne statt kühle SaaS-Farben */
-  --status-dc: #6B5A48;
-  --status-ac: #B85834;
-  --status-done: #5A6B52;
-  --status-danger: #A84848;
-  --status-danger-bg: rgba(168, 72, 72, 0.08);
+  /* Status — kräftige Industriefarben */
+  --status-dc: #0B5FB0;     /* DC Montage = Blau */
+  --status-ac: #E84A00;     /* AC Elektrik = Orange */
+  --status-done: #1E7A34;   /* Fertig = Grün */
+  --status-danger: #C81E1E;
+  --status-danger-bg: rgba(200, 30, 30, 0.08);
 
-  --radius-card: 20px;
-  --radius-sm: 10px;
-  --radius-pill: 9999px;
-  --font-display: 'Outfit', 'Roboto', -apple-system, sans-serif;
-  --font-body: 'Outfit', 'Roboto', -apple-system, sans-serif;
-  --font-mono: 'Outfit', 'Roboto', sans-serif;
+  --radius-card: 2px;
+  --radius-sm: 2px;
+  --radius-pill: 3px;
+  --font-display: 'Archivo', 'Roboto', -apple-system, sans-serif;
+  --font-body: 'Archivo', 'Roboto', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
   --ease-ayocin: cubic-bezier(0.16, 1, 0.3, 1);
 
   --project-sidebar-w: 300px;
@@ -78,10 +81,7 @@ body{
   display: flex;
   flex-direction: row;
   user-select: none;
-  background-image:
-    radial-gradient(ellipse 70% 50% at 12% 8%, var(--accent-glow-yellow) 0%, transparent 55%),
-    radial-gradient(ellipse 55% 45% at 88% 92%, var(--accent-glow-coral) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(178, 162, 139, 0.08) 0%, transparent 70%);
+  background-image: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -91,7 +91,7 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
 
 /* Ayocin: atmosphärische Tiefe statt Schatten */
 .grain-overlay{
-  position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.045;
+  display:none;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 .grid-overlay{
@@ -99,7 +99,7 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   background-image:linear-gradient(rgba(178,162,139,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(178,162,139,0.07) 1px, transparent 1px);
   background-size:48px 48px;
 }
-.ambient-glow{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:.5}
+.ambient-glow{display:none}
 .glow-top{width:480px;height:320px;background:var(--accent-glow-yellow);top:-80px;left:10%}
 .glow-bottom{width:420px;height:320px;background:var(--accent-glow-coral);bottom:-60px;right:8%}
 
@@ -114,12 +114,12 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   padding: 8px 18px;
   border-radius: var(--radius-pill);
   font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  border: 1px solid var(--ayocin-dark);
-  background: var(--ayocin-surface);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 2px solid var(--ayocin-dark);
+  background: var(--ayocin-cream);
   color: var(--ayocin-dark);
   cursor: pointer;
   transition: background 0.35s var(--ease-ayocin), transform 0.35s var(--ease-ayocin), border-color 0.35s var(--ease-ayocin);
@@ -128,9 +128,10 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   text-decoration: none;
 }
 .btn-ayocin:hover {
-  transform: translateY(-1px);
-  background: var(--ayocin-cream);
+  transform: translate(-1px, -1px);
+  background: var(--solar-yellow);
   border-color: var(--ayocin-dark);
+  box-shadow: 3px 3px 0 var(--ayocin-dark);
 }
 .btn-ayocin:active { transform: translateY(0); }
 
@@ -204,7 +205,7 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
 .login-card {
   position: relative; z-index: 1;
   background: var(--ayocin-cream); padding: 48px 40px; border-radius: var(--radius-card);
-  border: 1px solid rgba(252, 246, 236, 0.12);
+  border: 3px solid var(--solar-yellow);
   width: 400px; max-width: 92vw; text-align: center;
   animation: loginIn 0.8s var(--ease-ayocin) both;
 }
@@ -218,7 +219,7 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   letter-spacing: 0.08em; margin-bottom: 20px; text-transform: uppercase;
 }
 .login-headline {
-  font-family: var(--font-display); font-size: 32px; font-weight: 500;
+  font-family: var(--font-display); font-size: 34px; font-weight: 900;
   line-height: 1; letter-spacing: -0.02em; color: var(--ayocin-dark); margin-bottom: 8px;
 }
 .login-sub {
@@ -227,7 +228,7 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
 
 #loader{position:fixed;inset:0;z-index:99999;background:var(--ayocin-dark);display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px}
 #loader.show{display:flex}
-.spinner{width:40px;height:40px;border:2px solid rgba(252,246,236,.12);border-top-color:var(--ayocin-sand);border-radius:50%;animation:spin .9s linear infinite}
+.spinner{width:40px;height:40px;border:2px solid rgba(255,255,255,.12);border-top-color:var(--solar-yellow);border-radius:50%;animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loader-text{font-family:var(--font-body);font-size:11px;color:rgba(252,246,236,.65);letter-spacing:0.12em;text-transform:uppercase;font-weight:500}
 
@@ -345,10 +346,10 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   display: flex; align-items: center; padding: 0 24px; gap: 16px;
 }
 .logo{
-  font-family: var(--font-display); font-size: 20px; font-weight: 500;
+  font-family: var(--font-display); font-size: 20px; font-weight: 900;
   letter-spacing: -0.02em; color: var(--ayocin-dark); display: flex; align-items: center; gap: 10px;
 }
-.logo span{ color: var(--ayocin-bronze); font-weight: 500; }
+.logo span{ color: var(--ayocin-bronze); font-weight: 900; }
 .logo-badge {
   font-family: var(--font-body); font-size: 10px; background: var(--ayocin-dark); color: var(--ayocin-cream);
   padding: 3px 10px; border-radius: var(--radius-pill); letter-spacing: 0.06em;
@@ -365,15 +366,15 @@ input,select,textarea{font-family:inherit;font-size:12px;font-weight:400}
   overflow-x: auto; padding: 8px 16px; gap: 4px; -webkit-overflow-scrolling: touch;
 }
 .tab{
-  padding: 8px 18px; font-size: 12px; font-weight: 500; cursor: pointer;
+  padding: 8px 18px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer;
   color: var(--ink-secondary); border-radius: var(--radius-pill); letter-spacing: 0;
   white-space: nowrap; display: flex; align-items: center; gap: 6px;
   transition: all 0.3s var(--ease-ayocin); border: 1px solid transparent; min-height: 36px;
 }
 .tab:hover{ background: var(--ayocin-cream); color: var(--ink-primary); }
 .tab.active{
-  color: var(--ayocin-dark); background: var(--ayocin-cream); border-color: var(--ayocin-border-strong);
-  font-weight: 500;
+  color: var(--ayocin-dark); background: var(--solar-yellow); border-color: var(--ayocin-dark);
+  font-weight: 800;
 }
 
 .app-main{ flex: 1; position: relative; overflow: hidden; }
@@ -417,7 +418,7 @@ th, td{ border: 1px solid rgba(178, 162, 139, 0.35); text-align: center; font-si
   position: sticky; top: 28px; z-index: 99; height: 42px; background: var(--ayocin-surface); color: var(--ayocin-dark);
 }
 
-th.is-today-head { background: #E6DFD1 !important; color: var(--status-danger) !important; border-bottom: 3px solid var(--status-danger) !important; }
+th.is-today-head { background: var(--solar-yellow) !important; color: #111111 !important; border-bottom: 3px solid #111111 !important; }
 td.is-today-col { border-left: 2px solid rgba(179, 57, 57, 0.35) !important; border-right: 2px solid rgba(179, 57, 57, 0.35) !important; }
 
 td:first-child{
@@ -505,12 +506,12 @@ body.view-W .cell-phone-link { display: inline-flex; }
 
 /* URLAUB & KRANK */
 .grid-block-vacation{
-  background: repeating-linear-gradient(45deg, #FAF7F0, #FAF7F0 4px, #F5E9D3 4px, #F5E9D3 8px) !important;
-  color: #8C6A30 !important; font-weight: 800 !important; border-radius: 6px; padding: 6px; font-size: 11px;
+  background: repeating-linear-gradient(45deg, #FFF6C4, #FFF6C4 6px, #FFE566 6px, #FFE566 12px) !important;
+  color: #6B5800 !important; font-weight: 800 !important; border-radius: 2px; padding: 6px; font-size: 11px;
 }
 .grid-block-sick{
-  background: repeating-linear-gradient(45deg, #FAF7F0, #FAF7F0 4px, #F7DCDA 4px, #F7DCDA 8px) !important;
-  color: var(--status-danger) !important; font-weight: 800 !important; border-radius: 6px; padding: 6px; font-size: 11px;
+  background: repeating-linear-gradient(45deg, #FDEDED, #FDEDED 6px, #F5C4C4 6px, #F5C4C4 12px) !important;
+  color: var(--status-danger) !important; font-weight: 800 !important; border-radius: 2px; padding: 6px; font-size: 11px;
 }
 
 table tr.team-divider td{
@@ -598,22 +599,22 @@ body.role-monteur .project-sidebar { display: none !important; }
   #printSheet, #printSheet * { visibility: visible; }
   #printSheet {
     display: block !important; position: absolute; left: 0; top: 0; width: 100%;
-    background: #FCF6EC; color: #2E2521; padding: 24px; font-family: 'Outfit', 'Roboto', sans-serif;
+    background: #FFFFFF; color: #111111; padding: 24px; font-family: 'Archivo', 'Roboto', sans-serif;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
   .print-header-explorer {
     border-bottom: 2px solid #2E2521; padding-bottom: 12px; margin-bottom: 16px;
     display: flex; justify-content: space-between; align-items: flex-end;
   }
-  .print-tag { background: #2E2521; color: #CEC1B2; font-family: 'Outfit', sans-serif; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
-  .print-banner { background: #EFE9DF; border-left: 4px solid #2E2521; padding: 10px 14px; margin-bottom: 16px; border-radius: 4px; font-size: 13px; }
+  .print-tag { background: #111111; color: #FFD400; font-family: 'Archivo', sans-serif; font-size: 11px; padding: 3px 8px; border-radius: 2px; font-weight: 800; }
+  .print-banner { background: #FFF6C4; border-left: 4px solid #111111; padding: 10px 14px; margin-bottom: 16px; border-radius: 2px; font-size: 13px; }
   .print-table { width: 100%; border-collapse: collapse; margin-top: 12px; background: #fff; }
   .print-table th, .print-table td { border: 1px solid #c4bcac; padding: 10px; text-align: left; font-size: 12px; vertical-align: top; }
-  .print-table th { background: #FCF6EC; font-weight: 500; }
+  .print-table th { background: #F0EFEA; font-weight: 700; }
 }
 
 .task-shell{ max-width: 720px; margin: 0 auto; }
-.task-shell h2{ font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1; margin-bottom: 6px; letter-spacing: -0.02em; }
+.task-shell h2{ font-family: var(--font-display); font-size: 28px; font-weight: 900; line-height: 1; margin-bottom: 6px; letter-spacing: -0.02em; text-transform: uppercase; }
 .task-sub{ font-size: 11px; color: var(--ink-muted); letter-spacing: 0.06em; margin-bottom: 20px; text-transform: uppercase; font-weight: 500; }
 .task-monitor{ display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
 .task-stat{ background: var(--ayocin-surface); border: 1px solid var(--ayocin-border); border-radius: var(--radius-card); padding: 16px 10px; text-align: center; }
@@ -659,7 +660,7 @@ body.role-monteur .project-sidebar { display: none !important; }
   to { opacity: 1; transform: translate(-50%, -50%); }
 }
 .modal.show{ display: block; }
-.modal h2{ font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.1; margin-bottom: 16px; letter-spacing: -0.02em; }
+.modal h2{ font-family: var(--font-display); font-size: 22px; font-weight: 800; line-height: 1.1; margin-bottom: 16px; letter-spacing: -0.02em; }
 .form-field label{ display: block; font-size: 10px; font-weight: 500; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
 .form-field input, .form-field select, .form-field textarea{
   width: 100%; padding: 10px 12px; border: 1px solid var(--ayocin-border-strong); border-radius: var(--radius-sm);
@@ -689,9 +690,9 @@ body.role-monteur .project-sidebar { display: none !important; }
 <!-- 1. LOGIN SCREEN -->
 <div id="loginScreen">
   <div class="login-card">
-    <div class="login-tag">Operations Suite</div>
+    <div class="login-tag">PV-Bau · Montage · Elektrik</div>
     <div class="login-headline">SOLPRO</div>
-    <div class="login-sub">Solar &amp; Resource Scheduling<br>Where operations meet clarity.</div>
+    <div class="login-sub">Einsatzplanung für Photovoltaik &amp; Bau.<br>Planen. Montieren. Anschließen.</div>
     <div class="form-field" style="text-align:left">
       <label>Passwort</label>
       <input type="password" id="loginPassword" placeholder="Passwort eingeben…">
@@ -1081,7 +1082,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const RANGE = { start: '2026-08-17', end: '2026-12-31' };
-const COLORS = ['#6B5A48','#5A6B52','#8C6A30','#B85834','#5C6B5E','#A8654B','#7A6B55','#9E8354','#6D597A','#5A534C'];
+const COLORS = ['#0B5FB0','#E84A00','#1E7A34','#6D28D9','#0E7490','#B45309','#BE185D','#374151','#166534','#7C2D12'];
 function getAutoColor() { return COLORS[Math.floor(Math.random() * COLORS.length)]; }
 
 function naturalSort(a, b) {
