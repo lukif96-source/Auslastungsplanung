@@ -3,16 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#12110F">
+<meta name="theme-color" content="#131314">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SOLPRO">
-<meta name="description" content="SOLPRO Suite v2 - Professionelles Solar-Management">
-<title>SOLPRO · Suite v2</title>
+<meta name="apple-mobile-web-app-title" content="SOLPRO AI">
+<meta name="description" content="SOLPRO Suite v2 - Google AI Inspired Solar Management">
+<title>SOLPRO · AI Explorer Suite</title>
 
-<!-- Schriften -->
+<!-- Google Fonts: Space Grotesk, Inter & JetBrains Mono -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
 
 <!-- Supabase Lib -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -25,149 +26,200 @@
 
 <style>
 /* ═══════════════════════════════════════════════════════════════
-   1. DESIGN TOKENS & FARBSYSTEM (ULTRA-LIT)
+   1. GOOGLE AI / LANGUAGE EXPLORER FARBSYSTEM & DESIGN TOKENS
    ═══════════════════════════════════════════════════════════════ */
 :root {
-  --cream: #F7F4EE;
-  --cream-deep: #EDE9DF;
-  --cream-card: #FAF8F5;
-  --ink: #12110F;
-  --ink-mid: #3a3730;
-  --ink-muted: #8a8478;
-  --lime: #B8D84B;
-  --lime-dk: #8faa2c;
-  --lime-glow: rgba(184,216,75,0.35);
-  --gold: #D4A017;
-  --danger: #C8303A;
-  --danger-bg: rgba(200,48,58,0.08);
-  --success: #1A7A4A;
-  --success-bg: rgba(26,122,74,0.12);
-  --warn: #B86A10;
-  --info: #2563eb;
+  --bg-cream: #F8F5EE;
+  --bg-cream-subtle: #F1ECE1;
+  --bg-cream-card: #FFFFFF;
+  --ink: #131314;
+  --ink-secondary: #444746;
+  --ink-muted: #747775;
+  --border-subtle: #E2DDD2;
+  --border-strong: #C7C1B3;
 
-  --glass-bg: rgba(247,244,238,0.78);
-  --glass-bg-heavy: #FAF8F5;
-  --glass-border: rgba(0,0,0,0.08);
-  --glass-shadow: 0 8px 32px rgba(18,17,15,0.08);
-  --glass-shadow-lg: 0 20px 60px rgba(18,17,15,0.14);
+  /* Google AI / Lab Akzente */
+  --google-blue: #1A73E8;
+  --google-blue-bg: rgba(26,115,232,0.1);
+  --ai-lime: #B8D84B;
+  --ai-lime-glow: rgba(184,216,75,0.35);
+  --ai-purple: #7C3AED;
+  --google-red: #D93025;
+  --google-red-bg: rgba(217,48,37,0.08);
+  --google-yellow: #FBBC04;
+  --google-yellow-bg: rgba(251,188,4,0.15);
+  --google-green: #1E8E3E;
+  --google-green-bg: rgba(30,142,62,0.12);
 
-  --radius: 12px;
-  --radius-sm: 7px;
-  --radius-pill: 30px;
-  --font-display: 'Syne', sans-serif;
+  /* Radien & Typo */
+  --radius-card: 16px;
+  --radius-sm: 8px;
+  --radius-pill: 9999px;
+  --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --ease: cubic-bezier(.2,.8,.2,1);
 
-  --project-sidebar-w: 280px;
+  --project-sidebar-w: 300px;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;height:100dvh;width:100%;overflow:hidden}
 body{
-  font-family:var(--font-body); background:var(--cream); color:var(--ink);
-  display:flex; flex-direction:row; user-select:none;
+  font-family: var(--font-body);
+  background: var(--bg-cream);
+  color: var(--ink);
+  display: flex;
+  flex-direction: row;
+  user-select: none;
   background-image:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(184,216,75,0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(212,160,23,0.07) 0%, transparent 60%);
-  -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(26,115,232,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 100% 100%, rgba(184,216,75,0.08) 0%, transparent 50%);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 button{font-family:inherit;cursor:pointer}
-input,select,textarea{font-family:inherit;font-size:14px}
-:focus-visible{outline:2px solid var(--lime-dk);outline-offset:2px;border-radius:4px}
+input,select,textarea{font-family:inherit;font-size:13px}
+:focus-visible{outline:2px solid var(--google-blue);outline-offset:2px;border-radius:6px}
 
-.bg-blob{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);opacity:.35}
-.blob-1{width:600px;height:400px;background:var(--lime);top:-120px;left:-80px}
-.blob-2{width:500px;height:350px;background:var(--gold);top:40%;right:-100px;opacity:.18}
+/* Google AI Ambient Licht */
+.ai-glow-blob{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px);opacity:.4}
+.blob-top{width:500px;height:350px;background:var(--ai-lime);top:-100px;left:10%}
+.blob-bottom{width:450px;height:350px;background:rgba(26,115,232,0.3);bottom:-80px;right:5%}
 
-/* LOGIN SCREEN */
+/* ═══════════════════════════════════════════════════════════════
+   2. LOGIN SCREEN (GOOGLE LABS STYLE)
+   ═══════════════════════════════════════════════════════════════ */
 #loginScreen {
   position: fixed; inset: 0; z-index: 999999;
-  background: rgba(18, 17, 15, 0.85); backdrop-filter: blur(25px);
+  background: rgba(19, 19, 20, 0.88); backdrop-filter: blur(25px);
   display: flex; align-items: center; justify-content: center;
 }
 .login-card {
-  background: #FAF8F5; padding: 36px 30px; border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.7); box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-  width: 360px; max-width: 90vw; text-align: center;
+  background: var(--bg-cream); padding: 40px 32px; border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  width: 370px; max-width: 90vw; text-align: center;
+}
+.login-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 800;
+  background: var(--ink); color: var(--ai-lime); padding: 3px 10px; border-radius: var(--radius-pill);
+  letter-spacing: 1px; margin-bottom: 12px;
 }
 
-#loader{position:fixed;inset:0;z-index:99999;background:rgba(18,17,15,0.75);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px}
+#loader{position:fixed;inset:0;z-index:99999;background:rgba(19,19,20,0.75);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px}
 #loader.show{display:flex}
-.spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--lime);border-radius:50%;animation:spin .9s linear infinite}
+.spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--ai-lime);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loader-text{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:2px}
+.loader-text{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:2px}
 
-/* TOOLTIP FÜR ADRESSEN & MATERIAL */
+/* ═══════════════════════════════════════════════════════════════
+   3. ADRESS-TOOLTIP (EXPLORER INFO CARD)
+   ═══════════════════════════════════════════════════════════════ */
 #hoverTooltip {
-  position: fixed; background: var(--ink); color: #fff; padding: 10px 14px; border-radius: 8px;
+  position: fixed; background: #FFFFFF; color: var(--ink); padding: 12px 14px; border-radius: 12px;
   font-size: 11px; font-weight: 500; pointer-events: auto; z-index: 100000; opacity: 0;
   transition: opacity 0.2s, transform 0.2s; transform: translate(-50%, -100%) scale(0.96);
-  margin-top: -10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); text-align: left; max-width: 320px;
-  line-height: 1.4; border: 1px solid rgba(255,255,255,0.15);
+  margin-top: -10px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); text-align: left; max-width: 320px;
+  line-height: 1.4; border: 1px solid var(--border-subtle);
 }
 #hoverTooltip::after {
   content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-  border-width: 6px; border-style: solid; border-color: var(--ink) transparent transparent transparent;
+  border-width: 6px; border-style: solid; border-color: #FFFFFF transparent transparent transparent;
 }
 #hoverTooltip.show { opacity: 1; transform: translate(-50%, -100%) scale(1); }
-.tooltip-title{ font-weight: 800; font-size: 12px; color: var(--lime); margin-bottom: 3px; }
-.tooltip-sub{ font-size: 10px; color: #d0cbc3; margin-bottom: 6px; }
-.tooltip-notes{ background: rgba(255,255,255,0.1); padding: 5px 8px; border-radius: 4px; font-size: 10px; margin-top: 6px; max-height: 100px; overflow-y: auto; white-space: pre-line; }
-.tooltip-maps-btn{ display: inline-block; margin-top: 6px; font-size: 10px; font-weight: 700; color: var(--lime); text-decoration: none; border-bottom: 1px dashed var(--lime); }
+.tooltip-title{ font-family: var(--font-display); font-weight: 700; font-size: 13px; color: var(--ink); margin-bottom: 2px; }
+.tooltip-sub{ font-size: 10.5px; color: var(--ink-secondary); margin-bottom: 6px; }
+.tooltip-notes{ background: var(--bg-cream-subtle); padding: 6px 9px; border-radius: 6px; font-size: 10.5px; margin-top: 6px; max-height: 110px; overflow-y: auto; white-space: pre-line; border: 1px solid var(--border-subtle); }
+.tooltip-maps-btn{ display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 10.5px; font-weight: 700; color: var(--google-blue); text-decoration: none; }
+.tooltip-maps-btn:hover{ text-decoration: underline; }
 
-/* SEITENLEISTE */
+/* ═══════════════════════════════════════════════════════════════
+   4. PROJEKT-SEITENLEISTE (GOOGLE AI CARD LOOK)
+   ═══════════════════════════════════════════════════════════════ */
 .project-sidebar{
-  width: var(--project-sidebar-w); min-width: 200px; max-width: 550px;
-  background: var(--glass-bg-heavy); border-right: 1px solid var(--glass-border);
+  width: var(--project-sidebar-w); min-width: 230px; max-width: 580px;
+  background: var(--bg-cream-subtle); border-right: 1px solid var(--border-subtle);
   display: flex; flex-direction: column; flex-shrink: 0; position: relative; z-index: 250; height: 100%;
 }
-.project-sidebar-head{ padding: 16px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--cream-deep); }
-.project-sidebar-title{ font-family: var(--font-display); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--ink); }
-.project-sidebar-body{ padding: 12px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+.project-sidebar-head{ padding: 16px 14px 12px; display: flex; align-items: center; justify-content: space-between; }
+.project-sidebar-title{ font-family: var(--font-display); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-secondary); }
+.project-sidebar-body{ padding: 0 12px 12px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
 .project-sidebar-body .list-search, .project-sidebar-body select {
-  width: 100%; padding: 9px 12px; border: 1px solid rgba(0,0,0,0.12); border-radius: var(--radius-sm);
-  background: #fff; font-size: 12px; outline: none;
+  width: 100%; padding: 8px 12px; border: 1px solid var(--border-subtle); border-radius: var(--radius-pill);
+  background: #FFFFFF; font-size: 12px; outline: none; transition: all 0.2s;
 }
-.project-sidebar-body .list-search:focus, .project-sidebar-body select:focus { border-color: var(--lime-dk); box-shadow: 0 0 0 3px var(--lime-glow); }
-.project-list{ flex: 1; min-height: 0; overflow-y: auto; padding: 6px 10px 16px; display: flex; flex-direction: column; gap: 6px; }
-.project-list::-webkit-scrollbar{width:6px}
-.project-list::-webkit-scrollbar-thumb{background:var(--cream-deep);border-radius:10px}
+.project-sidebar-body .list-search:focus, .project-sidebar-body select:focus { border-color: var(--google-blue); box-shadow: 0 0 0 3px var(--google-blue-bg); }
+.project-list{ flex: 1; min-height: 0; overflow-y: auto; padding: 4px 10px 16px; display: flex; flex-direction: column; gap: 6px; }
+.project-list::-webkit-scrollbar{width:5px}
+.project-list::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:10px}
 
-/* CHIPS */
+/* Chips im Google AI Pill Style */
 .pal-chip{
   display: flex; align-items: center; justify-content: space-between; gap: 6px;
-  padding: 7px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;
-  cursor: pointer; background: #fff; border: 1.5px solid rgba(0,0,0,0.08);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.04); transition: transform .12s, box-shadow .12s;
+  padding: 6px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;
+  cursor: pointer; background: #FFFFFF; border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: transform .12s, box-shadow .12s, border-color .15s;
 }
-.pal-chip:hover{ transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
-.pal-chip.active{ border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink) inset, 0 4px 10px rgba(0,0,0,0.15); }
-.pal-chip.is-fixed{ border-color: var(--success); box-shadow: 0 0 0 1.5px var(--success) inset; }
+.pal-chip:hover{ transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+.pal-chip.active{ border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink) inset, 0 4px 12px rgba(0,0,0,0.12); }
+.pal-chip.both-done{ border-color: var(--google-green) !important; box-shadow: 0 0 0 1.5px var(--google-green) inset !important; }
 .pal-chip-title{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
-.pal-chip-actions{ display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
-.pal-chip .cnt{ font-size: 9px; font-family: var(--font-mono); padding: 2px 5px; background: rgba(0,0,0,0.18); border-radius: 8px; color: #fff; }
-.chip-btn{ background: transparent; border: none; font-size: 12px; cursor: pointer; opacity: 0.55; padding: 3px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.15s; line-height: 1; }
-.chip-btn:hover{ opacity: 1; transform: scale(1.25); }
-.chip-btn.btn-confirm:hover{ color: var(--success); }
-.chip-btn.btn-done:hover{ color: var(--info); }
-.chip-btn.btn-del:hover{ color: var(--danger); }
-.ac-warn{ background: var(--danger); color: #fff; font-size: 8px; font-weight: 800; padding: 2px 4px; border-radius: 4px; white-space: nowrap; letter-spacing: 0.3px; text-transform: uppercase; }
-.fixed-badge{ background: var(--success); color: #fff; font-size: 8px; font-weight: 800; padding: 2px 4px; border-radius: 4px; white-space: nowrap; text-transform: uppercase; }
+.pal-chip-actions{ display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+/* Split-Pille (DC | AC) */
+.phase-pill-wrap {
+  display: inline-flex; align-items: center; gap: 2px;
+  background: rgba(0,0,0,0.22); padding: 2px 4px; border-radius: var(--radius-pill);
+}
+.phase-pip {
+  font-size: 8px; font-weight: 800; font-family: var(--font-mono);
+  padding: 1px 4px; border-radius: 4px; color: rgba(255,255,255,0.5);
+  background: transparent; transition: all 0.15s;
+}
+.phase-pip.is-active-dc { background: var(--google-blue); color: #fff; }
+.phase-pip.is-active-ac { background: #E37400; color: #fff; }
+.pal-chip.both-done .phase-pip.is-active-dc,
+.pal-chip.both-done .phase-pip.is-active-ac { background: var(--google-green); color: #fff; }
+
+.pal-chip .cnt{ font-size: 9px; font-family: var(--font-mono); padding: 2px 5px; background: rgba(0,0,0,0.18); border-radius: var(--radius-pill); color: #fff; }
+.chip-btn{ background: transparent; border: none; font-size: 12px; cursor: pointer; opacity: 0.55; padding: 2px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.15s; line-height: 1; }
+.chip-btn:hover{ opacity: 1; transform: scale(1.2); }
+.chip-btn.btn-done:hover{ color: var(--google-blue); }
+.chip-btn.btn-del:hover{ color: var(--google-red); }
+.ac-warn{ background: var(--google-red); color: #fff; font-size: 8px; font-weight: 800; padding: 2px 5px; border-radius: var(--radius-pill); white-space: nowrap; letter-spacing: 0.3px; text-transform: uppercase; }
 
 .project-sidebar-resizer{ position: absolute; top: 0; right: -3px; width: 6px; height: 100%; cursor: col-resize; z-index: 260; touch-action: none; }
 .project-sidebar-resizer::after{ content: ''; position: absolute; top: 0; right: 2px; width: 2px; height: 100%; background: transparent; transition: background 0.15s; }
-.project-sidebar-resizer:hover::after, .project-sidebar-resizer.dragging::after{ background: var(--lime-dk); }
+.project-sidebar-resizer:hover::after, .project-sidebar-resizer.dragging::after{ background: var(--google-blue); }
 
-/* MAIN CONTENT */
+/* ═══════════════════════════════════════════════════════════════
+   5. HAUPTBEREICH & TOPBAR (FLOATING CAPSULE LOOK)
+   ═══════════════════════════════════════════════════════════════ */
 .main-wrapper{ flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; position: relative; z-index: 1; }
-.topbar{ position: relative; z-index: 200; flex-shrink: 0; min-height: 56px; background: var(--glass-bg-heavy); border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; padding: 0 20px; gap: 12px; }
-.logo{ font-family: var(--font-display); font-size: 20px; font-weight: 800; letter-spacing: -.5px; color: var(--ink); white-space: nowrap; }
-.logo span{ color: var(--lime-dk); }
+.topbar{
+  position: relative; z-index: 200; flex-shrink: 0; min-height: 56px;
+  background: var(--bg-cream-card); border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center; padding: 0 20px; gap: 12px;
+}
+.logo{ font-family: var(--font-display); font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+.logo span{ color: var(--google-blue); }
+.logo-badge { font-family: var(--font-mono); font-size: 9px; background: var(--ink); color: var(--ai-lime); padding: 2px 7px; border-radius: var(--radius-pill); letter-spacing: 0.5px; }
 
-.tab-nav{ position: relative; z-index: 190; flex-shrink: 0; display: flex; background: var(--glass-bg); border-bottom: 1px solid var(--glass-border); overflow-x: auto; }
-.tab{ padding: 12px 18px; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--ink-muted); border-bottom: 2.5px solid transparent; letter-spacing: .3px; text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: color 0.15s, border-color 0.15s; }
-.tab.active{ color: var(--ink); border-color: var(--lime-dk); }
+.tab-nav{
+  position: relative; z-index: 190; flex-shrink: 0; display: flex;
+  background: var(--bg-cream-subtle); border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto; padding: 4px 12px; gap: 4px;
+}
+.tab{
+  padding: 8px 16px; font-size: 11px; font-weight: 700; cursor: pointer;
+  color: var(--ink-secondary); border-radius: var(--radius-pill); letter-spacing: .2px;
+  text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s; border: 1px solid transparent;
+}
+.tab:hover{ background: rgba(0,0,0,0.04); }
+.tab.active{
+  color: var(--ink); background: #FFFFFF; border-color: var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-weight: 800;
+}
 
 .app-main{ flex: 1; position: relative; overflow: hidden; }
 .view{ position: absolute; inset: 0; display: none; overflow: auto; padding: 16px; }
@@ -176,82 +228,104 @@ input,select,textarea{font-family:inherit;font-size:14px}
 /* TOOLBAR & BUTTONS */
 .planner-header{ display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
 .kpi-row{ display: flex; gap: 6px; flex-wrap: wrap; }
-.kpi-pill{ display: flex; flex-direction: column; justify-content: center; padding: 6px 14px; border-radius: var(--radius-pill); background: #fff; border: 1px solid var(--cream-deep); min-width: 80px; }
+.kpi-pill{
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 6px 14px; border-radius: var(--radius-pill); background: #FFFFFF;
+  border: 1px solid var(--border-subtle); min-width: 80px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
 .kpi-lbl{ font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--ink-muted); }
-.kpi-val{ font-family: var(--font-mono); font-size: 15px; font-weight: 800; margin-top: 1px; }
+.kpi-val{ font-family: var(--font-mono); font-size: 14px; font-weight: 800; margin-top: 1px; color: var(--ink); }
 
 .planner-toolbar{ display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
-.btn{ background: #fff; border: 1px solid rgba(0,0,0,0.12); padding: 8px 12px; font-size: 10px; font-weight: 700; border-radius: var(--radius-sm); color: var(--ink); text-transform: uppercase; letter-spacing: .3px; transition: all 0.15s; white-space: nowrap; min-height: 36px; display: inline-flex; align-items: center; gap: 5px; }
-.btn:hover{ background: var(--cream-deep); }
-.btn.primary{ background: var(--ink); color: var(--lime); border-color: var(--ink); }
-.btn.danger{ background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
-.btn.success{ background: var(--success-bg); color: var(--success); border-color: var(--success); }
+.btn{
+  background: #FFFFFF; border: 1px solid var(--border-subtle); padding: 7px 14px;
+  font-size: 10.5px; font-weight: 700; border-radius: var(--radius-pill); color: var(--ink);
+  text-transform: uppercase; letter-spacing: .3px; transition: all 0.15s; white-space: nowrap;
+  min-height: 34px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.btn:hover{ background: var(--bg-cream-subtle); border-color: var(--border-strong); }
+.btn.primary{ background: var(--ink); color: #FFFFFF; border-color: var(--ink); }
+.btn.primary:hover{ background: #2D2D2E; }
+.btn.danger{ background: var(--google-red-bg); color: var(--google-red); border-color: rgba(217,48,37,0.2); }
+.btn.success{ background: var(--google-green-bg); color: var(--google-green); border-color: rgba(30,142,62,0.2); }
 
-.btn.btn-lock{ border-color: var(--ink); font-weight: 800; }
-.btn.btn-lock.locked{ background: #FAF8F5; color: var(--ink); }
-.btn.btn-lock.unlocked{ background: var(--ink); color: var(--lime); box-shadow: 0 0 0 2px var(--lime-glow); }
+.btn.btn-lock{ font-weight: 800; }
+.btn.btn-lock.locked{ background: #FFFFFF; color: var(--ink-secondary); }
+.btn.btn-lock.unlocked{ background: var(--google-blue); color: #FFFFFF; border-color: var(--google-blue); box-shadow: 0 0 0 3px var(--google-blue-bg); }
 
-.seg{ display: flex; gap: 2px; background: #EAE6DC; border: 1px solid rgba(0,0,0,0.08); border-radius: var(--radius-sm); padding: 3px; }
-.seg .btn{ border: none; background: transparent; padding: 6px 12px; min-height: 30px; border-radius: 5px; font-size: 10px; color: var(--ink-mid); }
-.seg .btn.active{ background: var(--ink); color: var(--lime); font-weight: 800; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.seg{
+  display: flex; gap: 2px; background: var(--bg-cream-subtle);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-pill); padding: 2px;
+}
+.seg .btn{ border: none; background: transparent; padding: 5px 12px; min-height: 28px; border-radius: var(--radius-pill); font-size: 10px; color: var(--ink-secondary); box-shadow: none; }
+.seg .btn.active{ background: #FFFFFF; color: var(--ink); font-weight: 800; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
 
-/* GRID TABELLE */
-.planner-grid-wrap{ overflow: auto; background: #fff; border-radius: var(--radius); border: 1px solid var(--glass-border); max-height: calc(100vh - 240px); }
+/* ═══════════════════════════════════════════════════════════════
+   6. GRID TABELLE (CLEAN GOOGLE SHEETS / LAB LOOK)
+   ═══════════════════════════════════════════════════════════════ */
+.planner-grid-wrap{
+  overflow: auto; background: #FFFFFF; border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle); max-height: calc(100vh - 230px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
 table{ border-collapse: collapse; table-layout: fixed; width: max-content; min-width: 100%; }
-th, td{ border: 1px solid #E5E1D8; text-align: center; font-size: 11px; }
+th, td{ border: 1px solid #E8E4DA; text-align: center; font-size: 11px; }
 
-#gridHead tr:nth-child(1) th{ position: sticky; top: 0; z-index: 100; height: 28px; font-size: 9px; font-weight: 800; text-transform: uppercase; background: var(--ink); color: var(--lime); }
-#gridHead tr:nth-child(2) th{ position: sticky; top: 28px; z-index: 99; height: 42px; background: #F2EFE9; color: var(--ink); }
+#gridHead tr:nth-child(1) th{
+  position: sticky; top: 0; z-index: 100; height: 26px; font-size: 9px; font-weight: 800;
+  text-transform: uppercase; background: var(--ink); color: #FFFFFF; letter-spacing: 0.5px;
+}
+#gridHead tr:nth-child(2) th{
+  position: sticky; top: 26px; z-index: 99; height: 40px; background: #F6F3EB; color: var(--ink);
+}
 
-/* HEUTE SPALTE HIGHLIGHT */
-th.is-today-head { background: #EAE3D2 !important; color: var(--danger) !important; border-bottom: 3px solid var(--danger) !important; }
-td.is-today-col { border-left: 2px solid rgba(200,48,58,0.35) !important; border-right: 2px solid rgba(200,48,58,0.35) !important; }
+th.is-today-head { background: #ECE7D9 !important; color: var(--google-red) !important; border-bottom: 3px solid var(--google-red) !important; }
+td.is-today-col { border-left: 2px solid rgba(217,48,37,0.3) !important; border-right: 2px solid rgba(217,48,37,0.3) !important; }
 
-td:first-child{ position: sticky; left: 0; z-index: 80; background: var(--cream-card)!important; width: 140px!important; text-align: left; padding: 4px 8px; font-weight: 700; border-right: 2px solid var(--ink); }
-.fixed-corner{ position: sticky; left: 0; top: 0; z-index: 110!important; background: var(--ink)!important; width: 140px!important; }
+td:first-child{
+  position: sticky; left: 0; z-index: 80; background: #FAF8F3 !important;
+  width: 140px !important; text-align: left; padding: 4px 8px; font-weight: 700; border-right: 2px solid var(--ink);
+}
+.fixed-corner{ position: sticky; left: 0; top: 0; z-index: 110 !important; background: var(--ink) !important; width: 140px !important; }
 
-.monday-start{ border-left: 3px solid var(--lime)!important; }
+.monday-start{ border-left: 3px solid var(--google-blue) !important; }
 .day-num{ font-family: var(--font-mono); font-size: 13px; font-weight: 800; }
 .day-short{ font-size: 8px; font-weight: 700; text-transform: uppercase; color: var(--ink-muted); margin-top: 1px; }
 
 .project-cell{ height: 44px; cursor: crosshair; font-size: 8.5px; font-weight: 800; text-transform: uppercase; padding: 2px; line-height: 1.1; position: relative; transition: outline 0.1s; }
 .project-cell:hover{ outline: 2px solid var(--ink); outline-offset: -2px; z-index: 10; }
-.selecting{ background-color: rgba(184,216,75,.35)!important; outline: 2px dashed var(--ink)!important; }
+.selecting{ background-color: rgba(26,115,232,0.18) !important; outline: 2px dashed var(--google-blue) !important; }
 
-/* PROJEKT AUFLEUCHTEN BEI KLICK */
+/* Pulsieren bei Auswahl */
 .project-cell.is-highlighted {
-  outline: 3px solid var(--lime) !important;
-  box-shadow: 0 0 12px var(--lime-glow) !important;
-  z-index: 50;
-  animation: pulseGlow 1.5s infinite;
+  outline: 3px solid var(--google-blue) !important;
+  box-shadow: 0 0 12px rgba(26,115,232,0.4) !important;
+  z-index: 50; animation: pulseGlow 1.5s infinite;
 }
-@keyframes pulseGlow {
-  0% { filter: brightness(1); }
-  50% { filter: brightness(1.25); }
-  100% { filter: brightness(1); }
-}
+@keyframes pulseGlow { 0% { filter: brightness(1); } 50% { filter: brightness(1.2); } 100% { filter: brightness(1); } }
 
-/* IBN BADGE IN ZELLE */
 .ibn-badge {
   position: absolute; top: 1px; right: 1px;
-  background: var(--ink); color: var(--lime);
+  background: var(--ink); color: var(--ai-lime);
   font-family: var(--font-mono); font-size: 7px; font-weight: 800;
   padding: 1px 3px; border-radius: 3px; line-height: 1;
 }
 
-/* URLAUB & KRANK */
 .grid-vacation{
-  background: repeating-linear-gradient(45deg, #FAF8F5, #FAF8F5 6px, #FCE8B2 6px, #FCE8B2 12px)!important;
-  color: #B87503!important; font-weight: 800!important; font-style: italic;
+  background: repeating-linear-gradient(45deg, #FAF8F5, #FAF8F5 6px, #FCE8B2 6px, #FCE8B2 12px) !important;
+  color: #B87503 !important; font-weight: 800 !important; font-style: italic;
 }
 .grid-sick{
-  background: repeating-linear-gradient(45deg, #FAF8F5, #FAF8F5 6px, #FCD5D7 6px, #FCD5D7 12px)!important;
-  color: #C8303A!important; font-weight: 800!important; font-style: italic;
+  background: repeating-linear-gradient(45deg, #FAF8F5, #FAF8F5 6px, #FCD5D7 6px, #FCD5D7 12px) !important;
+  color: var(--google-red) !important; font-weight: 800 !important; font-style: italic;
 }
 
-table tr.team-divider td{ border: none; text-align: left!important; font-family: var(--font-mono); font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; padding: 7px 12px!important; position: static!important; width: auto!important; background: #EDE9DF; border-top: 2px solid var(--ink-muted); }
+table tr.team-divider td{
+  border: none; text-align: left !important; font-family: var(--font-mono); font-size: 9.5px;
+  font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; padding: 7px 12px !important;
+  position: static !important; width: auto !important; background: var(--bg-cream-subtle); border-top: 2px solid var(--border-strong);
+}
 
-/* SPALTEN-DYNAMIK */
 body.view-W table th:not(:first-child), body.view-W .project-cell { width: 140px !important; min-width: 140px !important; max-width: 140px !important; font-size: 9.5px !important; }
 body.view-M table th:not(:first-child), body.view-M .project-cell { width: 62px !important; min-width: 62px !important; max-width: 62px !important; font-size: 8px !important; }
 body.view-J table th:not(:first-child), body.view-J .project-cell { width: 26px !important; min-width: 26px !important; max-width: 26px !important; font-size: 0 !important; }
@@ -259,109 +333,132 @@ body.view-J .day-short { display: none; }
 body.view-J .day-num { font-size: 10px; }
 
 /* ═══════════════════════════════════════════════════════════════
-   6. MONTEUR ANSICHT (SMARTPHONE KARTEN)
+   7. GOOGLE LABS EXPLORER MODAL & PDF EXPORT
    ═══════════════════════════════════════════════════════════════ */
-.monteur-shell{ max-width: 680px; margin: 0 auto; }
-.monteur-card{
-  background: #fff; border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
-  border: 1px solid var(--cream-deep); box-shadow: var(--glass-shadow);
-  display: flex; flex-direction: column; gap: 8px;
+.explorer-card {
+  background: var(--bg-cream-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-card);
+  padding: 16px; margin-top: 12px;
 }
-.monteur-card-header{ display: flex; justify-content: space-between; align-items: center; }
-.monteur-card-title{ font-size: 16px; font-weight: 800; color: var(--ink); }
-.monteur-card-address{ font-size: 12px; color: var(--ink-muted); display: flex; align-items: center; gap: 6px; }
-.btn-maps{
-  background: var(--ink); color: var(--lime); text-decoration: none;
-  font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: var(--radius-sm);
-  display: inline-flex; align-items: center; gap: 5px; width: fit-content; margin-top: 4px;
+.explorer-meta-tag {
+  display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono);
+  font-size: 10px; font-weight: 800; background: var(--ink); color: var(--ai-lime);
+  padding: 3px 8px; border-radius: var(--radius-pill); letter-spacing: 0.5px;
+}
+.explorer-day-card {
+  background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: 10px;
+  padding: 10px 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px;
+}
+.explorer-day-head {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; font-weight: 800; border-bottom: 1px solid var(--bg-cream-subtle); padding-bottom: 4px;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   7. WOCHENZETTEL DRUCKBLATT (@MEDIA PRINT)
-   ═══════════════════════════════════════════════════════════════ */
+/* DRUCK-LAYOUT FÜR PDF */
 #printSheet { display: none; }
 @media print {
   body * { visibility: hidden; }
   #printSheet, #printSheet * { visibility: visible; }
   #printSheet {
     display: block !important; position: absolute; left: 0; top: 0; width: 100%;
-    background: #fff; color: #000; padding: 20px; font-family: sans-serif;
+    background: #F8F5EE; color: #131314; padding: 24px; font-family: 'Inter', sans-serif;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
-  .print-header{ border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; }
-  .print-table{ width: 100%; border-collapse: collapse; margin-top: 12px; }
-  .print-table th, .print-table td{ border: 1px solid #999; padding: 8px; text-align: left; font-size: 12px; vertical-align: top; }
-  .print-table th{ background: #f0f0f0; }
+  .print-header-explorer {
+    border-bottom: 2px solid #131314; padding-bottom: 12px; margin-bottom: 16px;
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+  .print-tag { background: #131314; color: #B8D84B; font-family: monospace; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+  .print-banner { background: #EFEBE0; border-left: 4px solid #131314; padding: 10px 14px; margin-bottom: 16px; border-radius: 4px; font-size: 13px; }
+  .print-table { width: 100%; border-collapse: collapse; margin-top: 12px; background: #fff; }
+  .print-table th, .print-table td { border: 1px solid #d8d3c8; padding: 10px; text-align: left; font-size: 12px; vertical-align: top; }
+  .print-table th { background: #F6F3EB; font-weight: 800; }
 }
 
-/* TODOS, ADMIN, IMPORT */
+/* MONTEUR ANSICHT, TODOS, ADMIN */
+.monteur-shell{ max-width: 680px; margin: 0 auto; }
+.monteur-card{
+  background: #FFFFFF; border-radius: var(--radius-card); padding: 16px; margin-bottom: 12px;
+  border: 1px solid var(--border-subtle); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.monteur-card-header{ display: flex; justify-content: space-between; align-items: center; }
+.monteur-card-title{ font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--ink); }
+.monteur-card-address{ font-size: 12px; color: var(--ink-secondary); display: flex; align-items: center; gap: 6px; }
+.btn-maps{
+  background: var(--ink); color: #FFFFFF; text-decoration: none;
+  font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: var(--radius-pill);
+  display: inline-flex; align-items: center; gap: 5px; width: fit-content; margin-top: 4px;
+}
+
 .task-shell{ max-width: 720px; margin: 0 auto; }
-.task-shell h2{ font-family: var(--font-display); font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+.task-shell h2{ font-family: var(--font-display); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
 .task-sub{ font-size: 10px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
 .task-monitor{ display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px; }
-.task-stat{ background: #fff; border: 1px solid var(--cream-deep); border-radius: var(--radius); padding: 12px 8px; text-align: center; box-shadow: var(--glass-shadow); }
-.task-stat-num{ font-family: var(--font-mono); font-size: 26px; font-weight: 800; color: var(--ink); line-height: 1; }
+.task-stat{ background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: 14px 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.task-stat-num{ font-family: var(--font-mono); font-size: 24px; font-weight: 800; color: var(--ink); line-height: 1; }
 .task-stat-lbl{ font-size: 9px; text-transform: uppercase; letter-spacing:.5px; color: var(--ink-muted); margin-top: 4px; font-weight: 700; }
-.task-stat.today{ border-color: var(--gold); background: rgba(212,160,23,0.10); }
-.task-stat.today .task-stat-num{ color: var(--gold); }
-.task-stat.overdue{ border-color: var(--danger); background: var(--danger-bg); }
-.task-stat.overdue .task-stat-num{ color: var(--danger); }
-.task-input-row{ display: flex; gap: 0; margin-bottom: 16px; border-radius: var(--radius-sm); border: 1px solid var(--cream-deep); background: #fff; }
-.task-input-row input{ flex: 1; padding: 12px 14px; border: none; background: transparent; font-size: 14px; outline: none; }
+.task-stat.today{ border-color: var(--google-yellow); background: var(--google-yellow-bg); }
+.task-stat.today .task-stat-num{ color: #B06000; }
+.task-stat.overdue{ border-color: var(--google-red); background: var(--google-red-bg); }
+.task-stat.overdue .task-stat-num{ color: var(--google-red); }
+.task-input-row{ display: flex; gap: 0; margin-bottom: 16px; border-radius: var(--radius-pill); border: 1px solid var(--border-subtle); background: #FFFFFF; overflow: hidden; }
+.task-input-row input{ flex: 1; padding: 10px 16px; border: none; background: transparent; font-size: 13px; outline: none; }
 .task-list{ display: flex; flex-direction: column; gap: 6px; }
-.task-item{ display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #fff; border: 1px solid var(--cream-deep); border-radius: var(--radius-sm); }
+.task-item{ display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: var(--radius-card); }
 .task-item.done{ opacity: .45; }
 .task-item.done .task-text{ text-decoration: line-through; }
 
 .admin-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media(max-width:900px){ .admin-grid{ grid-template-columns: 1fr; } }
-.admin-card{ background: #fff; border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 20px; box-shadow: var(--glass-shadow); }
+.admin-card{ background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
 .admin-list{ max-height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 12px; padding-right: 6px; }
-.admin-item{ display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #FAF8F5; border: 1px solid var(--cream-deep); border-radius: var(--radius-sm); }
+.admin-item{ display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg-cream-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-card); }
 
-.import-box{ background: #fff; border: 2px dashed var(--ink-muted); border-radius: var(--radius); padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; }
-.import-box:hover{ border-color: var(--lime-dk); background: rgba(184,216,75,0.1); }
+.import-box{ background: #FFFFFF; border: 2px dashed var(--border-strong); border-radius: var(--radius-card); padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; }
+.import-box:hover{ border-color: var(--google-blue); background: var(--google-blue-bg); }
 
-.preview-table-wrap{ max-height: 260px; overflow-y: auto; border: 1px solid var(--cream-deep); border-radius: 6px; margin: 12px 0; }
+.preview-table-wrap{ max-height: 260px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: 8px; margin: 12px 0; }
 .preview-table{ width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
-.preview-table th{ position: sticky; top: 0; background: var(--ink); color: var(--lime); padding: 6px 10px; font-weight: 700; z-index: 10; }
-.preview-table td{ padding: 6px 10px; border-bottom: 1px solid var(--cream-deep); }
-.preview-table tr:hover td{ background: rgba(184,216,75,0.12); }
+.preview-table th{ position: sticky; top: 0; background: var(--ink); color: var(--ai-lime); padding: 6px 10px; font-weight: 700; z-index: 10; }
+.preview-table td{ padding: 6px 10px; border-bottom: 1px solid var(--border-subtle); }
+.preview-table tr:hover td{ background: rgba(26,115,232,0.06); }
 
-.overlay{ position: fixed; inset: 0; background: rgba(18,17,15,.5); backdrop-filter: blur(4px); z-index: 5000; display: none; }
-.modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #fff; border: 1px solid var(--cream-deep); box-shadow: var(--glass-shadow-lg); border-radius: 16px; padding: 24px; display: none; z-index: 5001; width: 420px; max-width: 94vw; }
+.overlay{ position: fixed; inset: 0; background: rgba(19,19,20,0.6); backdrop-filter: blur(4px); z-index: 5000; display: none; }
+.modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #FFFFFF; border: 1px solid var(--border-subtle); box-shadow: 0 24px 64px rgba(0,0,0,0.25); border-radius: 20px; padding: 24px; display: none; z-index: 5001; width: 440px; max-width: 94vw; }
 .modal.show{ display: block; }
-.modal h2{ font-family: var(--font-display); font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+.modal h2{ font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 16px; }
 .form-field{ margin-bottom: 12px; }
 .form-field label{ display: block; font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; margin-bottom: 4px; }
-.form-field input, .form-field select{ width: 100%; padding: 10px 12px; border: 1px solid var(--cream-deep); border-radius: var(--radius-sm); background: #fff; font-size: 14px; outline: none; }
-.form-field input:focus, .form-field select:focus{ border-color: var(--lime-dk); }
+.form-field input, .form-field select, .form-field textarea{ width: 100%; padding: 9px 12px; border: 1px solid var(--border-subtle); border-radius: 8px; background: #FFFFFF; font-size: 13px; outline: none; }
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus{ border-color: var(--google-blue); }
 .m-btns{ display: flex; gap: 8px; margin-top: 18px; }
-.m-btn{ flex: 1; padding: 10px; border-radius: var(--radius-sm); font-weight: 700; border: 1px solid var(--cream-deep); background: transparent; }
-.m-save{ background: var(--ink); color: var(--lime); border-color: var(--ink); }
+.m-btn{ flex: 1; padding: 10px; border-radius: var(--radius-pill); font-weight: 700; font-size: 12px; border: 1px solid var(--border-subtle); background: transparent; }
+.m-save{ background: var(--ink); color: #FFFFFF; border-color: var(--ink); }
 
 .toast-stack{ position: fixed; bottom: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-.toast{ display: flex; align-items: center; gap: 9px; background: var(--ink); color: #fff; border-radius: 10px; padding: 10px 14px; font-size: 12px; font-weight: 600; opacity: 0; transform: translateY(8px); transition: opacity .25s, transform .25s; }
+.toast{ display: flex; align-items: center; gap: 9px; background: var(--ink); color: #fff; border-radius: var(--radius-pill); padding: 10px 16px; font-size: 12px; font-weight: 600; opacity: 0; transform: translateY(8px); transition: opacity .25s, transform .25s; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 .toast.show{ opacity: 1; transform: translateY(0); }
-.toast .dot{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--lime-dk); }
-.toast.t-error .dot{ background: var(--danger); }
-.toast.t-warn .dot{ background: var(--gold); }
+.toast .dot{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--ai-lime); }
+.toast.t-error .dot{ background: var(--google-red); }
+.toast.t-warn .dot{ background: var(--google-yellow); }
 </style>
 </head>
 <body id="appBody" class="view-M">
 
-<div class="bg-blob blob-1"></div>
-<div class="bg-blob blob-2"></div>
+<div class="ai-glow-blob blob-top"></div>
+<div class="ai-glow-blob blob-bottom"></div>
 
 <!-- 1. LOGIN SCREEN -->
 <div id="loginScreen">
   <div class="login-card">
-    <div class="logo" style="font-size:26px;margin-bottom:8px">SOL<span>PRO</span></div>
-    <div style="font-size:12px;color:var(--ink-muted);margin-bottom:20px;text-transform:uppercase;letter-spacing:1px;font-weight:700">Geschützter Bereich</div>
+    <div class="login-tag">✦ GOOGLE AI LABS</div>
+    <div class="logo" style="font-size:24px;justify-content:center;margin-bottom:8px">SOL<span>PRO</span> <span class="logo-badge">v2</span></div>
+    <div style="font-size:12px;color:var(--ink-muted);margin-bottom:24px;font-weight:600">Solar Resource & Pipeline Explorer</div>
     <div class="form-field" style="text-align:left">
-      <label>Passwort eingeben</label>
-      <input type="password" id="loginPassword" placeholder="Passwort..." style="text-align:center;font-size:16px;letter-spacing:2px">
+      <label>Passwort</label>
+      <input type="password" id="loginPassword" placeholder="Passwort eingeben..." style="text-align:center;font-size:15px;letter-spacing:2px">
     </div>
-    <button class="btn primary" style="width:100%;justify-content:center;margin-top:10px" onclick="tryLogin()">Anmelden</button>
+    <button class="btn primary" style="width:100%;justify-content:center;margin-top:10px" onclick="tryLogin()">System starten</button>
   </div>
 </div>
 
@@ -371,15 +468,16 @@ body.view-J .day-num { font-size: 10px; }
 <!-- 2. PROJEKT-SEITENLEISTE -->
 <div class="project-sidebar" id="projectSidebar">
   <div class="project-sidebar-head">
-    <span class="project-sidebar-title">📁 Projekt-Pool</span>
+    <span class="project-sidebar-title">✦ Projekt-Pool</span>
   </div>
   <div class="project-sidebar-body">
     <input type="text" class="list-search" id="plannerSearch" placeholder="🔍 Nachname / Baustelle..." onkeyup="renderPalette()">
     <select id="plannerStatus" onchange="renderPalette()">
       <option value="">Alle offenen</option>
-      <option value="auftrag">Nur Neu (Auftrag)</option>
-      <option value="bestaetigt">Nur Fixierte (Passt)</option>
-      <option value="im_einsatz">Im Einsatz</option>
+      <option value="both_done">Nur Komplett geplante (✅ DC+AC)</option>
+      <option value="dc_only">Nur DC eingeteilt (AC offen)</option>
+      <option value="ac_only">Nur AC eingeteilt (DC offen)</option>
+      <option value="none">Noch gar nicht eingeteilt</option>
     </select>
   </div>
   <div class="project-list" id="paletteUI"></div>
@@ -390,12 +488,12 @@ body.view-J .day-num { font-size: 10px; }
 <div class="main-wrapper">
 
   <div class="topbar">
-    <div class="logo">SOL<span>PRO</span></div>
-    <div style="font-size:11px;color:var(--ink-muted);margin-left:12px;font-weight:600">
-      💡 <b style="color:var(--ink)">Rechtsklick</b> löscht Kästchen · <b style="color:var(--ink)">Klick links</b> lässt Tage im Kalender aufleuchten!
+    <div class="logo">SOL<span>PRO</span> <span class="logo-badge">✦ AI EXPLORER</span></div>
+    <div style="font-size:11px;color:var(--ink-secondary);margin-left:12px;font-weight:500">
+      💡 <b style="color:var(--ink)">Rechtsklick</b> löscht Kästchen · <b style="color:var(--ink)">Klick links</b> markiert alle Tage
     </div>
     <div style="margin-left:auto">
-      <button class="btn" style="font-size:9px;padding:4px 8px;min-height:auto" onclick="logout()" title="Abmelden">🔒 Abmelden</button>
+      <button class="btn" style="font-size:9px;padding:3px 10px;min-height:auto" onclick="logout()" title="Abmelden">🔒 Abmelden</button>
     </div>
   </div>
 
@@ -409,7 +507,7 @@ body.view-J .day-num { font-size: 10px; }
 
   <div class="app-main">
 
-    <!-- 1. PLANER VIEW -->
+    <!-- PLANER VIEW -->
     <div id="view-planner" class="view active">
       <div class="planner-header">
         <div class="kpi-row" id="kpiRow"></div>
@@ -422,14 +520,10 @@ body.view-J .day-num { font-size: 10px; }
           <button class="btn" data-view="J" onclick="switchViewMode('J')">Jahr</button>
         </div>
 
-        <!-- BUTTON: HEUTE AUTO-SCROLL -->
         <button class="btn" onclick="scrollToToday()">🎯 Heute</button>
-
-        <!-- SPERRE BUTTON -->
         <button class="btn btn-lock locked" id="btnLock" onclick="togglePlannerLock()">🔒 Gesperrt</button>
-
         <button class="btn" id="btnUndo" onclick="undoPaint()">↶ Rückgängig</button>
-        <button class="btn primary" onclick="window.print()">📄 PDF Export</button>
+        <button class="btn primary" onclick="openBusExportModal()">📄 Bus-Wochenzettel (PDF)</button>
       </div>
 
       <div class="planner-grid-wrap" id="gridWrap">
@@ -440,20 +534,20 @@ body.view-J .day-num { font-size: 10px; }
       </div>
     </div>
 
-    <!-- 2. MONTEUR ANSICHT (MOBILE / TAGESKARTEN) -->
+    <!-- MONTEUR ANSICHT -->
     <div id="view-monteur" class="view">
       <div class="monteur-shell">
         <h2>📱 Monteur-Einsatzplan</h2>
         <div class="task-sub">Schnellansicht für Baustellen & Navigation auf dem Smartphone</div>
 
-        <div style="background:#fff;padding:14px;border-radius:var(--radius);border:1px solid var(--cream-deep);margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div style="background:#fff;padding:16px;border-radius:var(--radius-card);border:1px solid var(--border-subtle);margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
           <div style="flex:1;min-width:180px">
-            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;display:block;margin-bottom:3px">Partie / Bus auswählen:</label>
-            <select id="monteurBusSelect" onchange="renderMonteurView()" style="padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--cream-deep);width:100%;font-weight:700"></select>
+            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;display:block;margin-bottom:4px">Partie / Bus:</label>
+            <select id="monteurBusSelect" onchange="renderMonteurView()" style="padding:8px 12px;border-radius:var(--radius-pill);border:1px solid var(--border-subtle);width:100%;font-weight:700"></select>
           </div>
           <div style="min-width:140px">
-            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;display:block;margin-bottom:3px">Datum:</label>
-            <input type="date" id="monteurDateSelect" onchange="renderMonteurView()" style="padding:7px 10px;border-radius:var(--radius-sm);border:1px solid var(--cream-deep);font-size:12px;width:100%">
+            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;display:block;margin-bottom:4px">Datum:</label>
+            <input type="date" id="monteurDateSelect" onchange="renderMonteurView()" style="padding:7px 12px;border-radius:var(--radius-pill);border:1px solid var(--border-subtle);font-size:12px;width:100%">
           </div>
         </div>
 
@@ -461,7 +555,7 @@ body.view-J .day-num { font-size: 10px; }
       </div>
     </div>
 
-    <!-- 3. AUFGABEN VIEW -->
+    <!-- AUFGABEN VIEW -->
     <div id="view-tasks" class="view">
       <div class="task-shell">
         <h2>Meine Aufgaben</h2>
@@ -482,14 +576,14 @@ body.view-J .day-num { font-size: 10px; }
         </div>
         <div class="task-input-row">
           <input type="text" id="taskInput" placeholder="Neue Aufgabe eingeben (Enter)...">
-          <input type="date" id="taskDueDate" style="width:140px;border-left:1px solid var(--cream-deep)">
-          <button class="btn primary" id="btnAddTask" onclick="addTask()" style="border-radius:0;border:none;min-height:auto">+</button>
+          <input type="date" id="taskDueDate" style="width:140px;border-left:1px solid var(--border-subtle);border-radius:0">
+          <button class="btn primary" id="btnAddTask" onclick="addTask()" style="border-radius:0;border:none;min-height:auto;padding:0 18px">+</button>
         </div>
         <div class="task-list" id="taskList"></div>
       </div>
     </div>
 
-    <!-- 4. IMPORT VIEW -->
+    <!-- IMPORT VIEW -->
     <div id="view-import" class="view">
       <div class="task-shell">
         <h2>📥 Taifun Import</h2>
@@ -497,12 +591,12 @@ body.view-J .day-num { font-size: 10px; }
           Lade deine Taifun HTML-Datei hoch. Es werden automatisch nur <b>Nachnamen</b>, Firmen, Material & Notizen importiert.
         </div>
 
-        <div style="background:#fff;padding:16px;border-radius:var(--radius);border:1px solid var(--cream-deep);margin-bottom:16px;display:flex;flex-direction:column;gap:12px">
+        <div style="background:#fff;padding:16px;border-radius:var(--radius-card);border:1px solid var(--border-subtle);margin-bottom:16px;display:flex;flex-direction:column;gap:12px">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
             <div style="display:flex;align-items:center;gap:10px">
               <label style="font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px">
                 <span>Import ab Datum:</span>
-                <input type="date" id="importStartDate" value="2026-08-24" onchange="reFilterImport()" style="padding:4px 8px;border:1px solid var(--cream-deep);border-radius:4px;font-size:12px">
+                <input type="date" id="importStartDate" value="2026-08-24" onchange="reFilterImport()" style="padding:4px 10px;border:1px solid var(--border-subtle);border-radius:var(--radius-pill);font-size:12px">
               </label>
             </div>
             
@@ -513,14 +607,14 @@ body.view-J .day-num { font-size: 10px; }
         <input type="file" id="fileInput" accept=".html" style="display:none" onchange="handleFileUpload(event)">
         <div class="import-box" onclick="document.getElementById('fileInput').click()">
           <div style="font-size:32px;margin-bottom:12px">📄</div>
-          <div style="font-weight:700;font-size:16px;color:var(--ink)">Klicken oder HTML-Datei hier ablegen</div>
-          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">Liest zuverlässig 100% aller Projekte fehlerfrei ein</div>
+          <div style="font-weight:700;font-size:15px;color:var(--ink)">Klicken oder HTML-Datei hier ablegen</div>
+          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">Liest nur Termine ab dem eingestellten Startdatum ein</div>
         </div>
 
-        <div id="importResult" style="display:none;margin-top:20px;background:#fff;padding:20px;border-radius:var(--radius);border:1px solid var(--cream-deep)">
+        <div id="importResult" style="display:none;margin-top:20px;background:#fff;padding:20px;border-radius:var(--radius-card);border:1px solid var(--border-subtle)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <h3 style="font-size:14px;font-weight:800">Gefundene Projekte (<b id="impProjCount" style="color:var(--success)">0</b>):</h3>
-            <span style="font-size:10px;color:var(--ink-muted)">Bitte prüfen vor dem Speichern</span>
+            <h3 style="font-size:14px;font-weight:800">Gefundene Projekte (<b id="impProjCount" style="color:var(--google-blue)">0</b>):</h3>
+            <span style="font-size:10px;color:var(--ink-muted)">Vor dem Speichern prüfen</span>
           </div>
 
           <div class="preview-table-wrap">
@@ -543,7 +637,7 @@ body.view-J .day-num { font-size: 10px; }
       </div>
     </div>
 
-    <!-- 5. VERWALTUNG VIEW (ADMIN) -->
+    <!-- VERWALTUNG VIEW (ADMIN) -->
     <div id="view-admin" class="view">
       <div class="task-shell" style="max-width:1000px">
         <h2>⚙️ Verwaltung</h2>
@@ -558,7 +652,7 @@ body.view-J .day-num { font-size: 10px; }
                 <button class="btn primary" onclick="openAdminProjectModal()">+ Neu</button>
               </div>
             </div>
-            <input type="text" id="adminProjSearch" placeholder="Suchen..." style="width:100%;padding:10px;font-size:12px;border:1px solid var(--cream-deep);border-radius:4px" onkeyup="renderAdminProjects()">
+            <input type="text" id="adminProjSearch" placeholder="Suchen..." style="width:100%;padding:8px 12px;font-size:12px;border:1px solid var(--border-subtle);border-radius:var(--radius-pill)" onkeyup="renderAdminProjects()">
             <div class="admin-list" id="adminProjectList"></div>
           </div>
 
@@ -576,23 +670,65 @@ body.view-J .day-num { font-size: 10px; }
   </div>
 </div>
 
-<!-- DRUCKBLATT FÜR WOCHENZETTEL (@MEDIA PRINT) -->
+<!-- GOOGLE EXPLORER WOCHENPLAN MODAL -->
+<div class="modal" id="busExportModal" style="width:520px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="explorer-meta-tag">✦ GOOGLE LABS // EXPORT</div>
+    <div style="font-size:11px;color:var(--ink-muted);font-weight:600">Cream Explorer Layout</div>
+  </div>
+  <h2 style="margin-bottom:4px">Partie-Wochenzettel drucken</h2>
+  <div style="font-size:11px;color:var(--ink-muted);margin-bottom:16px">Erstellt einen druckfertigen Wochen-Einsatzplan für das ausgewählte Team.</div>
+
+  <div class="form-field">
+    <label>Bus / Partie</label>
+    <select id="exportBusSelect" onchange="renderExportPreview()"></select>
+  </div>
+
+  <div class="form-field">
+    <label>Kalenderwoche (KW)</label>
+    <select id="exportKwSelect" onchange="renderExportPreview()"></select>
+  </div>
+
+  <div class="form-field">
+    <label>Zusätzliche Bemerkungen (z.B. Auswärtsmontage):</label>
+    <textarea id="exportRemarks" rows="2" placeholder="z.B. Auswärtsmontage Seekirchen · Hotel gebucht · 40m Gerüst vor Ort..." oninput="renderExportPreview()"></textarea>
+  </div>
+
+  <div class="explorer-card">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Live-Vorschau:</div>
+    <div id="exportPreviewList" style="max-height:180px;overflow-y:auto"></div>
+  </div>
+
+  <div class="m-btns">
+    <button class="m-btn m-save" onclick="executeBusPrint()">📄 Jetzt als PDF drucken</button>
+    <button class="m-btn" onclick="closeModal()">Schließen</button>
+  </div>
+</div>
+
+<!-- DRUCKBLATT FÜR PDF (@MEDIA PRINT) -->
 <div id="printSheet">
-  <div class="print-header">
+  <div class="print-header-explorer">
     <div>
-      <h2 style="margin:0;font-size:20px">SOLPRO · PARTIE-EINSATZPLAN</h2>
-      <div style="font-size:14px;margin-top:4px" id="printSheetSub">Bus: GM-SOL2 · KW 35</div>
+      <span class="print-tag" id="printSheetTag">SOLPRO // KW 35</span>
+      <h1 style="margin:6px 0 2px;font-size:22px;font-weight:800" id="printSheetTitle">Einsatzplan Partie Hager</h1>
+      <div style="font-size:12px;color:#555" id="printSheetSub">Woche 35 · Zeitraum</div>
     </div>
-    <div style="text-align:right;font-size:12px">
-      Gedruckt am: <span id="printSheetDate"></span>
+    <div style="text-align:right;font-size:11px;color:#777">
+      Erstellt am: <span id="printSheetDate"></span>
     </div>
   </div>
+
+  <div class="print-banner" id="printSheetBanner" style="display:none">
+    <b>📢 WICHTIGE HINWEISE / BEMERKUNGEN:</b><br>
+    <span id="printSheetBannerText"></span>
+  </div>
+
   <table class="print-table">
     <thead>
       <tr>
-        <th style="width:18%">Wochentag / Datum</th>
+        <th style="width:18%">Wochentag</th>
         <th style="width:25%">Kunde & Baustelle</th>
-        <th style="width:25%">Adresse</th>
+        <th style="width:25%">Adresse (Navigation)</th>
         <th style="width:32%">Arbeitsauftrag & Material</th>
       </tr>
     </thead>
@@ -610,7 +746,7 @@ body.view-J .day-num { font-size: 10px; }
   <div class="form-field"><label>Anzeigename (z.B. Nachname oder Firma)</label><input type="text" id="pmName"></div>
   <div class="form-field"><label>Adresse (Hover Info)</label><input type="text" id="pmAddress"></div>
   <div class="form-field"><label>kWp (Leistung)</label><input type="number" id="pmKwp" step="0.1"></div>
-  <div class="form-field"><label>Notizen / Material / IBN Infos</label><textarea id="pmNotes" rows="3" style="width:100%;padding:8px;border:1px solid var(--cream-deep);border-radius:4px;font-size:12px"></textarea></div>
+  <div class="form-field"><label>Notizen / Material / IBN Infos</label><textarea id="pmNotes" rows="3"></textarea></div>
   <div class="form-field">
     <label>Status</label>
     <select id="pmStatus">
@@ -664,7 +800,7 @@ body.view-J .day-num { font-size: 10px; }
 <div class="toast-stack" id="toastStack"></div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     JAVASCRIPT LOGIK (MAXIMAL AUSFÜHRLICH)
+     JAVASCRIPT LOGIK
      ═══════════════════════════════════════════════════════════════ -->
 <script>
 'use strict';
@@ -674,18 +810,16 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const RANGE = { start: '2026-08-17', end: '2026-12-31' };
-const COLORS = ['#1e40af','#0d9488','#16a34a','#65a30d','#ca8a04','#ea580c','#dc2626','#db2777','#9333ea','#2563eb'];
+const COLORS = ['#1a73e8','#0d9488','#1e8e3e','#65a30d','#ca8a04','#e37400','#d93025','#7c3aed','#9333ea','#2563eb'];
 function getAutoColor() { return COLORS[Math.floor(Math.random() * COLORS.length)]; }
 
 function naturalSort(a, b) {
   return (a.label || '').localeCompare((b.label || ''), 'de', { numeric: true, sensitivity: 'base' });
 }
 
-// ─── ALGORITHMUS: NUR NACHNAMEN & SAUBERE FIRMEN ───
 function extractShortName(rawName, subProject) {
   if (!rawName) return '';
   let name = rawName.trim();
-
   name = name.replace(/^z\.?H\.?d?\.?\s+[^\n,]+/i, '').trim();
 
   const isCompany = /(gmbh|ag|kg|se|og|co\.?\s*kg|gemeinde|tischlerei|werks|gbr|mbh|solpro|efabrik|megawatt|umwelt)/i.test(name);
@@ -709,6 +843,13 @@ function extractShortName(rawName, subProject) {
   return subProject ? `${name} (${subProject})` : name;
 }
 
+function getKW(d) {
+  const x = new Date(d);
+  x.setHours(0,0,0,0);
+  x.setDate(x.getDate() + 4 - (x.getDay()||7));
+  return Math.ceil((((x - new Date(x.getFullYear(), 0, 1)) / 86400000) + 1) / 7);
+}
+
 let state = {
   projects: [], buses: [], grid: {}, todos: [],
   activeProjId: null, isDrawing: false, selectedCells: [], undoStack: [],
@@ -727,7 +868,7 @@ function showToast(msg, type='success') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
 }
 
-// ─── LOGIN MIT PASSWORT "solpro" ───
+// ─── LOGIN "solpro" ───
 function checkAuth() {
   if (localStorage.getItem('solpro_auth') === 'true') {
     $('loginScreen').style.display = 'none';
@@ -763,18 +904,14 @@ function logout() {
   showToast('Abgemeldet');
 }
 
-// ─── SUPABASE REALTIME LIVE-SYNC ───
+// ─── SUPABASE REALTIME ───
 function initRealtime() {
   try {
     sb.channel('realtime_solpro')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'grid_assignments' }, () => {
-        reloadGridSilently();
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
-        reloadProjectsSilently();
-      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'grid_assignments' }, () => reloadGridSilently())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => reloadProjectsSilently())
       .subscribe();
-  } catch(e) { console.log('Realtime sync info:', e); }
+  } catch(e) {}
 }
 
 async function reloadGridSilently() {
@@ -798,12 +935,12 @@ async function reloadProjectsSilently() {
   }
 }
 
-// ─── KALENDER SPERRE / ENTSPERRE ───
+// ─── SPERRE ───
 function togglePlannerLock() {
   if (!state.isLocked) {
     state.isLocked = true;
     updateLockUI();
-    showToast('Planer wieder gesperrt 🔒');
+    showToast('Planer gesperrt 🔒');
   } else {
     $('plannerUnlockPassword').value = '';
     openModal('unlockPlannerModal');
@@ -837,7 +974,7 @@ function updateLockUI() {
   }
 }
 
-// ─── 1. WOCHE / MONAT / JAHR UMSCHALTER ───
+// ─── WOCHE / MONAT / JAHR ───
 function switchViewMode(view) {
   document.body.classList.remove('view-W', 'view-M', 'view-J');
   document.body.classList.add('view-' + view);
@@ -846,7 +983,7 @@ function switchViewMode(view) {
   });
 }
 
-// ─── 2. TAB NAVIGATION ───
+// ─── TAB NAVIGATION ───
 document.querySelectorAll('.tab').forEach(t => {
   t.onclick = () => {
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
@@ -860,7 +997,7 @@ document.querySelectorAll('.tab').forEach(t => {
   }
 });
 
-// ─── 3. 1-SEKUNDE HOVER TOOLTIP (ADRESSE + MATERIAL + MAPS) ───
+// ─── 1-SEKUNDE HOVER TOOLTIP ───
 let hoverTimer;
 const tooltip = $('hoverTooltip');
 
@@ -875,8 +1012,8 @@ document.addEventListener('mouseover', e => {
       tooltip.innerHTML = `
         <div class="tooltip-title">${esc(p.name)}</div>
         <div class="tooltip-sub">📍 ${esc(p.address || 'Keine Adresse')} · ⚡ ${p.kwp || 0} kWp</div>
-        ${p.order_id ? `<div class="tooltip-notes">📦 <b>Details:</b>\n${esc(p.order_id)}</div>` : ''}
-        <a href="${mapsUrl}" target="_blank" class="tooltip-maps-btn">🗺️ In Google Maps öffnen ↗</a>
+        ${p.order_id ? `<div class="tooltip-notes">📦 <b>Details & Notizen:</b>\n${esc(p.order_id)}</div>` : ''}
+        <a href="${mapsUrl}" target="_blank" class="tooltip-maps-btn">🗺️ In Google Maps navigieren ↗</a>
       `;
       const rect = target.getBoundingClientRect();
       tooltip.style.left = (rect.left + rect.width / 2) + 'px';
@@ -890,7 +1027,7 @@ document.addEventListener('mouseout', e => {
   tooltip.classList.remove('show');
 });
 
-// ─── 4. HEUTE BUTTON & AUTO-SCROLL ───
+// ─── HEUTE AUTO-SCROLL ───
 function scrollToToday() {
   const today = new Date().toISOString().split('T')[0];
   const headEl = document.getElementById(`th-${today}`);
@@ -902,7 +1039,7 @@ function scrollToToday() {
   }
 }
 
-// ─── 5. SEITENLEISTE RESIZE SLIDER ───
+// ─── SEITENLEISTE SLIDER ───
 (function initSidebarResizer() {
   const handle = $('sidebarResizer');
   const panel = $('projectSidebar');
@@ -911,7 +1048,7 @@ function scrollToToday() {
   const onMove = e => {
     if (!dragging) return;
     let w = startW + (e.clientX - startX);
-    w = Math.max(180, Math.min(550, w));
+    w = Math.max(200, Math.min(550, w));
     document.documentElement.style.setProperty('--project-sidebar-w', w + 'px');
   };
   const onUp = () => {
@@ -936,7 +1073,7 @@ function scrollToToday() {
   });
 })();
 
-// ─── 6. DATENBANK LADEN ───
+// ─── DATEN LADEN ───
 async function loadData() {
   loader(true, 'Verbinde Datenbank...');
   try {
@@ -970,9 +1107,10 @@ function renderAll() {
   renderAdminBuses();
   renderTodos();
   populateMonteurSelects();
+  populateExportSelects();
 }
 
-// ─── 7. TAIFUN IMPORT (MIT NOTIZEN & DETAILS) ───
+// ─── TAIFUN IMPORT ───
 function handleFileUpload(e) {
   const file = e.target.files[0];
   if(!file) return;
@@ -1005,9 +1143,7 @@ function parseTaifun(htmlContent) {
       }
     }
 
-    if (filterStartDate && currentRowDate && currentRowDate < filterStartDate) {
-      return;
-    }
+    if (filterStartDate && currentRowDate && currentRowDate < filterStartDate) return;
 
     tr.querySelectorAll('td').forEach(td => {
       const text = td.textContent;
@@ -1021,7 +1157,6 @@ function parseTaifun(htmlContent) {
           const projectId = projMatch ? projMatch[1] : '';
           const orderId = orderMatch ? orderMatch[1] : '';
 
-          // Baustelle & Notizen
           let subProject = '';
           let noteLines = [];
           const projectLineIdx = lines.findIndex(l => l.includes('Projekt: P'));
@@ -1080,32 +1215,24 @@ async function saveImportToDB() {
 
     if (existing) {
       await sb.from('projects').update({ 
-        name: proj.displayName,
-        address: proj.address,
-        order_id: orderDetails
+        name: proj.displayName, address: proj.address, order_id: orderDetails
       }).eq('id', existing.id);
     } else {
       await sb.from('projects').insert({
-        name: proj.displayName,
-        address: proj.address,
-        kwp: 0,
-        status: 'auftrag',
-        color: getAutoColor(),
-        project_id: proj.projectId,
-        order_id: orderDetails
+        name: proj.displayName, address: proj.address, kwp: 0, status: 'auftrag',
+        color: getAutoColor(), project_id: proj.projectId, order_id: orderDetails
       });
       newCount++;
     }
   }
   
-  showToast(`${state.importBuffer.length} Projekte erfolgreich synchronisiert!`);
+  showToast(`${state.importBuffer.length} Projekte synchronisiert!`);
   state.importBuffer = [];
   $('importResult').style.display = 'none';
   $('fileInput').value = '';
   await loadData();
 }
 
-// ─── 8. RESET: ALLE PROJEKTE LÖSCHEN ───
 async function deleteAllProjects() {
   if (!confirm("⚠️ ACHTUNG: Möchtest du wirklich ALLE Projekte und Kalender-Zuweisungen löschen?\n(Deine Busse & Teams bleiben erhalten!)")) return;
   if (!confirm("Bist du 100% sicher? Dieser Vorgang kann nicht rückgängig gemacht werden!")) return;
@@ -1127,11 +1254,9 @@ async function deleteAllProjects() {
   loader(false);
 }
 
-// ─── 9. SMARTE AC WARNUNG ───
-function getProjectWarnings() {
-  const warnings = {};
-  const msPerDay = 24 * 60 * 60 * 1000;
-  const scheduled = {};
+// ─── SMARTE AC/DC ANALYSE ───
+function analyzeProjectsStatus() {
+  const result = {};
 
   Object.keys(state.grid).forEach(k => {
     const val = state.grid[k];
@@ -1143,18 +1268,28 @@ function getProjectWarnings() {
     const bus = state.buses.find(b => b.slug === busSlug);
     if (!bus) return;
 
-    if (!scheduled[val]) scheduled[val] = { dcDates: [], acDates: [] };
+    if (!result[val]) result[val] = { hasDC: false, hasAC: false, dcDates: [], acDates: [] };
     const cellDateMs = new Date(dateStr).getTime();
 
     if (bus.team === 'elektriker') {
-      scheduled[val].acDates.push(cellDateMs);
+      result[val].hasAC = true;
+      result[val].acDates.push(cellDateMs);
     } else {
-      scheduled[val].dcDates.push(cellDateMs);
+      result[val].hasDC = true;
+      result[val].dcDates.push(cellDateMs);
     }
   });
 
-  Object.keys(scheduled).forEach(projId => {
-    const data = scheduled[projId];
+  return result;
+}
+
+function getProjectWarnings() {
+  const warnings = {};
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const analysis = analyzeProjectsStatus();
+
+  Object.keys(analysis).forEach(projId => {
+    const data = analysis[projId];
     const p = state.projects.find(x => x.id === projId);
     if (!p) return;
 
@@ -1177,32 +1312,45 @@ function getProjectWarnings() {
   return warnings;
 }
 
-// ─── 10. PLANER & SEITENLEISTE ───
+// ─── PLANER & SEITENLEISTE (SPLIT-PILLEN DC | AC) ───
 function renderPalette() {
   const c = $('paletteUI');
   c.innerHTML = '';
   const search = $('plannerSearch').value.toLowerCase();
-  const status = $('plannerStatus').value;
+  const statusFilter = $('plannerStatus').value;
   
-  let filtered = state.projects.filter(p => p.status !== 'abgeschlossen');
-  if (status) filtered = filtered.filter(p => p.status === status);
-  if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search));
-  
+  const statusData = analyzeProjectsStatus();
   const warnings = getProjectWarnings();
+
+  let filtered = state.projects.filter(p => p.status !== 'abgeschlossen');
+
+  if (statusFilter === 'both_done') {
+    filtered = filtered.filter(p => statusData[p.id]?.hasDC && statusData[p.id]?.hasAC);
+  } else if (statusFilter === 'dc_only') {
+    filtered = filtered.filter(p => statusData[p.id]?.hasDC && !statusData[p.id]?.hasAC);
+  } else if (statusFilter === 'ac_only') {
+    filtered = filtered.filter(p => !statusData[p.id]?.hasDC && statusData[p.id]?.hasAC);
+  } else if (statusFilter === 'none') {
+    filtered = filtered.filter(p => !statusData[p.id]?.hasDC && !statusData[p.id]?.hasAC);
+  }
+
+  if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search));
 
   filtered.forEach(p => {
     const cnt = Object.values(state.grid).filter(v => v === p.id).length;
     const el = document.createElement('div');
-    const isFixed = p.status === 'bestaetigt';
     
-    el.className = 'pal-chip' + (state.activeProjId === p.id ? ' active' : '') + (isFixed ? ' is-fixed' : '');
+    const info = statusData[p.id] || { hasDC: false, hasAC: false };
+    const isBothDone = info.hasDC && info.hasAC;
+    
+    el.className = 'pal-chip' + (state.activeProjId === p.id ? ' active' : '') + (isBothDone ? ' both-done' : '');
     el.style.background = p.color; 
     el.style.color = '#fff';
     el.dataset.projId = p.id;
     
     let badge = '';
-    if (isFixed) {
-      badge = `<span class="fixed-badge">✅ Fix</span>`;
+    if (isBothDone) {
+      badge = `<span class="ac-warn" style="background:var(--google-green)">✅ DC+AC</span>`;
     } else if (warnings[p.id]) {
       badge = `<span class="ac-warn">⚠️ AC fehlt</span>`;
     }
@@ -1211,8 +1359,11 @@ function renderPalette() {
       <span class="pal-chip-title">${esc(p.name)}</span>
       <div class="pal-chip-actions">
         ${badge}
+        <div class="phase-pill-wrap" title="Status: Montage (DC) & Elektriker (AC)">
+          <span class="phase-pip ${info.hasDC ? 'is-active-dc' : ''}">DC</span>
+          <span class="phase-pip ${info.hasAC ? 'is-active-ac' : ''}">AC</span>
+        </div>
         <span class="cnt">${cnt}T</span>
-        <button class="chip-btn btn-confirm" title="Termin passt / Bestätigen" onclick="event.stopPropagation(); toggleProjectConfirm('${p.id}')">${isFixed ? '⭐' : '👍'}</button>
         <button class="chip-btn btn-done" title="Auf Erledigt setzen (ausblenden)" onclick="event.stopPropagation(); markProjectDone('${p.id}')">✓</button>
         <button class="chip-btn btn-del" title="Projekt komplett löschen" onclick="event.stopPropagation(); deleteProjectFast('${p.id}', '${esc(p.name)}')">🗑</button>
       </div>
@@ -1220,16 +1371,16 @@ function renderPalette() {
     el.onclick = () => { 
       state.activeProjId = (state.activeProjId === p.id) ? null : p.id; 
       renderPalette(); 
-      repaint(); // LÄSST KALENDER-TAGE AUFLEUCHTEN
+      repaint();
     };
     c.appendChild(el);
   });
   
   // Werkzeuge
   [
-    { id: 'ERASER', text: '🧹 Löschen', color: '#3a3730' },
+    { id: 'ERASER', text: '🧹 Löschen', color: '#131314' },
     { id: 'vacation', text: '🌴 Urlaub', color: '#ca8a04' },
-    { id: 'sick', text: '🤒 Krank', color: '#dc2626' }
+    { id: 'sick', text: '🤒 Krank', color: '#d93025' }
   ].forEach(x => {
     const el = document.createElement('div');
     el.className = 'pal-chip' + (state.activeProjId === x.id ? ' active' : '');
@@ -1240,22 +1391,6 @@ function renderPalette() {
   });
 }
 
-// "Termin passt / Bestätigt"
-async function toggleProjectConfirm(id) {
-  const p = state.projects.find(x => x.id === id);
-  if(!p) return;
-  
-  const isNowFixed = p.status !== 'bestaetigt';
-  p.status = isNowFixed ? 'bestaetigt' : 'auftrag';
-  
-  renderPalette();
-  repaint();
-  showToast(isNowFixed ? 'Termin als FIX bestätigt! ✅' : 'Fixierung aufgehoben');
-  
-  await sb.from('projects').update({ status: p.status }).eq('id', id);
-}
-
-// Erledigt
 async function markProjectDone(id) {
   const p = state.projects.find(x => x.id === id);
   if(p) {
@@ -1266,7 +1401,6 @@ async function markProjectDone(id) {
   }
 }
 
-// Löschen
 async function deleteProjectFast(id, name) {
   if(!confirm(`Möchtest du "${name}" und alle Kalendereinträge wirklich komplett löschen?`)) return;
   
@@ -1283,7 +1417,7 @@ async function deleteProjectFast(id, name) {
   await sb.from('projects').delete().eq('id', id);
 }
 
-// ─── 11. KALENDER GRID BAUEN ───
+// ─── KALENDER GRID ───
 function buildGrid() {
   const dates = [];
   let d = new Date(RANGE.start);
@@ -1338,7 +1472,7 @@ function buildGrid() {
           <td>
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-weight:700;font-size:11px">${esc(bus.label)}</span>
-              <button class="btn" style="padding:2px 5px;font-size:8px;min-height:auto" onclick="printBusSheet('${bus.slug}')" title="Monteurs-Wochenzettel drucken">📄 Zettel</button>
+              <button class="btn" style="padding:2px 6px;font-size:8px;min-height:auto" onclick="openBusExportModal('${bus.slug}')" title="Wochenzettel drucken">📄 Zettel</button>
             </div>
           </td>
       `;
@@ -1380,12 +1514,10 @@ function repaint() {
         cell.style.background = p.color; cell.style.color = '#fff';
         cell.dataset.projId = p.id;
         
-        // PROJEKT AUFLEUCHTEN LASSEN WENN LINKS ANGEKLICKT
         if (state.activeProjId === p.id) {
           cell.classList.add('is-highlighted');
         }
 
-        // IBN UHRZEIT-ERKENNUNG (z.B. "10:00")
         let ibnBadge = '';
         if (p.order_id && p.order_id.toLowerCase().includes('ibn')) {
           const timeMatch = p.order_id.match(/\b([01]?[0-9]|2[0-3]):[0-5][0-9]\b/);
@@ -1401,7 +1533,7 @@ function repaint() {
   $('kpiRow').innerHTML = `<div class="kpi-pill"><span class="kpi-lbl">Geplante Tage</span><span class="kpi-val">${work}</span></div>`;
 }
 
-// ─── 12. DIREKTES LÖSCHEN (RECHTSKLICK / DOPPELKLICK) ───
+// ─── DIREKTES LÖSCHEN ───
 document.addEventListener('contextmenu', e => {
   const cell = e.target.closest('.project-cell');
   if (cell && state.grid[cell.id]) {
@@ -1443,7 +1575,7 @@ async function clearSingleCell(el) {
   }
 }
 
-// ─── 13. PLANER ZEICHNEN ───
+// ─── PLANER ZEICHNEN ───
 function setupGridPaint() {
   document.addEventListener('mousedown', e => {
     if (e.button !== 0) return;
@@ -1497,10 +1629,7 @@ async function executePaint(cells, value) {
       
       state.grid[cid] = value;
       await sb.from('grid_assignments').upsert({ 
-        bus_id: bus.id, 
-        work_date: date, 
-        project_id: dbVal, 
-        kind: kind 
+        bus_id: bus.id, work_date: date, project_id: dbVal, kind: kind 
       }, { onConflict: 'bus_id,work_date' });
     }
   }
@@ -1523,68 +1652,152 @@ async function undoPaint() {
     const bus = state.buses.find(b => b.slug === busSlug); if(!bus) continue;
     const isSpecial = (val === 'vacation' || val === 'sick');
     await sb.from('grid_assignments').upsert({
-      bus_id: bus.id, work_date: dt, 
-      project_id: isSpecial ? null : val, 
-      kind: isSpecial ? val : 'project'
+      bus_id: bus.id, work_date: dt, project_id: isSpecial ? null : val, kind: isSpecial ? val : 'project'
     }, { onConflict: 'bus_id,work_date' });
   }
   repaint(); renderPalette();
 }
 
-// ─── 14. MONTEURS-WOCHENZETTEL DRUCKEN ───
-function printBusSheet(busSlug) {
-  const bus = state.buses.find(b => b.slug === busSlug);
-  if(!bus) return;
+// ─── GOOGLE EXPLORER WOCHENPLAN EXPORT ───
+function populateExportSelects() {
+  const busSel = $('exportBusSelect');
+  busSel.innerHTML = state.buses.map(b => `<option value="${b.slug}">${esc(b.label)} (${b.team})</option>`).join('');
 
-  const today = new Date();
-  $('printSheetSub').textContent = `Bus: ${bus.label} · Team: ${bus.team.toUpperCase()}`;
-  $('printSheetDate').textContent = today.toLocaleDateString('de-DE');
-
-  // Alle Termine für diesen Bus sammeln
-  const busEntries = [];
-  Object.keys(state.grid).forEach(k => {
-    if (k.startsWith(`CELL_${busSlug}_`)) {
-      const dateStr = k.replace(`CELL_${busSlug}_`, '');
-      const projId = state.grid[k];
-      busEntries.push({ dateStr, projId });
+  const kwSel = $('exportKwSelect');
+  const kwMap = new Map();
+  let d = new Date(RANGE.start);
+  const end = new Date(RANGE.end);
+  
+  while(d <= end) {
+    const kw = getKW(d);
+    if (!kwMap.has(kw)) {
+      const mon = new Date(d); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7));
+      const fri = new Date(mon); fri.setDate(fri.getDate() + 4);
+      const label = `KW ${kw} (${mon.getDate()}.${mon.getMonth()+1}. - ${fri.getDate()}.${fri.getMonth()+1}.${fri.getFullYear()})`;
+      kwMap.set(kw, { label, monIso: mon.toISOString().split('T')[0] });
     }
-  });
+    d.setDate(d.getDate() + 7);
+  }
 
-  busEntries.sort((a,b) => a.dateStr.localeCompare(b.dateStr));
+  kwSel.innerHTML = Array.from(kwMap.entries()).map(([kw, data]) => `<option value="${kw}" data-mon="${data.monIso}">${data.label}</option>`).join('');
+}
+
+function openBusExportModal(preSelectedBusSlug = null) {
+  populateExportSelects();
+  if (preSelectedBusSlug) $('exportBusSelect').value = preSelectedBusSlug;
+  renderExportPreview();
+  openModal('busExportModal');
+}
+
+function renderExportPreview() {
+  const busSlug = $('exportBusSelect').value;
+  const kwOpt = $('exportKwSelect').selectedOptions[0];
+  const monIso = kwOpt?.dataset?.mon || '2026-08-24';
+
+  const container = $('exportPreviewList');
+  const days = [];
+  let d = new Date(monIso);
+  for (let i = 0; i < 5; i++) {
+    days.push(new Date(d));
+    d.setDate(d.getDate() + 1);
+  }
+
+  container.innerHTML = days.map(date => {
+    const iso = date.toISOString().split('T')[0];
+    const dayName = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][date.getDay()];
+    const cellKey = `CELL_${busSlug}_${iso}`;
+    const val = state.grid[cellKey];
+
+    let contentHtml = '<span style="color:#888;font-size:11px">Kein Einsatz eingetragen</span>';
+    if (val === 'vacation') contentHtml = '<b style="color:#B87503">🌴 URLAUB</b>';
+    else if (val === 'sick') contentHtml = '<b style="color:#D93025">🤒 KRANK</b>';
+    else if (val) {
+      const p = state.projects.find(x => x.id === val);
+      if (p) {
+        contentHtml = `
+          <div style="font-weight:700;color:var(--ink)">${esc(p.name)}</div>
+          <div style="font-size:10px;color:var(--ink-secondary)">📍 ${esc(p.address || 'Keine Adresse')} · ⚡ ${p.kwp||0} kWp</div>
+        `;
+      }
+    }
+
+    return `
+      <div class="explorer-day-card">
+        <div class="explorer-day-head">
+          <span>${dayName}</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--ink-muted)">${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()}</span>
+        </div>
+        <div>${contentHtml}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function executeBusPrint() {
+  const busSlug = $('exportBusSelect').value;
+  const kw = $('exportKwSelect').value;
+  const remarks = $('exportRemarks').value.trim();
+  const kwOpt = $('exportKwSelect').selectedOptions[0];
+  const monIso = kwOpt?.dataset?.mon || '2026-08-24';
+
+  const bus = state.buses.find(b => b.slug === busSlug);
+  if (!bus) return;
+
+  const mon = new Date(monIso);
+  const fri = new Date(mon); fri.setDate(fri.getDate() + 4);
+
+  $('printSheetTag').textContent = `SOLPRO // KW ${kw}`;
+  $('printSheetTitle').textContent = `Einsatzplan: ${bus.label} (${bus.team.toUpperCase()})`;
+  $('printSheetSub').textContent = `Woche ${kw} · Zeitraum: ${mon.getDate()}.${mon.getMonth()+1}.${mon.getFullYear()} - ${fri.getDate()}.${fri.getMonth()+1}.${fri.getFullYear()}`;
+  $('printSheetDate').textContent = new Date().toLocaleDateString('de-DE');
+
+  if (remarks) {
+    $('printSheetBanner').style.display = 'block';
+    $('printSheetBannerText').textContent = remarks;
+  } else {
+    $('printSheetBanner').style.display = 'none';
+  }
+
+  const days = [];
+  let d = new Date(monIso);
+  for (let i = 0; i < 5; i++) {
+    days.push(new Date(d));
+    d.setDate(d.getDate() + 1);
+  }
 
   const tbody = $('printSheetBody');
-  if (busEntries.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px">Keine Termine für diesen Bus eingetragen.</td></tr>`;
-  } else {
-    tbody.innerHTML = busEntries.map(e => {
-      const d = new Date(e.dateStr);
-      const dayName = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][d.getDay()];
-      
-      if (e.projId === 'vacation') {
-        return `<tr><td><b>${dayName}</b><br>${e.dateStr}</td><td colspan="3" style="background:#fce8b2;color:#855800;font-weight:700">🌴 URLAUB</td></tr>`;
-      }
-      if (e.projId === 'sick') {
-        return `<tr><td><b>${dayName}</b><br>${e.dateStr}</td><td colspan="3" style="background:#fcd5d7;color:#9e1c24;font-weight:700">🤒 KRANK</td></tr>`;
-      }
+  tbody.innerHTML = days.map(date => {
+    const iso = date.toISOString().split('T')[0];
+    const dayName = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][date.getDay()];
+    const cellKey = `CELL_${busSlug}_${iso}`;
+    const val = state.grid[cellKey];
 
-      const p = state.projects.find(x => x.id === e.projId);
-      if(!p) return '';
+    if (val === 'vacation') {
+      return `<tr><td><b>${dayName}</b><br><span style="font-family:monospace">${date.getDate()}.${date.getMonth()+1}.</span></td><td colspan="3" style="background:#FCE8B2;color:#B87503;font-weight:700">🌴 URLAUB</td></tr>`;
+    }
+    if (val === 'sick') {
+      return `<tr><td><b>${dayName}</b><br><span style="font-family:monospace">${date.getDate()}.${date.getMonth()+1}.</span></td><td colspan="3" style="background:#FCD5D7;color:#D93025;font-weight:700">🤒 KRANK</td></tr>`;
+    }
 
-      return `
-        <tr>
-          <td><b>${dayName}</b><br>${e.dateStr}</td>
-          <td><b>${esc(p.name)}</b><br><span style="font-size:10px;color:#666">Projekt: ${esc(p.project_id || '-')}</span></td>
-          <td>📍 ${esc(p.address || 'Keine Adresse')}</td>
-          <td><div style="font-size:11px;white-space:pre-line">${esc(p.order_id || 'Keine Notizen')}</div></td>
-        </tr>
-      `;
-    }).join('');
-  }
+    const p = state.projects.find(x => x.id === val);
+    if(!p) {
+      return `<tr><td><b>${dayName}</b><br><span style="font-family:monospace;font-size:11px">${date.getDate()}.${date.getMonth()+1}.</span></td><td colspan="3" style="color:#999">Kein Einsatz eingetragen</td></tr>`;
+    }
+
+    return `
+      <tr>
+        <td><b>${dayName}</b><br><span style="font-family:monospace;font-size:11px">${date.getDate()}.${date.getMonth()+1}.</span></td>
+        <td><b>${esc(p.name)}</b><br><span style="font-size:10px;color:#666">P-ID: ${esc(p.project_id || '-')} · ⚡ ${p.kwp || 0} kWp</span></td>
+        <td>📍 ${esc(p.address || 'Keine Adresse')}</td>
+        <td><div style="font-size:11px;white-space:pre-line">${esc(p.order_id || 'Keine Notizen')}</div></td>
+      </tr>
+    `;
+  }).join('');
 
   window.print();
 }
 
-// ─── 15. MONTEUR SMARTPHONE ANSICHT ───
+// ─── MONTEUR SMARTPHONE ANSICHT ───
 function populateMonteurSelects() {
   const sel = $('monteurBusSelect');
   sel.innerHTML = state.buses.map(b => `<option value="${b.slug}">${esc(b.label)} (${b.team})</option>`).join('');
@@ -1618,11 +1831,11 @@ function renderMonteurView() {
   }
 
   if (val === 'vacation') {
-    container.innerHTML = `<div class="monteur-card" style="background:#FCE8B2;color:#855800;text-align:center;font-weight:800;font-size:18px">🌴 URLAUB</div>`;
+    container.innerHTML = `<div class="monteur-card" style="background:#FCE8B2;color:#B87503;text-align:center;font-weight:800;font-size:18px">🌴 URLAUB</div>`;
     return;
   }
   if (val === 'sick') {
-    container.innerHTML = `<div class="monteur-card" style="background:#FCD5D7;color:#9E1C24;text-align:center;font-weight:800;font-size:18px">🤒 KRANK</div>`;
+    container.innerHTML = `<div class="monteur-card" style="background:#FCD5D7;color:#D93025;text-align:center;font-weight:800;font-size:18px">🤒 KRANK</div>`;
     return;
   }
 
@@ -1634,7 +1847,7 @@ function renderMonteurView() {
   container.innerHTML = `
     <div class="monteur-card">
       <div class="monteur-card-header">
-        <span style="background:${p.color};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px">TAGES-EINSATZ</span>
+        <span style="background:${p.color};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:var(--radius-pill)">TAGES-EINSATZ</span>
         <span style="font-weight:800;font-family:var(--font-mono)">${p.kwp || 0} kWp</span>
       </div>
       
@@ -1647,7 +1860,7 @@ function renderMonteurView() {
       <a href="${mapsUrl}" target="_blank" class="btn-maps">🗺️ In Google Maps navigieren ↗</a>
 
       ${p.order_id ? `
-        <div style="background:var(--cream-deep);padding:10px;border-radius:6px;font-size:12px;margin-top:8px">
+        <div style="background:var(--bg-cream-subtle);padding:10px;border-radius:8px;font-size:12px;margin-top:8px;border:1px solid var(--border-subtle)">
           <b>📦 Details & Material:</b>
           <div style="white-space:pre-line;margin-top:4px">${esc(p.order_id)}</div>
         </div>
@@ -1656,7 +1869,7 @@ function renderMonteurView() {
   `;
 }
 
-// ─── 16. AUFGABEN (TODOS) ───
+// ─── AUFGABEN (TODOS) ───
 function renderTodos() {
   const today = new Date().toISOString().split('T')[0];
   let overdue = 0, dueToday = 0, open = 0;
@@ -1669,7 +1882,7 @@ function renderTodos() {
     }
     return `
     <div class="task-item ${t.done ? 'done' : ''}">
-      <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo('${t.id}', this.checked)" style="width:18px;height:18px;accent-color:var(--lime-dk)">
+      <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo('${t.id}', this.checked)" style="width:18px;height:18px;accent-color:var(--google-blue)">
       <div style="flex:1">
         <div style="font-size:13px;font-weight:600">${esc(t.text)}</div>
         ${t.due_date ? `<div style="font-size:10px;color:var(--ink-muted);margin-top:2px">📅 ${t.due_date}</div>` : ''}
@@ -1711,7 +1924,7 @@ async function deleteTodo(id) {
   await sb.from('todos').delete().eq('id', id);
 }
 
-// ─── 17. VERWALTUNG (ADMIN) ───
+// ─── VERWALTUNG (ADMIN) ───
 function renderAdminProjects() {
   const search = $('adminProjSearch').value.toLowerCase();
   const list = state.projects.filter(p => p.name.toLowerCase().includes(search));
@@ -1719,7 +1932,7 @@ function renderAdminProjects() {
   $('adminProjectList').innerHTML = list.map(p => `
     <div class="admin-item">
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px">${esc(p.name)}</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px">${esc(p.name)}</div>
         <div style="font-size:11px;color:var(--ink-muted)">📍 ${esc(p.address)} · ⚡ ${p.kwp || 0} kWp</div>
       </div>
       <button class="btn" onclick="editAdminProject('${p.id}')">Bearbeiten</button>
@@ -1774,7 +1987,7 @@ function renderAdminBuses() {
   $('adminBusList').innerHTML = sortedBuses.map(b => `
     <div class="admin-item">
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px">${esc(b.label)}</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px">${esc(b.label)}</div>
         <div style="font-size:11px;color:var(--ink-muted)">Team: ${teams[b.team] || b.team}</div>
       </div>
       <button class="btn" onclick="editAdminBus('${b.id}')">Bearbeiten</button>
