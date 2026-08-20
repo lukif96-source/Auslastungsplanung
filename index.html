@@ -80,6 +80,25 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .sidebar-item .tooltip{position:absolute;left:60px;background:var(--ink);color:var(--lime);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap;z-index:500;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
 .sidebar-item:hover .tooltip{opacity:1}
 
+/* ── PROJEKT-SEITENLEISTE (links, resizable) ── */
+:root{ --project-sidebar-w: 260px; }
+.project-sidebar{width:var(--project-sidebar-w);min-width:150px;max-width:520px;background:var(--glass-bg-heavy);border-right:1px solid var(--glass-border);backdrop-filter:blur(var(--blur));display:flex;flex-direction:column;flex-shrink:0;position:relative;z-index:250;height:100%;overflow:hidden}
+.project-sidebar-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;flex-shrink:0}
+.project-sidebar-title{font-family:var(--font-display);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--ink)}
+.project-sidebar-body{padding:0 12px 12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.project-sidebar-body .list-search,.project-sidebar-body select{width:100%}
+.project-sidebar-body .btn{width:100%;justify-content:center}
+.project-list{flex:1;min-height:0;overflow-y:auto;padding:6px 12px 16px;display:flex;flex-direction:column;gap:6px}
+.project-list::-webkit-scrollbar{width:6px}
+.project-list::-webkit-scrollbar-thumb{background:var(--glass-border);border-radius:10px}
+.project-sidebar .pal-chip{width:100%;justify-content:space-between}
+.project-sidebar .pal-chip span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.project-sidebar .pal-chip .cnt{flex-shrink:0}
+.project-sidebar-resizer{position:absolute;top:0;right:-3px;width:6px;height:100%;cursor:col-resize;z-index:260;touch-action:none}
+.project-sidebar-resizer::after{content:'';position:absolute;top:0;right:2px;width:2px;height:100%;background:transparent;transition:background .15s}
+.project-sidebar-resizer:hover::after,.project-sidebar-resizer.dragging::after{background:var(--lime-dk)}
+.project-sidebar.resizing{transition:none!important;user-select:none}
+
 /* ── MAIN CONTENT WRAPPER ── */
 .main-wrapper{flex:1;display:flex;flex-direction:column;height:100%;min-width:0;position:relative;z-index:1}
 
@@ -88,6 +107,10 @@ input,select,textarea{font-family:inherit;font-size:14px}
   .sidebar.mobile-open{transform:translateX(0)}
   .sidebar-toggle{display:block;left:0;top:60px;border-radius:0 8px 8px 0}
   .main-wrapper{margin-left:0}
+  .project-sidebar{position:fixed;left:0;top:0;height:100%;width:min(var(--project-sidebar-w),85vw)!important;transform:translateX(-100%);transition:transform .3s ease;z-index:350}
+  .project-sidebar.mobile-open{transform:translateX(0)}
+  .project-sidebar-resizer{display:none}
+  #projectSidebarToggle{top:110px;z-index:340}
 }
 
 /* ── AUTH ── */
@@ -190,6 +213,15 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .bus-toggle{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--cream-deep);background:transparent;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--success);padding:0}
 .worker-row.is-offline .bus-toggle{border-color:var(--danger);color:var(--danger)}
 .worker-row.has-team-elektriker td:first-child{box-shadow:inset 3px 0 0 var(--lime-dk)}
+.bus-team.montage{background:rgba(212,160,23,0.18);color:var(--gold)}
+.worker-row.has-team-montage td:first-child{box-shadow:inset 3px 0 0 var(--gold)}
+.worker-row.has-team-other td:first-child{box-shadow:inset 3px 0 0 var(--ink-muted)}
+
+/* ── TEAM-GRUPPEN-TRENNER (klare Abgrenzung Elektriker/Montage) ── */
+tr.team-divider td{border:none!important;text-align:left!important;font-family:var(--font-mono);font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;padding:7px 12px!important;position:static!important;width:auto!important}
+tr.team-divider.team-elektriker td{background:rgba(184,216,75,.30)!important;color:var(--ink)!important;border-top:2px solid var(--lime-dk)!important}
+tr.team-divider.team-montage td{background:rgba(212,160,23,.26)!important;color:var(--ink)!important;border-top:2px solid var(--gold)!important}
+tr.team-divider.team-other td{background:var(--cream-deep)!important;color:var(--ink-muted)!important;border-top:2px solid var(--ink-muted)!important}
 
 .view-W th[id^="th-"],.view-W .project-cell{width:140px}
 .view-M th[id^="th-"],.view-M .project-cell{width:62px}
@@ -333,6 +365,26 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 <!-- SIDEBAR TOGGLE -->
 <button class="sidebar-toggle" id="sidebarToggle">☰</button>
 
+<!-- PROJEKT-SEITENLEISTE (links, ausklappbar per Schieberegler) -->
+<div class="project-sidebar" id="projectSidebar" style="display:none">
+  <div class="project-sidebar-head">
+    <span class="project-sidebar-title">📁 Projekte</span>
+  </div>
+  <div class="project-sidebar-body">
+    <input type="text" class="list-search" id="plannerProjectSearch" placeholder="🔍 Suchen...">
+    <select id="plannerStatusFilter" style="padding:8px 12px;font-size:11px;border:1px solid var(--cream-deep);border-radius:var(--radius-sm);background:rgba(255,255,255,0.7)">
+      <option value="">Alle Status</option>
+      <option value="auftrag">Auftrag</option>
+      <option value="im_einsatz">Im Einsatz</option>
+    </select>
+    <button class="btn" id="btnMyProjectsOnly">👤 Nur meine</button>
+    <button class="btn primary" id="btnPlannerNewProject">+ Kunde / Projekt anlegen</button>
+  </div>
+  <div class="project-list" id="paletteUI"></div>
+  <div class="project-sidebar-resizer" id="projectSidebarResizer" title="Ziehen zum Grösser-/Kleinermachen"></div>
+</div>
+<button class="sidebar-toggle" id="projectSidebarToggle" style="left:0">📁</button>
+
 <!-- MAIN CONTENT WRAPPER -->
 <div class="main-wrapper">
 
@@ -367,7 +419,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
     <div id="view-planner" class="view active">
       <div class="planner-header">
         <div class="kpi-row" id="kpiRow"></div>
-        <div class="palette-wrap" id="paletteUI"></div>
       </div>
       <div class="planner-toolbar">
         <div class="seg">
@@ -375,14 +426,6 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
           <button class="btn active" data-view="M">Monat</button>
           <button class="btn" data-view="J">Jahr</button>
         </div>
-        <input type="text" class="list-search" id="plannerProjectSearch" placeholder="🔍 Suchen..." style="width:130px;padding:8px 12px;font-size:11px">
-        <select id="plannerStatusFilter" style="padding:8px 12px;font-size:11px;border:1px solid var(--cream-deep);border-radius:var(--radius-sm);background:rgba(255,255,255,0.7)">
-          <option value="">Alle Status</option>
-          <option value="auftrag">Auftrag</option>
-          <option value="im_einsatz">Im Einsatz</option>
-        </select>
-        <button class="btn" id="btnMyProjectsOnly">👤 Nur meine</button>
-        <button class="btn primary" id="btnPlannerNewProject">+ Kunde / Projekt anlegen</button>
         <button class="btn" id="btnNewDeadline">📅 Neuer Termin</button>
         <button class="btn" id="btnLock">🔒 <span id="lockText">Gesperrt</span></button>
         <button class="btn" id="btnUndo">↶ Rückgängig</button>
@@ -730,6 +773,7 @@ async function bootApp() {
   if (profile.role === 'viewer') { state.isLocked = true; updateLockUI(); }
 
   $('sidebar').style.display = 'flex';
+  $('projectSidebar').style.display = 'flex';
   hideAuth();
 
   await loadBuses();
@@ -802,7 +846,11 @@ function switchTab(tab) {
 
   if (window.innerWidth <= 768) {
     $('sidebar').classList.remove('mobile-open');
+    $('projectSidebar').classList.remove('mobile-open');
   }
+
+  $('projectSidebar').style.display = tab === 'planner' ? 'flex' : 'none';
+  $('projectSidebarToggle').style.display = tab === 'planner' ? '' : 'none';
 
   if (tab === 'planner') buildGrid();
   if (tab === 'tasks') renderTodos();
@@ -846,6 +894,12 @@ function setupListeners() {
     $('sidebar').classList.toggle('mobile-open');
   };
 
+  $('projectSidebarToggle').onclick = () => {
+    $('projectSidebar').classList.toggle('mobile-open');
+  };
+
+  setupSidebarResizer();
+
   $('btnNewDeadline').onclick = () => openDeadlineModal(null, null);
   $('appointmentSave').onclick = saveDeadline;
   $('projSave').onclick = saveProject;
@@ -873,6 +927,59 @@ function setupListeners() {
 function closeModal() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('show')); $('overlay').style.display = 'none'; }
 function showModal(id) { closeModal(); $('overlay').style.display = 'block'; $(id).classList.add('show'); }
 
+// ─── PROJEKT-SEITENLEISTE: GRÖSSE PER SCHIEBEREGLER ANPASSEN ───
+(function initSidebarWidth() {
+  const saved = localStorage.getItem('solpro_sidebar_w');
+  if (saved) document.documentElement.style.setProperty('--project-sidebar-w', saved + 'px');
+})();
+function setupSidebarResizer() {
+  const handle = $('projectSidebarResizer');
+  const panel = $('projectSidebar');
+  if (!handle || !panel) return;
+  const MIN = 180, MAX = 480;
+  let dragging = false, startX = 0, startW = 0;
+
+  const onMove = e => {
+    if (!dragging) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    let w = startW + (x - startX);
+    w = Math.max(MIN, Math.min(MAX, w));
+    document.documentElement.style.setProperty('--project-sidebar-w', w + 'px');
+  };
+  const onUp = () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    panel.classList.remove('resizing');
+    document.body.style.cursor = '';
+    const w = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--project-sidebar-w'));
+    if (w) localStorage.setItem('solpro_sidebar_w', w);
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+  };
+  const onDown = e => {
+    dragging = true;
+    startX = e.touches ? e.touches[0].clientX : e.clientX;
+    startW = panel.getBoundingClientRect().width;
+    handle.classList.add('dragging');
+    panel.classList.add('resizing');
+    document.body.style.cursor = 'col-resize';
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onUp);
+    e.preventDefault();
+  };
+  handle.addEventListener('mousedown', onDown);
+  handle.addEventListener('touchstart', onDown, { passive: false });
+  handle.addEventListener('dblclick', () => {
+    document.documentElement.style.setProperty('--project-sidebar-w', '260px');
+    localStorage.setItem('solpro_sidebar_w', '260');
+  });
+}
+
 // ─── PLANNER ───
 function buildGrid() {
   const visibleBuses = state.buses;
@@ -897,19 +1004,52 @@ function buildGrid() {
   });
   thead.innerHTML = trM + `</tr>` + trK + `</tr>` + trD + `</tr>`;
   tbody.innerHTML = '';
+
+  // ── Busse klar nach Team gruppieren: Elektriker-Busse zuerst, dann Montage-Busse,
+  //    danach eventuelle weitere Teams, zuletzt Busse ohne Team-Zuordnung.
+  const teamKeyOf = b => {
+    const t = (b.team || '').trim().toLowerCase();
+    if (t === 'elektriker') return 'elektriker';
+    if (t === 'montage') return 'montage';
+    if (t) return t;
+    return '__none__';
+  };
+  const groups = new Map();
   visibleBuses.forEach(b => {
-    const sf = b.slug;
-    const off = b.is_offline;
-    const isElek = (b.team || '').toLowerCase() === 'elektriker';
-    const teamClass = isElek ? ' has-team-elektriker' : '';
-    const teamBadge = b.team ? `<span class="bus-team ${isElek?'elektriker':''}">${escHtml(b.team)}</span>` : '';
-    let row = `<tr id="row_${sf}" class="worker-row ${off?'is-offline':'is-active'}${teamClass}"><td><div class="bus-name-wrap"><div class="bus-name-info"><span class="bus-name-label">${escHtml(b.label)}</span>${teamBadge}</div><button class="bus-toggle" data-bus="${escAttr(sf)}">${off?'✕':'✓'}</button></div></td>`;
-    dates.forEach(d => {
-      const iso = isoOf(d);
-      row += `<td id="CELL_${sf}_${iso}" class="project-cell ${d.getDay()===1?'monday-start':''}" data-ts="${d.getTime()}" data-bus="${escAttr(sf)}" data-date="${iso}"></td>`;
-    });
-    tbody.insertAdjacentHTML('beforeend', row + `</tr>`);
+    const k = teamKeyOf(b);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(b);
   });
+  const rank = k => k === 'elektriker' ? 0 : k === 'montage' ? 1 : k === '__none__' ? 9 : 2;
+  const orderedKeys = [...groups.keys()].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+  const colCount = dates.length + 1;
+  const dividerMeta = k => {
+    if (k === 'elektriker') return { cls: 'team-elektriker', label: '⚡ ELEKTRIKER-BUSSE' };
+    if (k === 'montage') return { cls: 'team-montage', label: '🔧 MONTAGE-BUSSE' };
+    if (k === '__none__') return { cls: 'team-other', label: 'OHNE TEAM' };
+    return { cls: 'team-other', label: `${escHtml(groups.get(k)[0].team)}`.toUpperCase() };
+  };
+
+  orderedKeys.forEach(k => {
+    const busesInGroup = groups.get(k);
+    const { cls, label } = dividerMeta(k);
+    tbody.insertAdjacentHTML('beforeend', `<tr class="team-divider ${cls}"><td colspan="${colCount}">${label} (${busesInGroup.length})</td></tr>`);
+    busesInGroup.forEach(b => {
+      const sf = b.slug;
+      const off = b.is_offline;
+      const isElek = k === 'elektriker', isMontage = k === 'montage', isOther = k !== 'elektriker' && k !== 'montage' && k !== '__none__';
+      const teamClass = isElek ? ' has-team-elektriker' : isMontage ? ' has-team-montage' : isOther ? ' has-team-other' : '';
+      const badgeCls = isElek ? 'elektriker' : isMontage ? 'montage' : '';
+      const teamBadge = b.team ? `<span class="bus-team ${badgeCls}">${escHtml(b.team)}</span>` : '';
+      let row = `<tr id="row_${sf}" class="worker-row ${off?'is-offline':'is-active'}${teamClass}"><td><div class="bus-name-wrap"><div class="bus-name-info"><span class="bus-name-label">${escHtml(b.label)}</span>${teamBadge}</div><button class="bus-toggle" data-bus="${escAttr(sf)}">${off?'✕':'✓'}</button></div></td>`;
+      dates.forEach(d => {
+        const iso = isoOf(d);
+        row += `<td id="CELL_${sf}_${iso}" class="project-cell ${d.getDay()===1?'monday-start':''}" data-ts="${d.getTime()}" data-bus="${escAttr(sf)}" data-date="${iso}"></td>`;
+      });
+      tbody.insertAdjacentHTML('beforeend', row + `</tr>`);
+    });
+  });
+
   document.querySelectorAll('.bus-toggle').forEach(b => b.onclick = () => toggleBus(b.dataset.bus));
   repaint();
 }
@@ -967,18 +1107,7 @@ function renderKPI() {
 function renderPalette() {
   const c = $('paletteUI');
   c.innerHTML = '';
-  if (canEdit()) {
-    const add = document.createElement('button');
-    add.className = 'btn-add-chip'; add.textContent = '+';
-    add.title = 'Kunde direkt anlegen';
-    // Das Plus-Icon öffnet nun direkt das Projekt-Fenster und bereitet es für den Planer vor
-    add.onclick = () => {
-      openProjectModal();
-      $('projStatus').value = 'auftrag';
-      setTimeout(() => $('projName').focus(), 50);
-    };
-    c.appendChild(add);
-  }
+  $('btnPlannerNewProject').style.display = canEdit() ? '' : 'none';
   let paletteProjects = state.projects.filter(p => ['auftrag','im_einsatz'].includes(p.status));
   
   if (state.plannerStatusFilter) {
