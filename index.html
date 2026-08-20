@@ -2,18 +2,18 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#131314">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#191816">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SOLPRO AI">
-<meta name="description" content="SOLPRO Suite v2 - Google AI Inspired Solar Management">
-<title>SOLPRO · AI Explorer Suite</title>
+<meta name="apple-mobile-web-app-title" content="SOLPRO">
+<meta name="description" content="SOLPRO Suite v2 - Architectural Solar & Resource Management">
+<title>SOLPRO · Architectural Suite</title>
 
-<!-- Google Fonts: Space Grotesk, Inter & JetBrains Mono -->
+<!-- Schriften: Space Grotesk, Inter & JetBrains Mono -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Supabase Lib -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -26,203 +26,209 @@
 
 <style>
 /* ═══════════════════════════════════════════════════════════════
-   1. GOOGLE AI / LANGUAGE EXPLORER FARBSYSTEM & DESIGN TOKENS
+   1. AYOCIN LUXURY COLOR SYSTEM & DESIGN TOKENS
    ═══════════════════════════════════════════════════════════════ */
 :root {
-  --bg-cream: #F8F5EE;
-  --bg-cream-subtle: #F1ECE1;
-  --bg-cream-card: #FFFFFF;
-  --ink: #131314;
-  --ink-secondary: #444746;
-  --ink-muted: #747775;
-  --border-subtle: #E2DDD2;
-  --border-strong: #C7C1B3;
+  --bg-sand: #F5F2EB;
+  --bg-sand-subtle: #EAE5DC;
+  --bg-card: #FCFAF6;
+  --ink: #191816;
+  --ink-secondary: #4A463F;
+  --ink-muted: #878174;
+  --border-fine: #DDD7CD;
+  --border-strong: #C4BCAC;
 
-  /* Google AI / Lab Akzente */
-  --google-blue: #1A73E8;
-  --google-blue-bg: rgba(26,115,232,0.1);
-  --ai-lime: #B8D84B;
-  --ai-lime-glow: rgba(184,216,75,0.35);
-  --ai-purple: #7C3AED;
-  --google-red: #D93025;
-  --google-red-bg: rgba(217,48,37,0.08);
-  --google-yellow: #FBBC04;
-  --google-yellow-bg: rgba(251,188,4,0.15);
-  --google-green: #1E8E3E;
-  --google-green-bg: rgba(30,142,62,0.12);
+  /* Ayocin Brass & Earth Accents */
+  --brass: #C2A676;
+  --brass-dark: #9E8354;
+  --brass-glow: rgba(194, 166, 118, 0.25);
+  
+  /* Gewerke & Status */
+  --dc-slate: #2B5973;
+  --ac-copper: #B85D35;
+  --forest-done: #285C42;
+  --danger-clay: #B33939;
+  --danger-bg: rgba(179, 57, 57, 0.08);
 
-  /* Radien & Typo */
-  --radius-card: 16px;
+  --radius-card: 14px;
   --radius-sm: 8px;
   --radius-pill: 9999px;
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --project-sidebar-w: 300px;
+  --project-sidebar-w: 295px;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;height:100dvh;width:100%;overflow:hidden}
 body{
   font-family: var(--font-body);
-  background: var(--bg-cream);
+  background: var(--bg-sand);
   color: var(--ink);
   display: flex;
   flex-direction: row;
   user-select: none;
   background-image:
-    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(26,115,232,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 100% 100%, rgba(184,216,75,0.08) 0%, transparent 50%);
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(194, 166, 118, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 100% 100%, rgba(43, 89, 115, 0.06) 0%, transparent 50%);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 button{font-family:inherit;cursor:pointer}
 input,select,textarea{font-family:inherit;font-size:13px}
-:focus-visible{outline:2px solid var(--google-blue);outline-offset:2px;border-radius:6px}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:6px}
 
-/* Google AI Ambient Licht */
-.ai-glow-blob{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px);opacity:.4}
-.blob-top{width:500px;height:350px;background:var(--ai-lime);top:-100px;left:10%}
-.blob-bottom{width:450px;height:350px;background:rgba(26,115,232,0.3);bottom:-80px;right:5%}
+.ambient-glow{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px);opacity:.35}
+.glow-top{width:500px;height:350px;background:var(--brass);top:-100px;left:15%}
+.glow-bottom{width:450px;height:350px;background:rgba(43, 89, 115, 0.25);bottom:-80px;right:5%}
 
 /* ═══════════════════════════════════════════════════════════════
-   2. LOGIN SCREEN (GOOGLE LABS STYLE)
+   2. LOGIN SCREEN (AYOCIN MONOLITH STYLE)
    ═══════════════════════════════════════════════════════════════ */
 #loginScreen {
   position: fixed; inset: 0; z-index: 999999;
-  background: rgba(19, 19, 20, 0.88); backdrop-filter: blur(25px);
+  background: rgba(25, 24, 22, 0.92); backdrop-filter: blur(25px);
   display: flex; align-items: center; justify-content: center;
 }
 .login-card {
-  background: var(--bg-cream); padding: 40px 32px; border-radius: 24px;
+  background: var(--bg-sand); padding: 40px 32px; border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-  width: 370px; max-width: 90vw; text-align: center;
+  width: 370px; max-width: 92vw; text-align: center;
 }
 .login-tag {
   display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 800;
-  background: var(--ink); color: var(--ai-lime); padding: 3px 10px; border-radius: var(--radius-pill);
+  background: var(--ink); color: var(--brass); padding: 3px 10px; border-radius: var(--radius-pill);
   letter-spacing: 1px; margin-bottom: 12px;
 }
+.login-hint-box {
+  background: var(--bg-sand-subtle); border: 1px solid var(--border-fine); border-radius: 10px;
+  padding: 10px 12px; font-size: 11px; color: var(--ink-secondary); margin-top: 16px; text-align: left;
+  line-height: 1.5;
+}
 
-#loader{position:fixed;inset:0;z-index:99999;background:rgba(19,19,20,0.75);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px}
+#loader{position:fixed;inset:0;z-index:99999;background:rgba(25, 24, 22, 0.78);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px}
 #loader.show{display:flex}
-.spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--ai-lime);border-radius:50%;animation:spin .8s linear infinite}
+.spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--brass);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loader-text{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:2px}
 
 /* ═══════════════════════════════════════════════════════════════
-   3. ADRESS-TOOLTIP (EXPLORER INFO CARD)
+   3. ADRESS-TOOLTIP (INTERAKTIV)
    ═══════════════════════════════════════════════════════════════ */
 #hoverTooltip {
-  position: fixed; background: #FFFFFF; color: var(--ink); padding: 12px 14px; border-radius: 12px;
+  position: fixed; background: var(--bg-card); color: var(--ink); padding: 14px 16px; border-radius: 12px;
   font-size: 11px; font-weight: 500; pointer-events: auto; z-index: 100000; opacity: 0;
   transition: opacity 0.2s, transform 0.2s; transform: translate(-50%, -100%) scale(0.96);
-  margin-top: -10px; box-shadow: 0 12px 36px rgba(0,0,0,0.18); text-align: left; max-width: 320px;
-  line-height: 1.4; border: 1px solid var(--border-subtle);
+  margin-top: -10px; box-shadow: 0 16px 40px rgba(25, 24, 22, 0.16); text-align: left; max-width: 330px;
+  line-height: 1.4; border: 1px solid var(--border-fine); display: none;
 }
 #hoverTooltip::after {
   content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-  border-width: 6px; border-style: solid; border-color: #FFFFFF transparent transparent transparent;
+  border-width: 6px; border-style: solid; border-color: var(--bg-card) transparent transparent transparent;
 }
-#hoverTooltip.show { opacity: 1; transform: translate(-50%, -100%) scale(1); }
-.tooltip-title{ font-family: var(--font-display); font-weight: 700; font-size: 13px; color: var(--ink); margin-bottom: 2px; }
+#hoverTooltip.show { opacity: 1; transform: translate(-50%, -100%) scale(1); display: block; }
+.tooltip-title{ font-family: var(--font-display); font-weight: 700; font-size: 13.5px; color: var(--ink); margin-bottom: 2px; }
 .tooltip-sub{ font-size: 10.5px; color: var(--ink-secondary); margin-bottom: 6px; }
-.tooltip-notes{ background: var(--bg-cream-subtle); padding: 6px 9px; border-radius: 6px; font-size: 10.5px; margin-top: 6px; max-height: 110px; overflow-y: auto; white-space: pre-line; border: 1px solid var(--border-subtle); }
-.tooltip-maps-btn{ display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 10.5px; font-weight: 700; color: var(--google-blue); text-decoration: none; }
-.tooltip-maps-btn:hover{ text-decoration: underline; }
+.tooltip-notes{ background: var(--bg-sand); padding: 6px 9px; border-radius: 6px; font-size: 10.5px; margin-top: 6px; max-height: 110px; overflow-y: auto; white-space: pre-line; border: 1px solid var(--border-fine); }
+.tooltip-maps-btn{
+  display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 10.5px; font-weight: 700;
+  color: #fff; background: var(--ink); padding: 5px 12px; border-radius: var(--radius-pill); text-decoration: none;
+}
+.tooltip-maps-btn:hover{ background: var(--brass-dark); }
 
 /* ═══════════════════════════════════════════════════════════════
-   4. PROJEKT-SEITENLEISTE (GOOGLE AI CARD LOOK)
+   4. PROJEKT-SEITENLEISTE
    ═══════════════════════════════════════════════════════════════ */
 .project-sidebar{
   width: var(--project-sidebar-w); min-width: 230px; max-width: 580px;
-  background: var(--bg-cream-subtle); border-right: 1px solid var(--border-subtle);
+  background: var(--bg-sand-subtle); border-right: 1px solid var(--border-fine);
   display: flex; flex-direction: column; flex-shrink: 0; position: relative; z-index: 250; height: 100%;
 }
-.project-sidebar-head{ padding: 16px 14px 12px; display: flex; align-items: center; justify-content: space-between; }
-.project-sidebar-title{ font-family: var(--font-display); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-secondary); }
+.project-sidebar-head{ padding: 18px 14px 12px; display: flex; align-items: center; justify-content: space-between; }
+.project-sidebar-title{ font-family: var(--font-display); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--ink-secondary); }
 .project-sidebar-body{ padding: 0 12px 12px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
 .project-sidebar-body .list-search, .project-sidebar-body select {
-  width: 100%; padding: 8px 12px; border: 1px solid var(--border-subtle); border-radius: var(--radius-pill);
-  background: #FFFFFF; font-size: 12px; outline: none; transition: all 0.2s;
+  width: 100%; padding: 8px 12px; border: 1px solid var(--border-fine); border-radius: var(--radius-pill);
+  background: var(--bg-card); font-size: 12px; outline: none; transition: all 0.2s; color: var(--ink);
 }
-.project-sidebar-body .list-search:focus, .project-sidebar-body select:focus { border-color: var(--google-blue); box-shadow: 0 0 0 3px var(--google-blue-bg); }
+.project-sidebar-body .list-search:focus, .project-sidebar-body select:focus { border-color: var(--ink); }
 .project-list{ flex: 1; min-height: 0; overflow-y: auto; padding: 4px 10px 16px; display: flex; flex-direction: column; gap: 6px; }
 .project-list::-webkit-scrollbar{width:5px}
 .project-list::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:10px}
 
-/* Chips im Google AI Pill Style */
+/* Chips */
 .pal-chip{
   display: flex; align-items: center; justify-content: space-between; gap: 6px;
   padding: 6px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;
-  cursor: pointer; background: #FFFFFF; border: 1px solid var(--border-subtle);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: transform .12s, box-shadow .12s, border-color .15s;
+  cursor: pointer; background: var(--bg-card); border: 1px solid var(--border-fine);
+  box-shadow: 0 1px 3px rgba(25, 24, 22, 0.04); transition: transform .12s, box-shadow .12s, border-color .15s;
 }
-.pal-chip:hover{ transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-.pal-chip.active{ border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink) inset, 0 4px 12px rgba(0,0,0,0.12); }
-.pal-chip.both-done{ border-color: var(--google-green) !important; box-shadow: 0 0 0 1.5px var(--google-green) inset !important; }
+.pal-chip:hover{ transform: translateY(-1px); box-shadow: 0 4px 12px rgba(25, 24, 22, 0.08); }
+.pal-chip.active{ border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink) inset, 0 4px 12px rgba(25, 24, 22, 0.12); }
+.pal-chip.done-all{ border-color: var(--forest-done) !important; box-shadow: 0 0 0 1.5px var(--forest-done) inset !important; }
 .pal-chip-title{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
 .pal-chip-actions{ display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 
-/* Split-Pille (DC | AC) */
 .phase-pill-wrap {
   display: inline-flex; align-items: center; gap: 2px;
-  background: rgba(0,0,0,0.22); padding: 2px 4px; border-radius: var(--radius-pill);
+  background: rgba(25, 24, 22, 0.2); padding: 2px 4px; border-radius: var(--radius-pill);
+  cursor: pointer; transition: transform 0.1s;
 }
+.phase-pill-wrap:hover{ transform: scale(1.08); }
 .phase-pip {
   font-size: 8px; font-weight: 800; font-family: var(--font-mono);
-  padding: 1px 4px; border-radius: 4px; color: rgba(255,255,255,0.5);
+  padding: 1px 4px; border-radius: 4px; color: rgba(255,255,255,0.45);
   background: transparent; transition: all 0.15s;
 }
-.phase-pip.is-active-dc { background: var(--google-blue); color: #fff; }
-.phase-pip.is-active-ac { background: #E37400; color: #fff; }
-.pal-chip.both-done .phase-pip.is-active-dc,
-.pal-chip.both-done .phase-pip.is-active-ac { background: var(--google-green); color: #fff; }
+.phase-pip.is-active-dc { background: var(--dc-slate); color: #fff; }
+.phase-pip.is-active-ac { background: var(--ac-copper); color: #fff; }
+.pal-chip.done-all .phase-pip.is-active-dc,
+.pal-chip.done-all .phase-pip.is-active-ac { background: var(--forest-done); color: #fff; }
 
-.pal-chip .cnt{ font-size: 9px; font-family: var(--font-mono); padding: 2px 5px; background: rgba(0,0,0,0.18); border-radius: var(--radius-pill); color: #fff; }
+.pal-chip .cnt{ font-size: 9px; font-family: var(--font-mono); padding: 2px 5px; background: rgba(25, 24, 22, 0.18); border-radius: var(--radius-pill); color: #fff; }
 .chip-btn{ background: transparent; border: none; font-size: 12px; cursor: pointer; opacity: 0.55; padding: 2px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.15s; line-height: 1; }
 .chip-btn:hover{ opacity: 1; transform: scale(1.2); }
-.chip-btn.btn-done:hover{ color: var(--google-blue); }
-.chip-btn.btn-del:hover{ color: var(--google-red); }
-.ac-warn{ background: var(--google-red); color: #fff; font-size: 8px; font-weight: 800; padding: 2px 5px; border-radius: var(--radius-pill); white-space: nowrap; letter-spacing: 0.3px; text-transform: uppercase; }
+.chip-btn.btn-done:hover{ color: var(--dc-slate); }
+.chip-btn.btn-del:hover{ color: var(--danger-clay); }
+.ac-warn{ background: var(--danger-clay); color: #fff; font-size: 8px; font-weight: 800; padding: 2px 5px; border-radius: var(--radius-pill); white-space: nowrap; letter-spacing: 0.3px; text-transform: uppercase; }
 
 .project-sidebar-resizer{ position: absolute; top: 0; right: -3px; width: 6px; height: 100%; cursor: col-resize; z-index: 260; touch-action: none; }
 .project-sidebar-resizer::after{ content: ''; position: absolute; top: 0; right: 2px; width: 2px; height: 100%; background: transparent; transition: background 0.15s; }
-.project-sidebar-resizer:hover::after, .project-sidebar-resizer.dragging::after{ background: var(--google-blue); }
+.project-sidebar-resizer:hover::after, .project-sidebar-resizer.dragging::after{ background: var(--brass); }
 
 /* ═══════════════════════════════════════════════════════════════
-   5. HAUPTBEREICH & TOPBAR (FLOATING CAPSULE LOOK)
+   5. HAUPTBEREICH & TOPBAR
    ═══════════════════════════════════════════════════════════════ */
 .main-wrapper{ flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; position: relative; z-index: 1; }
 .topbar{
   position: relative; z-index: 200; flex-shrink: 0; min-height: 56px;
-  background: var(--bg-cream-card); border-bottom: 1px solid var(--border-subtle);
-  display: flex; align-items: center; padding: 0 20px; gap: 12px;
+  background: var(--bg-card); border-bottom: 1px solid var(--border-fine);
+  display: flex; align-items: center; padding: 0 18px; gap: 12px;
 }
-.logo{ font-family: var(--font-display); font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
-.logo span{ color: var(--google-blue); }
-.logo-badge { font-family: var(--font-mono); font-size: 9px; background: var(--ink); color: var(--ai-lime); padding: 2px 7px; border-radius: var(--radius-pill); letter-spacing: 0.5px; }
+.logo{ font-family: var(--font-display); font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+.logo span{ color: var(--brass-dark); }
+.logo-badge { font-family: var(--font-mono); font-size: 9px; background: var(--ink); color: var(--bg-sand); padding: 2px 8px; border-radius: var(--radius-pill); letter-spacing: 0.8px; white-space: nowrap; font-weight: 700; }
 
 .tab-nav{
   position: relative; z-index: 190; flex-shrink: 0; display: flex;
-  background: var(--bg-cream-subtle); border-bottom: 1px solid var(--border-subtle);
-  overflow-x: auto; padding: 4px 12px; gap: 4px;
+  background: var(--bg-sand-subtle); border-bottom: 1px solid var(--border-fine);
+  overflow-x: auto; padding: 4px 10px; gap: 4px; -webkit-overflow-scrolling: touch;
 }
 .tab{
   padding: 8px 16px; font-size: 11px; font-weight: 700; cursor: pointer;
-  color: var(--ink-secondary); border-radius: var(--radius-pill); letter-spacing: .2px;
+  color: var(--ink-secondary); border-radius: var(--radius-pill); letter-spacing: .3px;
   text-transform: uppercase; white-space: nowrap; display: flex; align-items: center; gap: 6px;
-  transition: all 0.15s; border: 1px solid transparent;
+  transition: all 0.15s; border: 1px solid transparent; min-height: 36px;
 }
-.tab:hover{ background: rgba(0,0,0,0.04); }
+.tab:hover{ background: rgba(25, 24, 22, 0.04); }
 .tab.active{
-  color: var(--ink); background: #FFFFFF; border-color: var(--border-subtle);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-weight: 800;
+  color: var(--ink); background: var(--bg-card); border-color: var(--border-fine);
+  box-shadow: 0 1px 3px rgba(25, 24, 22, 0.05); font-weight: 800;
 }
 
 .app-main{ flex: 1; position: relative; overflow: hidden; }
-.view{ position: absolute; inset: 0; display: none; overflow: auto; padding: 16px; }
+.view{ position: absolute; inset: 0; display: none; overflow: auto; padding: 16px; -webkit-overflow-scrolling: touch; }
 .view.active{ display: block; }
 
 /* TOOLBAR & BUTTONS */
@@ -230,254 +236,320 @@ input,select,textarea{font-family:inherit;font-size:13px}
 .kpi-row{ display: flex; gap: 6px; flex-wrap: wrap; }
 .kpi-pill{
   display: flex; flex-direction: column; justify-content: center;
-  padding: 6px 14px; border-radius: var(--radius-pill); background: #FFFFFF;
-  border: 1px solid var(--border-subtle); min-width: 80px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  padding: 6px 14px; border-radius: var(--radius-pill); background: var(--bg-card);
+  border: 1px solid var(--border-fine); min-width: 80px; box-shadow: 0 1px 2px rgba(25, 24, 22, 0.03);
 }
 .kpi-lbl{ font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--ink-muted); }
 .kpi-val{ font-family: var(--font-mono); font-size: 14px; font-weight: 800; margin-top: 1px; color: var(--ink); }
 
-.planner-toolbar{ display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+.planner-toolbar{ display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
 .btn{
-  background: #FFFFFF; border: 1px solid var(--border-subtle); padding: 7px 14px;
+  background: var(--bg-card); border: 1px solid var(--border-fine); padding: 7px 14px;
   font-size: 10.5px; font-weight: 700; border-radius: var(--radius-pill); color: var(--ink);
   text-transform: uppercase; letter-spacing: .3px; transition: all 0.15s; white-space: nowrap;
-  min-height: 34px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  min-height: 36px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(25, 24, 22, 0.03);
 }
-.btn:hover{ background: var(--bg-cream-subtle); border-color: var(--border-strong); }
-.btn.primary{ background: var(--ink); color: #FFFFFF; border-color: var(--ink); }
-.btn.primary:hover{ background: #2D2D2E; }
-.btn.danger{ background: var(--google-red-bg); color: var(--google-red); border-color: rgba(217,48,37,0.2); }
-.btn.success{ background: var(--google-green-bg); color: var(--google-green); border-color: rgba(30,142,62,0.2); }
+.btn:hover{ background: var(--bg-sand-subtle); border-color: var(--border-strong); }
+.btn.primary{ background: var(--ink); color: var(--bg-sand); border-color: var(--ink); }
+.btn.primary:hover{ background: #2E2C29; }
+.btn.danger{ background: var(--danger-bg); color: var(--danger-clay); border-color: rgba(179, 57, 57, 0.2); }
+.btn.success{ background: var(--success-bg); color: var(--forest-done); border-color: rgba(40, 92, 66, 0.2); }
 
 .btn.btn-lock{ font-weight: 800; }
-.btn.btn-lock.locked{ background: #FFFFFF; color: var(--ink-secondary); }
-.btn.btn-lock.unlocked{ background: var(--google-blue); color: #FFFFFF; border-color: var(--google-blue); box-shadow: 0 0 0 3px var(--google-blue-bg); }
+.btn.btn-lock.locked{ background: var(--bg-card); color: var(--ink-secondary); }
+.btn.btn-lock.unlocked{ background: var(--ink); color: var(--brass); border-color: var(--ink); box-shadow: 0 0 0 2px var(--brass-glow); }
 
 .seg{
-  display: flex; gap: 2px; background: var(--bg-cream-subtle);
-  border: 1px solid var(--border-subtle); border-radius: var(--radius-pill); padding: 2px;
+  display: flex; gap: 2px; background: var(--bg-sand-subtle);
+  border: 1px solid var(--border-fine); border-radius: var(--radius-pill); padding: 2px;
 }
-.seg .btn{ border: none; background: transparent; padding: 5px 12px; min-height: 28px; border-radius: var(--radius-pill); font-size: 10px; color: var(--ink-secondary); box-shadow: none; }
-.seg .btn.active{ background: #FFFFFF; color: var(--ink); font-weight: 800; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.seg .btn{ border: none; background: transparent; padding: 5px 12px; min-height: 30px; border-radius: var(--radius-pill); font-size: 10px; color: var(--ink-secondary); box-shadow: none; }
+.seg .btn.active{ background: var(--bg-card); color: var(--ink); font-weight: 800; box-shadow: 0 1px 3px rgba(25, 24, 22, 0.08); }
 
 /* ═══════════════════════════════════════════════════════════════
-   6. GRID TABELLE (CLEAN GOOGLE SHEETS / LAB LOOK)
+   6. GRID TABELLE MIT MEHRFACH-TERMIN-KARTEN PRO TAG
    ═══════════════════════════════════════════════════════════════ */
 .planner-grid-wrap{
-  overflow: auto; background: #FFFFFF; border-radius: var(--radius-card);
-  border: 1px solid var(--border-subtle); max-height: calc(100vh - 230px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: auto; background: var(--bg-card); border-radius: var(--radius-card);
+  border: 1px solid var(--border-fine); max-height: calc(100vh - 230px);
+  box-shadow: 0 2px 8px rgba(25, 24, 22, 0.04); -webkit-overflow-scrolling: touch;
 }
 table{ border-collapse: collapse; table-layout: fixed; width: max-content; min-width: 100%; }
-th, td{ border: 1px solid #E8E4DA; text-align: center; font-size: 11px; }
+th, td{ border: 1px solid #E2DDD2; text-align: center; font-size: 11px; vertical-align: top; }
 
 #gridHead tr:nth-child(1) th{
   position: sticky; top: 0; z-index: 100; height: 26px; font-size: 9px; font-weight: 800;
-  text-transform: uppercase; background: var(--ink); color: #FFFFFF; letter-spacing: 0.5px;
+  text-transform: uppercase; background: var(--ink); color: var(--bg-sand); letter-spacing: 0.6px;
 }
 #gridHead tr:nth-child(2) th{
-  position: sticky; top: 26px; z-index: 99; height: 40px; background: #F6F3EB; color: var(--ink);
+  position: sticky; top: 26px; z-index: 99; height: 40px; background: #EEE9DF; color: var(--ink);
 }
 
-th.is-today-head { background: #ECE7D9 !important; color: var(--google-red) !important; border-bottom: 3px solid var(--google-red) !important; }
-td.is-today-col { border-left: 2px solid rgba(217,48,37,0.3) !important; border-right: 2px solid rgba(217,48,37,0.3) !important; }
+th.is-today-head { background: #E6DFD1 !important; color: var(--danger-clay) !important; border-bottom: 3px solid var(--danger-clay) !important; }
+td.is-today-col { border-left: 2px solid rgba(179, 57, 57, 0.35) !important; border-right: 2px solid rgba(179, 57, 57, 0.35) !important; }
 
 td:first-child{
-  position: sticky; left: 0; z-index: 80; background: #FAF8F3 !important;
-  width: 140px !important; text-align: left; padding: 4px 8px; font-weight: 700; border-right: 2px solid var(--ink);
+  position: sticky; left: 0; z-index: 80; background: #FAF7F0 !important;
+  width: 140px !important; text-align: left; padding: 6px 8px; font-weight: 700; border-right: 2px solid var(--ink);
 }
 .fixed-corner{ position: sticky; left: 0; top: 0; z-index: 110 !important; background: var(--ink) !important; width: 140px !important; }
 
-.monday-start{ border-left: 3px solid var(--google-blue) !important; }
+.monday-start{ border-left: 3px solid var(--brass) !important; }
 .day-num{ font-family: var(--font-mono); font-size: 13px; font-weight: 800; }
 .day-short{ font-size: 8px; font-weight: 700; text-transform: uppercase; color: var(--ink-muted); margin-top: 1px; }
 
-.project-cell{ height: 44px; cursor: crosshair; font-size: 8.5px; font-weight: 800; text-transform: uppercase; padding: 2px; line-height: 1.1; position: relative; transition: outline 0.1s; }
-.project-cell:hover{ outline: 2px solid var(--ink); outline-offset: -2px; z-index: 10; }
-.selecting{ background-color: rgba(26,115,232,0.18) !important; outline: 2px dashed var(--google-blue) !important; }
-
-/* Pulsieren bei Auswahl */
-.project-cell.is-highlighted {
-  outline: 3px solid var(--google-blue) !important;
-  box-shadow: 0 0 12px rgba(26,115,232,0.4) !important;
-  z-index: 50; animation: pulseGlow 1.5s infinite;
+/* DIE ZELLE & GESTAPELTE MINI-KARTEN */
+.project-cell{
+  height: auto; min-height: 52px; cursor: crosshair; padding: 2px;
+  position: relative; transition: background-color 0.1s;
 }
-@keyframes pulseGlow { 0% { filter: brightness(1); } 50% { filter: brightness(1.2); } 100% { filter: brightness(1); } }
+.project-cell:hover{ outline: 2px solid var(--ink); outline-offset: -2px; z-index: 10; }
+.selecting{ background-color: rgba(194, 166, 118, 0.22) !important; outline: 2px dashed var(--brass-dark) !important; }
+
+.cell-stack{ display: flex; flex-direction: column; gap: 2px; width: 100%; }
+
+.cell-item-card{
+  border-radius: 4px; padding: 2px 4px; font-size: 8.5px; font-weight: 700;
+  color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); text-align: left;
+  display: flex; justify-content: space-between; align-items: center;
+  position: relative; overflow: hidden; line-height: 1.15;
+}
+.cell-item-card.is-highlighted{
+  outline: 2px solid #fff !important;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5) !important;
+}
+.cell-item-name{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.cell-item-del{
+  background: rgba(0,0,0,0.25); border: none; color: #fff; font-size: 9px;
+  width: 13px; height: 13px; border-radius: 2px; display: flex; align-items: center;
+  justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.15s; margin-left: 2px;
+}
+.cell-item-card:hover .cell-item-del{ opacity: 1; }
 
 .ibn-badge {
-  position: absolute; top: 1px; right: 1px;
-  background: var(--ink); color: var(--ai-lime);
-  font-family: var(--font-mono); font-size: 7px; font-weight: 800;
-  padding: 1px 3px; border-radius: 3px; line-height: 1;
+  background: var(--ink); color: var(--brass); font-family: var(--font-mono);
+  font-size: 7px; font-weight: 800; padding: 1px 3px; border-radius: 2px; margin-right: 2px;
 }
 
-.grid-vacation{
-  background: repeating-linear-gradient(45deg, #FAF8F5, #FAF8F5 6px, #FCE8B2 6px, #FCE8B2 12px) !important;
-  color: #B87503 !important; font-weight: 800 !important; font-style: italic;
+.cell-phone-link {
+  display: none; font-family: var(--font-mono); font-size: 7.5px; font-weight: 700;
+  color: #FFFFFF; background: rgba(25, 24, 22, 0.4); text-decoration: none;
+  padding: 1px 3px; border-radius: 3px; margin-top: 1px; width: fit-content;
 }
-.grid-sick{
-  background: repeating-linear-gradient(45deg, #FAF8F5, #FAF8F5 6px, #FCD5D7 6px, #FCD5D7 12px) !important;
-  color: var(--google-red) !important; font-weight: 800 !important; font-style: italic;
+body.view-W .cell-phone-link { display: inline-flex; }
+
+/* URLAUB & KRANK GESTREIFT */
+.grid-block-vacation{
+  background: repeating-linear-gradient(45deg, #FAF7F0, #FAF7F0 4px, #F5E9D3 4px, #F5E9D3 8px) !important;
+  color: #8C6A30 !important; font-weight: 800 !important; border-radius: 4px; padding: 3px; font-size: 8px;
+}
+.grid-block-sick{
+  background: repeating-linear-gradient(45deg, #FAF7F0, #FAF7F0 4px, #F7DCDA 4px, #F7DCDA 8px) !important;
+  color: var(--danger-clay) !important; font-weight: 800 !important; border-radius: 4px; padding: 3px; font-size: 8px;
 }
 
 table tr.team-divider td{
   border: none; text-align: left !important; font-family: var(--font-mono); font-size: 9.5px;
   font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; padding: 7px 12px !important;
-  position: static !important; width: auto !important; background: var(--bg-cream-subtle); border-top: 2px solid var(--border-strong);
+  position: static !important; width: auto !important; background: var(--bg-sand-subtle); border-top: 2px solid var(--border-strong);
 }
 
-body.view-W table th:not(:first-child), body.view-W .project-cell { width: 140px !important; min-width: 140px !important; max-width: 140px !important; font-size: 9.5px !important; }
-body.view-M table th:not(:first-child), body.view-M .project-cell { width: 62px !important; min-width: 62px !important; max-width: 62px !important; font-size: 8px !important; }
+body.view-W table th:not(:first-child), body.view-W .project-cell { width: 140px !important; min-width: 140px !important; max-width: 140px !important; }
+body.view-M table th:not(:first-child), body.view-M .project-cell { width: 66px !important; min-width: 66px !important; max-width: 66px !important; }
 body.view-J table th:not(:first-child), body.view-J .project-cell { width: 26px !important; min-width: 26px !important; max-width: 26px !important; font-size: 0 !important; }
-body.view-J .day-short { display: none; }
-body.view-J .day-num { font-size: 10px; }
+body.view-J .cell-item-name, body.view-J .cell-item-del, body.view-J .cell-phone-link { display: none !important; }
+body.view-J .cell-item-card { height: 8px; padding: 0; }
 
 /* ═══════════════════════════════════════════════════════════════
-   7. GOOGLE LABS EXPLORER MODAL & PDF EXPORT
+   7. MONTEUR WOCHENANSICHT (MO - FR KARTEN)
    ═══════════════════════════════════════════════════════════════ */
+.monteur-shell{ max-width: 760px; margin: 0 auto; }
+.monteur-day-card{
+  background: var(--bg-card); border-radius: var(--radius-card); padding: 14px 16px; margin-bottom: 14px;
+  border: 1px solid var(--border-fine); box-shadow: 0 2px 6px rgba(25, 24, 22, 0.03);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.monteur-day-header{
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border-fine); padding-bottom: 6px;
+}
+.monteur-day-title{ font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--ink); }
+.monteur-day-date{ font-family: var(--font-mono); font-size: 12px; color: var(--ink-muted); }
+
+.monteur-job-item{
+  background: #FFFFFF; border: 1px solid var(--border-fine); border-radius: 10px;
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 6px;
+}
+.monteur-job-head{ display: flex; justify-content: space-between; align-items: center; }
+.monteur-job-name{ font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--ink); }
+.btn-maps-huge{
+  background: var(--ink); color: var(--bg-sand); text-decoration: none;
+  font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: var(--radius-pill);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: fit-content; margin-top: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   8. RESPONSIVE & AUSBLENDUNGEN
+   ═══════════════════════════════════════════════════════════════ */
+body.role-monteur .admin-only { display: none !important; }
+body.role-monteur .project-sidebar { display: none !important; }
+
+@media (max-width: 768px) {
+  body { flex-direction: column; }
+  .project-sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 500;
+    width: 86vw !important; max-width: 340px;
+    transform: translateX(-100%); transition: transform 0.25s var(--ease);
+    box-shadow: 0 0 50px rgba(0,0,0,0.3);
+  }
+  .project-sidebar.mobile-open { transform: translateX(0); }
+  .project-sidebar-resizer { display: none; }
+  
+  .topbar { padding: 0 12px; min-height: 50px; }
+  .logo { font-size: 15px; }
+  .logo-badge { display: none; }
+  .view { padding: 12px 10px; }
+  .tab-nav { padding: 4px 6px; }
+  .tab { padding: 6px 12px; font-size: 10px; min-height: 32px; }
+  .planner-toolbar { gap: 4px; }
+  .planner-toolbar .btn { padding: 6px 10px; font-size: 9.5px; min-height: 32px; }
+}
+
+/* EXPLORER MODAL & PDF PRINT */
 .explorer-card {
-  background: var(--bg-cream-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-card);
+  background: var(--bg-sand-subtle); border: 1px solid var(--border-fine); border-radius: var(--radius-card);
   padding: 16px; margin-top: 12px;
 }
 .explorer-meta-tag {
   display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono);
-  font-size: 10px; font-weight: 800; background: var(--ink); color: var(--ai-lime);
+  font-size: 10px; font-weight: 800; background: var(--ink); color: var(--brass);
   padding: 3px 8px; border-radius: var(--radius-pill); letter-spacing: 0.5px;
 }
 .explorer-day-card {
-  background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: 10px;
+  background: var(--bg-card); border: 1px solid var(--border-fine); border-radius: 10px;
   padding: 10px 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px;
 }
 .explorer-day-head {
   display: flex; justify-content: space-between; align-items: center;
-  font-size: 12px; font-weight: 800; border-bottom: 1px solid var(--bg-cream-subtle); padding-bottom: 4px;
+  font-size: 12px; font-weight: 800; border-bottom: 1px solid var(--bg-sand-subtle); padding-bottom: 4px;
 }
 
-/* DRUCK-LAYOUT FÜR PDF */
 #printSheet { display: none; }
 @media print {
   body * { visibility: hidden; }
   #printSheet, #printSheet * { visibility: visible; }
   #printSheet {
     display: block !important; position: absolute; left: 0; top: 0; width: 100%;
-    background: #F8F5EE; color: #131314; padding: 24px; font-family: 'Inter', sans-serif;
+    background: #F5F2EB; color: #191816; padding: 24px; font-family: 'Inter', sans-serif;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
   .print-header-explorer {
-    border-bottom: 2px solid #131314; padding-bottom: 12px; margin-bottom: 16px;
+    border-bottom: 2px solid #191816; padding-bottom: 12px; margin-bottom: 16px;
     display: flex; justify-content: space-between; align-items: flex-end;
   }
-  .print-tag { background: #131314; color: #B8D84B; font-family: monospace; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
-  .print-banner { background: #EFEBE0; border-left: 4px solid #131314; padding: 10px 14px; margin-bottom: 16px; border-radius: 4px; font-size: 13px; }
+  .print-tag { background: #191816; color: #C2A676; font-family: monospace; font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+  .print-banner { background: #EAE5DC; border-left: 4px solid #191816; padding: 10px 14px; margin-bottom: 16px; border-radius: 4px; font-size: 13px; }
   .print-table { width: 100%; border-collapse: collapse; margin-top: 12px; background: #fff; }
-  .print-table th, .print-table td { border: 1px solid #d8d3c8; padding: 10px; text-align: left; font-size: 12px; vertical-align: top; }
-  .print-table th { background: #F6F3EB; font-weight: 800; }
-}
-
-/* MONTEUR ANSICHT, TODOS, ADMIN */
-.monteur-shell{ max-width: 680px; margin: 0 auto; }
-.monteur-card{
-  background: #FFFFFF; border-radius: var(--radius-card); padding: 16px; margin-bottom: 12px;
-  border: 1px solid var(--border-subtle); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  display: flex; flex-direction: column; gap: 8px;
-}
-.monteur-card-header{ display: flex; justify-content: space-between; align-items: center; }
-.monteur-card-title{ font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--ink); }
-.monteur-card-address{ font-size: 12px; color: var(--ink-secondary); display: flex; align-items: center; gap: 6px; }
-.btn-maps{
-  background: var(--ink); color: #FFFFFF; text-decoration: none;
-  font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: var(--radius-pill);
-  display: inline-flex; align-items: center; gap: 5px; width: fit-content; margin-top: 4px;
+  .print-table th, .print-table td { border: 1px solid #c4bcac; padding: 10px; text-align: left; font-size: 12px; vertical-align: top; }
+  .print-table th { background: #FAF7F0; font-weight: 800; }
 }
 
 .task-shell{ max-width: 720px; margin: 0 auto; }
 .task-shell h2{ font-family: var(--font-display); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
 .task-sub{ font-size: 10px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
 .task-monitor{ display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px; }
-.task-stat{ background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: 14px 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.task-stat{ background: var(--bg-card); border: 1px solid var(--border-fine); border-radius: var(--radius-card); padding: 14px 8px; text-align: center; box-shadow: 0 1px 3px rgba(25, 24, 22, 0.04); }
 .task-stat-num{ font-family: var(--font-mono); font-size: 24px; font-weight: 800; color: var(--ink); line-height: 1; }
 .task-stat-lbl{ font-size: 9px; text-transform: uppercase; letter-spacing:.5px; color: var(--ink-muted); margin-top: 4px; font-weight: 700; }
-.task-stat.today{ border-color: var(--google-yellow); background: var(--google-yellow-bg); }
-.task-stat.today .task-stat-num{ color: #B06000; }
-.task-stat.overdue{ border-color: var(--google-red); background: var(--google-red-bg); }
-.task-stat.overdue .task-stat-num{ color: var(--google-red); }
-.task-input-row{ display: flex; gap: 0; margin-bottom: 16px; border-radius: var(--radius-pill); border: 1px solid var(--border-subtle); background: #FFFFFF; overflow: hidden; }
+.task-stat.today{ border-color: var(--brass); background: rgba(194, 166, 118, 0.12); }
+.task-stat.today .task-stat-num{ color: var(--brass-dark); }
+.task-stat.overdue{ border-color: var(--danger-clay); background: var(--danger-bg); }
+.task-stat.overdue .task-stat-num{ color: var(--danger-clay); }
+.task-input-row{ display: flex; gap: 0; margin-bottom: 16px; border-radius: var(--radius-pill); border: 1px solid var(--border-fine); background: var(--bg-card); overflow: hidden; }
 .task-input-row input{ flex: 1; padding: 10px 16px; border: none; background: transparent; font-size: 13px; outline: none; }
 .task-list{ display: flex; flex-direction: column; gap: 6px; }
-.task-item{ display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: var(--radius-card); }
+.task-item{ display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border-fine); border-radius: var(--radius-card); }
 .task-item.done{ opacity: .45; }
 .task-item.done .task-text{ text-decoration: line-through; }
 
 .admin-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media(max-width:900px){ .admin-grid{ grid-template-columns: 1fr; } }
-.admin-card{ background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.admin-card{ background: var(--bg-card); border: 1px solid var(--border-fine); border-radius: var(--radius-card); padding: 20px; box-shadow: 0 1px 3px rgba(25, 24, 22, 0.04); }
 .admin-list{ max-height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 12px; padding-right: 6px; }
-.admin-item{ display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg-cream-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-card); }
+.admin-item{ display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg-sand-subtle); border: 1px solid var(--border-fine); border-radius: var(--radius-card); }
 
-.import-box{ background: #FFFFFF; border: 2px dashed var(--border-strong); border-radius: var(--radius-card); padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; }
-.import-box:hover{ border-color: var(--google-blue); background: var(--google-blue-bg); }
+.import-box{ background: var(--bg-card); border: 2px dashed var(--border-strong); border-radius: var(--radius-card); padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; }
+.import-box:hover{ border-color: var(--brass-dark); background: rgba(194, 166, 118, 0.1); }
 
-.preview-table-wrap{ max-height: 260px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: 8px; margin: 12px 0; }
+.preview-table-wrap{ max-height: 280px; overflow-y: auto; border: 1px solid var(--border-fine); border-radius: 8px; margin: 12px 0; }
 .preview-table{ width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
-.preview-table th{ position: sticky; top: 0; background: var(--ink); color: var(--ai-lime); padding: 6px 10px; font-weight: 700; z-index: 10; }
-.preview-table td{ padding: 6px 10px; border-bottom: 1px solid var(--border-subtle); }
-.preview-table tr:hover td{ background: rgba(26,115,232,0.06); }
+.preview-table th{ position: sticky; top: 0; background: var(--ink); color: var(--brass); padding: 8px 10px; font-weight: 700; z-index: 10; }
+.preview-table td{ padding: 6px 10px; border-bottom: 1px solid var(--border-fine); vertical-align: middle; }
+.preview-table tr:hover td{ background: rgba(194, 166, 118, 0.08); }
+.preview-scope-select{ padding: 4px 6px; border: 1px solid var(--border-strong); border-radius: 4px; font-size: 11px; font-weight: 700; background: #fff; }
 
-.overlay{ position: fixed; inset: 0; background: rgba(19,19,20,0.6); backdrop-filter: blur(4px); z-index: 5000; display: none; }
-.modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #FFFFFF; border: 1px solid var(--border-subtle); box-shadow: 0 24px 64px rgba(0,0,0,0.25); border-radius: 20px; padding: 24px; display: none; z-index: 5001; width: 440px; max-width: 94vw; }
+.overlay{ position: fixed; inset: 0; background: rgba(25, 24, 22, 0.65); backdrop-filter: blur(4px); z-index: 5000; display: none; }
+.modal{ position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-card); border: 1px solid var(--border-fine); box-shadow: 0 24px 64px rgba(25, 24, 22, 0.25); border-radius: 20px; padding: 24px; display: none; z-index: 5001; width: 440px; max-width: 94vw; }
 .modal.show{ display: block; }
 .modal h2{ font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 16px; }
 .form-field{ margin-bottom: 12px; }
 .form-field label{ display: block; font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; margin-bottom: 4px; }
-.form-field input, .form-field select, .form-field textarea{ width: 100%; padding: 9px 12px; border: 1px solid var(--border-subtle); border-radius: 8px; background: #FFFFFF; font-size: 13px; outline: none; }
-.form-field input:focus, .form-field select:focus, .form-field textarea:focus{ border-color: var(--google-blue); }
+.form-field input, .form-field select, .form-field textarea{ width: 100%; padding: 9px 12px; border: 1px solid var(--border-fine); border-radius: 8px; background: #FFFFFF; font-size: 13px; outline: none; }
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus{ border-color: var(--ink); }
 .m-btns{ display: flex; gap: 8px; margin-top: 18px; }
-.m-btn{ flex: 1; padding: 10px; border-radius: var(--radius-pill); font-weight: 700; font-size: 12px; border: 1px solid var(--border-subtle); background: transparent; }
-.m-save{ background: var(--ink); color: #FFFFFF; border-color: var(--ink); }
+.m-btn{ flex: 1; padding: 10px; border-radius: var(--radius-pill); font-weight: 700; font-size: 12px; border: 1px solid var(--border-fine); background: transparent; }
+.m-save{ background: var(--ink); color: var(--bg-sand); border-color: var(--ink); }
 
 .toast-stack{ position: fixed; bottom: 18px; right: 18px; z-index: 9999; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-.toast{ display: flex; align-items: center; gap: 9px; background: var(--ink); color: #fff; border-radius: var(--radius-pill); padding: 10px 16px; font-size: 12px; font-weight: 600; opacity: 0; transform: translateY(8px); transition: opacity .25s, transform .25s; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.toast{ display: flex; align-items: center; gap: 9px; background: var(--ink); color: var(--bg-sand); border-radius: var(--radius-pill); padding: 10px 16px; font-size: 12px; font-weight: 600; opacity: 0; transform: translateY(8px); transition: opacity .25s, transform .25s; box-shadow: 0 4px 12px rgba(25, 24, 22, 0.2); }
 .toast.show{ opacity: 1; transform: translateY(0); }
-.toast .dot{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--ai-lime); }
-.toast.t-error .dot{ background: var(--google-red); }
-.toast.t-warn .dot{ background: var(--google-yellow); }
+.toast .dot{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--brass); }
+.toast.t-error .dot{ background: var(--danger-clay); }
+.toast.t-warn .dot{ background: var(--brass); }
 </style>
 </head>
 <body id="appBody" class="view-M">
 
-<div class="ai-glow-blob blob-top"></div>
-<div class="ai-glow-blob blob-bottom"></div>
+<div class="ambient-glow glow-top"></div>
+<div class="ambient-glow glow-bottom"></div>
 
-<!-- 1. LOGIN SCREEN -->
+<!-- 1. LOGIN SCREEN MIT 2 ROLLEN -->
 <div id="loginScreen">
   <div class="login-card">
-    <div class="login-tag">✦ GOOGLE AI LABS</div>
-    <div class="logo" style="font-size:24px;justify-content:center;margin-bottom:8px">SOL<span>PRO</span> <span class="logo-badge">v2</span></div>
-    <div style="font-size:12px;color:var(--ink-muted);margin-bottom:24px;font-weight:600">Solar Resource & Pipeline Explorer</div>
+    <div class="login-tag">AYOCIN // SOLPRO</div>
+    <div class="logo" style="font-size:22px;justify-content:center;margin-bottom:6px">SOL<span>PRO</span> <span class="logo-badge">PRO</span></div>
+    <div style="font-size:12px;color:var(--ink-muted);margin-bottom:20px;font-weight:600">Architectural Solar Operations</div>
     <div class="form-field" style="text-align:left">
       <label>Passwort</label>
       <input type="password" id="loginPassword" placeholder="Passwort eingeben..." style="text-align:center;font-size:15px;letter-spacing:2px">
     </div>
-    <button class="btn primary" style="width:100%;justify-content:center;margin-top:10px" onclick="tryLogin()">System starten</button>
+    <button class="btn primary" style="width:100%;justify-content:center;margin-top:10px" onclick="tryLogin()">System öffnen</button>
+    <div class="login-hint-box">
+      🔑 <b>Passwörter:</b><br>
+      • <code>solpro</code> = Vollzugriff für Büro / Planer<br>
+      • <code>monteur</code> = Monteur-Wochenplan & Navigation
+    </div>
   </div>
 </div>
 
 <div id="loader"><div class="spinner"></div><div class="loader-text" id="loaderText">Lade Suite…</div></div>
+
+<!-- DER INTERAKTIVE TOOLTIP -->
 <div id="hoverTooltip"></div>
 
-<!-- 2. PROJEKT-SEITENLEISTE -->
-<div class="project-sidebar" id="projectSidebar">
+<!-- 2. PROJEKT-SEITENLEISTE (ADMIN ONLY) -->
+<div class="project-sidebar admin-only" id="projectSidebar">
   <div class="project-sidebar-head">
-    <span class="project-sidebar-title">✦ Projekt-Pool</span>
+    <span class="project-sidebar-title">📁 Projekt-Pool</span>
   </div>
   <div class="project-sidebar-body">
     <input type="text" class="list-search" id="plannerSearch" placeholder="🔍 Nachname / Baustelle..." onkeyup="renderPalette()">
     <select id="plannerStatus" onchange="renderPalette()">
       <option value="">Alle offenen</option>
-      <option value="both_done">Nur Komplett geplante (✅ DC+AC)</option>
-      <option value="dc_only">Nur DC eingeteilt (AC offen)</option>
-      <option value="ac_only">Nur AC eingeteilt (DC offen)</option>
-      <option value="none">Noch gar nicht eingeteilt</option>
+      <option value="both_done">Nur Fertig geplante (✅)</option>
+      <option value="scope_both">Nur Komplettaufträge (DC+AC)</option>
+      <option value="scope_dc">Nur reine Montage (Nur DC)</option>
+      <option value="scope_ac">Nur reine Elektrik (Nur AC)</option>
     </select>
   </div>
   <div class="project-list" id="paletteUI"></div>
@@ -488,9 +560,9 @@ body.view-J .day-num { font-size: 10px; }
 <div class="main-wrapper">
 
   <div class="topbar">
-    <div class="logo">SOL<span>PRO</span> <span class="logo-badge">✦ AI EXPLORER</span></div>
-    <div style="font-size:11px;color:var(--ink-secondary);margin-left:12px;font-weight:500">
-      💡 <b style="color:var(--ink)">Rechtsklick</b> löscht Kästchen · <b style="color:var(--ink)">Klick links</b> markiert alle Tage
+    <div class="logo">SOL<span>PRO</span> <span class="logo-badge" id="roleBadge">PRO SUITE</span></div>
+    <div style="font-size:11px;color:var(--ink-secondary);margin-left:12px;font-weight:500" class="admin-only">
+      💡 <b style="color:var(--ink)">Multi-Termine:</b> Klick auf Zelle stapelt Termine · <b style="color:var(--ink)">Rechtsklick</b> löscht einzelnen Termin!
     </div>
     <div style="margin-left:auto">
       <button class="btn" style="font-size:9px;padding:3px 10px;min-height:auto" onclick="logout()" title="Abmelden">🔒 Abmelden</button>
@@ -498,17 +570,17 @@ body.view-J .day-num { font-size: 10px; }
   </div>
 
   <div class="tab-nav" id="tabNav">
-    <div class="tab active" data-tab="planner">📅 Planer</div>
-    <div class="tab" data-tab="monteur">📱 Monteur-Ansicht</div>
-    <div class="tab" data-tab="tasks">✓ Aufgaben</div>
-    <div class="tab" data-tab="import">📥 Taifun Import</div>
-    <div class="tab" data-tab="admin">⚙️ Verwaltung</div>
+    <div class="tab active admin-only" data-tab="planner">📅 Planer</div>
+    <div class="tab" data-tab="monteur">📱 Monteur-Wochenplan</div>
+    <div class="tab admin-only" data-tab="tasks">✓ Aufgaben</div>
+    <div class="tab admin-only" data-tab="import">📥 Taifun Import</div>
+    <div class="tab admin-only" data-tab="admin">⚙️ Verwaltung</div>
   </div>
 
   <div class="app-main">
 
     <!-- PLANER VIEW -->
-    <div id="view-planner" class="view active">
+    <div id="view-planner" class="view active admin-only">
       <div class="planner-header">
         <div class="kpi-row" id="kpiRow"></div>
       </div>
@@ -534,29 +606,29 @@ body.view-J .day-num { font-size: 10px; }
       </div>
     </div>
 
-    <!-- MONTEUR ANSICHT -->
+    <!-- MONTEUR WOCHENANSICHT (MO - FR KARTEN) -->
     <div id="view-monteur" class="view">
       <div class="monteur-shell">
-        <h2>📱 Monteur-Einsatzplan</h2>
-        <div class="task-sub">Schnellansicht für Baustellen & Navigation auf dem Smartphone</div>
+        <h2>📱 Monteur-Wochenplan</h2>
+        <div class="task-sub">Einsatzplan für die gesamte Arbeitswoche (Montag bis Freitag)</div>
 
-        <div style="background:#fff;padding:16px;border-radius:var(--radius-card);border:1px solid var(--border-subtle);margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div style="background:var(--bg-card);padding:16px;border-radius:var(--radius-card);border:1px solid var(--border-fine);margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
           <div style="flex:1;min-width:180px">
-            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;display:block;margin-bottom:4px">Partie / Bus:</label>
-            <select id="monteurBusSelect" onchange="renderMonteurView()" style="padding:8px 12px;border-radius:var(--radius-pill);border:1px solid var(--border-subtle);width:100%;font-weight:700"></select>
+            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;display:block;margin-bottom:4px">Dein Bus / Partie:</label>
+            <select id="monteurBusSelect" onchange="saveMonteurBusPref(); renderMonteurView()" style="padding:8px 12px;border-radius:var(--radius-pill);border:1px solid var(--border-fine);width:100%;font-weight:700;background:#fff"></select>
           </div>
-          <div style="min-width:140px">
-            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;display:block;margin-bottom:4px">Datum:</label>
-            <input type="date" id="monteurDateSelect" onchange="renderMonteurView()" style="padding:7px 12px;border-radius:var(--radius-pill);border:1px solid var(--border-subtle);font-size:12px;width:100%">
+          <div style="min-width:160px">
+            <label style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;display:block;margin-bottom:4px">Kalenderwoche:</label>
+            <select id="monteurKwSelect" onchange="renderMonteurView()" style="padding:8px 12px;border-radius:var(--radius-pill);border:1px solid var(--border-fine);width:100%;font-weight:700;background:#fff"></select>
           </div>
         </div>
 
-        <div id="monteurCardContainer"></div>
+        <div id="monteurWeekContainer"></div>
       </div>
     </div>
 
     <!-- AUFGABEN VIEW -->
-    <div id="view-tasks" class="view">
+    <div id="view-tasks" class="view admin-only">
       <div class="task-shell">
         <h2>Meine Aufgaben</h2>
         <div class="task-sub" id="taskCount">0 offen</div>
@@ -576,27 +648,27 @@ body.view-J .day-num { font-size: 10px; }
         </div>
         <div class="task-input-row">
           <input type="text" id="taskInput" placeholder="Neue Aufgabe eingeben (Enter)...">
-          <input type="date" id="taskDueDate" style="width:140px;border-left:1px solid var(--border-subtle);border-radius:0">
+          <input type="date" id="taskDueDate" style="width:140px;border-left:1px solid var(--border-fine);border-radius:0">
           <button class="btn primary" id="btnAddTask" onclick="addTask()" style="border-radius:0;border:none;min-height:auto;padding:0 18px">+</button>
         </div>
         <div class="task-list" id="taskList"></div>
       </div>
     </div>
 
-    <!-- IMPORT VIEW -->
-    <div id="view-import" class="view">
+    <!-- IMPORT VIEW MIT GEWERKE-DROPDOWN -->
+    <div id="view-import" class="view admin-only">
       <div class="task-shell">
         <h2>📥 Taifun Import</h2>
         <div class="task-sub" style="margin-bottom:20px;text-transform:none">
-          Lade deine Taifun HTML-Datei hoch. Es werden automatisch nur <b>Nachnamen</b>, Firmen, Material & Notizen importiert.
+          Lade deine Taifun HTML-Datei hoch. Du kannst in der Tabelle vor dem Speichern für jedes Projekt genau auswählen, ob es <b>DC+AC</b>, <b>Nur DC</b> oder <b>Nur AC</b> ist!
         </div>
 
-        <div style="background:#fff;padding:16px;border-radius:var(--radius-card);border:1px solid var(--border-subtle);margin-bottom:16px;display:flex;flex-direction:column;gap:12px">
+        <div style="background:var(--bg-card);padding:16px;border-radius:var(--radius-card);border:1px solid var(--border-fine);margin-bottom:16px;display:flex;flex-direction:column;gap:12px">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
             <div style="display:flex;align-items:center;gap:10px">
               <label style="font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px">
                 <span>Import ab Datum:</span>
-                <input type="date" id="importStartDate" value="2026-08-24" onchange="reFilterImport()" style="padding:4px 10px;border:1px solid var(--border-subtle);border-radius:var(--radius-pill);font-size:12px">
+                <input type="date" id="importStartDate" value="2026-08-24" onchange="reFilterImport()" style="padding:4px 10px;border:1px solid var(--border-fine);border-radius:var(--radius-pill);font-size:12px">
               </label>
             </div>
             
@@ -608,24 +680,26 @@ body.view-J .day-num { font-size: 10px; }
         <div class="import-box" onclick="document.getElementById('fileInput').click()">
           <div style="font-size:32px;margin-bottom:12px">📄</div>
           <div style="font-weight:700;font-size:15px;color:var(--ink)">Klicken oder HTML-Datei hier ablegen</div>
-          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">Liest nur Termine ab dem eingestellten Startdatum ein</div>
+          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">Liest nur Termine ab dem Startdatum ein</div>
         </div>
 
-        <div id="importResult" style="display:none;margin-top:20px;background:#fff;padding:20px;border-radius:var(--radius-card);border:1px solid var(--border-subtle)">
+        <!-- VORSCHAU MIT GEWERKE-DROPDOWN PRO PROJEKT -->
+        <div id="importResult" style="display:none;margin-top:20px;background:var(--bg-card);padding:20px;border-radius:var(--radius-card);border:1px solid var(--border-fine)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <h3 style="font-size:14px;font-weight:800">Gefundene Projekte (<b id="impProjCount" style="color:var(--google-blue)">0</b>):</h3>
-            <span style="font-size:10px;color:var(--ink-muted)">Vor dem Speichern prüfen</span>
+            <h3 style="font-size:14px;font-weight:800">Gefundene Projekte (<b id="impProjCount" style="color:var(--ink)">0</b>):</h3>
+            <span style="font-size:10px;color:var(--ink-muted)">Gewerke-Umfang bei Bedarf in der Spalte auswählen:</span>
           </div>
 
           <div class="preview-table-wrap">
             <table class="preview-table">
               <thead>
                 <tr>
-                  <th>Nr.</th>
-                  <th>Datum</th>
-                  <th>Projekt-ID</th>
-                  <th>Name / Baustelle</th>
-                  <th>Notizen / Material</th>
+                  <th style="width:5%">Nr.</th>
+                  <th style="width:14%">Datum</th>
+                  <th style="width:24%">Gewerke-Umfang (Auswählen!)</th>
+                  <th style="width:13%">Projekt-ID</th>
+                  <th style="width:24%">Name / Baustelle</th>
+                  <th style="width:20%">Material / Notizen</th>
                 </tr>
               </thead>
               <tbody id="previewTableBody"></tbody>
@@ -638,7 +712,7 @@ body.view-J .day-num { font-size: 10px; }
     </div>
 
     <!-- VERWALTUNG VIEW (ADMIN) -->
-    <div id="view-admin" class="view">
+    <div id="view-admin" class="view admin-only">
       <div class="task-shell" style="max-width:1000px">
         <h2>⚙️ Verwaltung</h2>
         <div class="task-sub" style="margin-bottom:20px">Busse anlegen & Projekte / Baustellen anpassen</div>
@@ -652,7 +726,7 @@ body.view-J .day-num { font-size: 10px; }
                 <button class="btn primary" onclick="openAdminProjectModal()">+ Neu</button>
               </div>
             </div>
-            <input type="text" id="adminProjSearch" placeholder="Suchen..." style="width:100%;padding:8px 12px;font-size:12px;border:1px solid var(--border-subtle);border-radius:var(--radius-pill)" onkeyup="renderAdminProjects()">
+            <input type="text" id="adminProjSearch" placeholder="Suchen..." style="width:100%;padding:8px 12px;font-size:12px;border:1px solid var(--border-fine);border-radius:var(--radius-pill)" onkeyup="renderAdminProjects()">
             <div class="admin-list" id="adminProjectList"></div>
           </div>
 
@@ -670,11 +744,11 @@ body.view-J .day-num { font-size: 10px; }
   </div>
 </div>
 
-<!-- GOOGLE EXPLORER WOCHENPLAN MODAL -->
+<!-- AYOCIN WOCHENPLAN MODAL -->
 <div class="modal" id="busExportModal" style="width:520px">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-    <div class="explorer-meta-tag">✦ GOOGLE LABS // EXPORT</div>
-    <div style="font-size:11px;color:var(--ink-muted);font-weight:600">Cream Explorer Layout</div>
+    <div class="explorer-meta-tag">AYOCIN // EXPORT</div>
+    <div style="font-size:11px;color:var(--ink-muted);font-weight:600">Druckfertig</div>
   </div>
   <h2 style="margin-bottom:4px">Partie-Wochenzettel drucken</h2>
   <div style="font-size:11px;color:var(--ink-muted);margin-bottom:16px">Erstellt einen druckfertigen Wochen-Einsatzplan für das ausgewählte Team.</div>
@@ -739,11 +813,19 @@ body.view-J .day-num { font-size: 10px; }
 <!-- OVERLAY -->
 <div class="overlay" id="overlay" onclick="closeModal()"></div>
 
-<!-- MODAL: PROJEKT BEARBEITEN -->
+<!-- MODAL: PROJEKT BEARBEITEN (ADMIN) -->
 <div class="modal" id="adminProjectModal">
   <h2 id="pmTitle">Projekt bearbeiten</h2>
   <input type="hidden" id="pmId">
   <div class="form-field"><label>Anzeigename (z.B. Nachname oder Firma)</label><input type="text" id="pmName"></div>
+  <div class="form-field">
+    <label>Gewerke-Umfang (Welche Arbeiten fallen an?)</label>
+    <select id="pmScope">
+      <option value="both">🔧+⚡ DC + AC (Komplettauftrag)</option>
+      <option value="dc">🔧 Nur DC (Reine Montage)</option>
+      <option value="ac">⚡ Nur AC (Reine Elektrik / Speicher / IBN)</option>
+    </select>
+  </div>
   <div class="form-field"><label>Adresse (Hover Info)</label><input type="text" id="pmAddress"></div>
   <div class="form-field"><label>kWp (Leistung)</label><input type="number" id="pmKwp" step="0.1"></div>
   <div class="form-field"><label>Notizen / Material / IBN Infos</label><textarea id="pmNotes" rows="3"></textarea></div>
@@ -800,7 +882,7 @@ body.view-J .day-num { font-size: 10px; }
 <div class="toast-stack" id="toastStack"></div>
 
 <!-- ═══════════════════════════════════════════════════════════════
-     JAVASCRIPT LOGIK
+     JAVASCRIPT LOGIK (MULTI-TERMIN SUPPORT & AYOCIN SYSTEM)
      ═══════════════════════════════════════════════════════════════ -->
 <script>
 'use strict';
@@ -810,11 +892,33 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const RANGE = { start: '2026-08-17', end: '2026-12-31' };
-const COLORS = ['#1a73e8','#0d9488','#1e8e3e','#65a30d','#ca8a04','#e37400','#d93025','#7c3aed','#9333ea','#2563eb'];
+const COLORS = ['#2b5973','#4a6b5d','#8c6a30','#b85d35','#5c6b5e','#a8654b','#3a506b','#9e8354','#6d597a','#40534c'];
 function getAutoColor() { return COLORS[Math.floor(Math.random() * COLORS.length)]; }
 
 function naturalSort(a, b) {
   return (a.label || '').localeCompare((b.label || ''), 'de', { numeric: true, sensitivity: 'base' });
+}
+
+function extractPhone(text) {
+  if (!text) return null;
+  const match = text.match(/(?:\+43|0)\s*(?:[0-9]\s*){6,14}/);
+  return match ? match[0].trim() : null;
+}
+
+// ─── GEWERKE-UMFANG HELPER ───
+function getProjectScope(p) {
+  if (!p) return 'both';
+  const text = (p.order_id || '') + ' ' + (p.status || '');
+  if (text.includes('[DC]') || text.includes('scope_dc')) return 'dc';
+  if (text.includes('[AC]') || text.includes('scope_ac')) return 'ac';
+  return 'both';
+}
+
+function encodeScopeInNotes(scope, rawNotes) {
+  let clean = (rawNotes || '').replace(/^\[(DC|AC|DC\+AC)\]\s*/i, '').trim();
+  if (scope === 'dc') return `[DC] ${clean}`;
+  if (scope === 'ac') return `[AC] ${clean}`;
+  return `[DC+AC] ${clean}`;
 }
 
 function extractShortName(rawName, subProject) {
@@ -851,9 +955,12 @@ function getKW(d) {
 }
 
 let state = {
-  projects: [], buses: [], grid: {}, todos: [],
-  activeProjId: null, isDrawing: false, selectedCells: [], undoStack: [],
-  importBuffer: [], lastUploadedHtml: null, isLocked: true
+  projects: [], buses: [],
+  grid: {}, // Speichert jetzt Arrays: state.grid[cellKey] = [ { id, project_id, kind }, ... ]
+  todos: [],
+  activeProjId: null, isDrawing: false, selectedCells: [],
+  undoStack: [],
+  importBuffer: [], lastUploadedHtml: null, isLocked: true, userRole: null
 };
 
 function loader(show, txt='Lade...') { $('loaderText').textContent=txt; $('loader').classList.toggle('show', show); }
@@ -868,9 +975,11 @@ function showToast(msg, type='success') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
 }
 
-// ─── LOGIN "solpro" ───
+// ─── LOGIN ───
 function checkAuth() {
-  if (localStorage.getItem('solpro_auth') === 'true') {
+  const savedRole = localStorage.getItem('solpro_role');
+  if (savedRole === 'admin' || savedRole === 'monteur') {
+    applyRole(savedRole);
     $('loginScreen').style.display = 'none';
     loadData();
     initRealtime();
@@ -883,28 +992,48 @@ function checkAuth() {
 function tryLogin() {
   const pwd = $('loginPassword').value.trim();
   if (pwd === 'solpro') {
-    localStorage.setItem('solpro_auth', 'true');
+    applyRole('admin');
     $('loginScreen').style.display = 'none';
-    showToast('Erfolgreich angemeldet!');
+    showToast('Willkommen im Büro-Vollzugriff!');
+    loadData();
+    initRealtime();
+  } else if (pwd === 'monteur') {
+    applyRole('monteur');
+    $('loginScreen').style.display = 'none';
+    showToast('Willkommen im Monteur-Wochenplan!');
     loadData();
     initRealtime();
   } else {
-    showToast('Falsches Passwort!', 'error');
+    showToast('Falsches Passwort! (solpro oder monteur)', 'error');
     $('loginPassword').value = '';
     $('loginPassword').focus();
   }
 }
 $('loginPassword').addEventListener('keypress', e => { if (e.key === 'Enter') tryLogin(); });
 
+function applyRole(role) {
+  state.userRole = role;
+  localStorage.setItem('solpro_role', role);
+  document.body.classList.toggle('role-monteur', role === 'monteur');
+  
+  if (role === 'monteur') {
+    $('roleBadge').textContent = '👷 MONTEUR-MODUS';
+    switchTab('monteur');
+  } else {
+    $('roleBadge').textContent = 'PRO SUITE';
+  }
+}
+
 function logout() {
-  localStorage.removeItem('solpro_auth');
+  localStorage.removeItem('solpro_role');
+  state.userRole = null;
   $('loginPassword').value = '';
   $('loginScreen').style.display = 'flex';
   $('loginPassword').focus();
   showToast('Abgemeldet');
 }
 
-// ─── SUPABASE REALTIME ───
+// ─── REALTIME ───
 function initRealtime() {
   try {
     sb.channel('realtime_solpro')
@@ -920,9 +1049,14 @@ async function reloadGridSilently() {
     state.grid = {};
     data.forEach(r => {
       const slug = state.buses.find(b => b.id === r.bus_id)?.slug;
-      if(slug) state.grid[`CELL_${slug}_${r.work_date}`] = r.project_id || r.kind;
+      if(slug) {
+        const key = `CELL_${slug}_${r.work_date}`;
+        if (!state.grid[key]) state.grid[key] = [];
+        state.grid[key].push({ id: r.id, project_id: r.project_id, kind: r.kind || 'project' });
+      }
     });
     repaint();
+    if (state.userRole === 'monteur') renderMonteurView();
   }
 }
 
@@ -937,6 +1071,10 @@ async function reloadProjectsSilently() {
 
 // ─── SPERRE ───
 function togglePlannerLock() {
+  if (state.userRole === 'monteur') {
+    showToast('Im Monteur-Modus ist der Planer schreibgeschützt', 'warn');
+    return;
+  }
   if (!state.isLocked) {
     state.isLocked = true;
     updateLockUI();
@@ -983,35 +1121,45 @@ function switchViewMode(view) {
   });
 }
 
-// ─── TAB NAVIGATION ───
-document.querySelectorAll('.tab').forEach(t => {
-  t.onclick = () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    $('view-' + t.dataset.tab).classList.add('active');
-    $('projectSidebar').style.display = t.dataset.tab === 'planner' ? 'flex' : 'none';
-    if(t.dataset.tab === 'admin') { renderAdminProjects(); renderAdminBuses(); }
-    if(t.dataset.tab === 'tasks') renderTodos();
-    if(t.dataset.tab === 'monteur') renderMonteurView();
+// ─── TABS ───
+function switchTab(tabName) {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.tab === tabName));
+  document.querySelectorAll('.view').forEach(x => x.classList.toggle('active', x.id === 'view-' + tabName));
+  
+  if (state.userRole !== 'monteur') {
+    $('projectSidebar').style.display = tabName === 'planner' ? 'flex' : 'none';
   }
+  if(tabName === 'admin') { renderAdminProjects(); renderAdminBuses(); }
+  if(tabName === 'tasks') renderTodos();
+  if(tabName === 'monteur') renderMonteurView();
+}
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => switchTab(t.dataset.tab);
 });
 
-// ─── 1-SEKUNDE HOVER TOOLTIP ───
-let hoverTimer;
+// ─── INTERAKTIVER HOVER TOOLTIP ───
+let tooltipTimeout, hideTimeout;
 const tooltip = $('hoverTooltip');
 
 document.addEventListener('mouseover', e => {
   const target = e.target.closest('[data-proj-id]');
   if (target && target.dataset.projId) {
+    clearTimeout(hideTimeout);
     const p = state.projects.find(x => x.id === target.dataset.projId);
     if (!p) return;
 
-    hoverTimer = setTimeout(() => {
+    tooltipTimeout = setTimeout(() => {
       const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address || p.name)}`;
+      const phone = extractPhone(p.order_id);
+      const scope = getProjectScope(p);
+      const scopeLabel = scope === 'dc' ? '🔧 Nur DC (Montage)' : scope === 'ac' ? '⚡ Nur AC (Elektrik)' : '🔧+⚡ DC+AC (Komplett)';
+
       tooltip.innerHTML = `
         <div class="tooltip-title">${esc(p.name)}</div>
         <div class="tooltip-sub">📍 ${esc(p.address || 'Keine Adresse')} · ⚡ ${p.kwp || 0} kWp</div>
+        <div style="font-size:10px;font-weight:700;color:var(--brass-dark);margin-bottom:4px">Umfang: ${scopeLabel}</div>
+        ${phone ? `<div style="margin:4px 0"><a href="tel:${cleanPhone(phone)}" style="color:var(--dc-slate);font-weight:700;font-family:var(--font-mono);font-size:11px;text-decoration:none">📞 ${phone}</a></div>` : ''}
         ${p.order_id ? `<div class="tooltip-notes">📦 <b>Details & Notizen:</b>\n${esc(p.order_id)}</div>` : ''}
         <a href="${mapsUrl}" target="_blank" class="tooltip-maps-btn">🗺️ In Google Maps navigieren ↗</a>
       `;
@@ -1019,15 +1167,31 @@ document.addEventListener('mouseover', e => {
       tooltip.style.left = (rect.left + rect.width / 2) + 'px';
       tooltip.style.top = (rect.top - 8) + 'px';
       tooltip.classList.add('show');
-    }, 1000);
+    }, 500);
   }
 });
+
 document.addEventListener('mouseout', e => {
-  clearTimeout(hoverTimer);
+  const target = e.target.closest('[data-proj-id]');
+  if (target) {
+    clearTimeout(tooltipTimeout);
+    hideTimeout = setTimeout(() => {
+      if (!tooltip.matches(':hover')) {
+        tooltip.classList.remove('show');
+      }
+    }, 300);
+  }
+});
+
+tooltip.addEventListener('mouseleave', () => {
   tooltip.classList.remove('show');
 });
 
-// ─── HEUTE AUTO-SCROLL ───
+function cleanPhone(p) {
+  return p ? p.replace(/[^0-9+]/g, '') : '';
+}
+
+// ─── HEUTE SCROLL ───
 function scrollToToday() {
   const today = new Date().toISOString().split('T')[0];
   const headEl = document.getElementById(`th-${today}`);
@@ -1039,7 +1203,7 @@ function scrollToToday() {
   }
 }
 
-// ─── SEITENLEISTE SLIDER ───
+// ─── SIDEBAR SLIDER ───
 (function initSidebarResizer() {
   const handle = $('sidebarResizer');
   const panel = $('projectSidebar');
@@ -1073,7 +1237,7 @@ function scrollToToday() {
   });
 })();
 
-// ─── DATEN LADEN ───
+// ─── DATEN LADEN (MULTI-ASSIGNMENTS) ───
 async function loadData() {
   loader(true, 'Verbinde Datenbank...');
   try {
@@ -1088,10 +1252,15 @@ async function loadData() {
     state.buses = resB.data || [];
     state.todos = resT.data || [];
     
+    // Grid Array als Mehrfach-Liste organisieren
     state.grid = {};
     (resG.data || []).forEach(r => {
       const slug = state.buses.find(b => b.id === r.bus_id)?.slug;
-      if(slug) state.grid[`CELL_${slug}_${r.work_date}`] = r.project_id || r.kind;
+      if(slug) {
+        const key = `CELL_${slug}_${r.work_date}`;
+        if (!state.grid[key]) state.grid[key] = [];
+        state.grid[key].push({ id: r.id, project_id: r.project_id, kind: r.kind || 'project' });
+      }
     });
 
     updateLockUI();
@@ -1175,10 +1344,18 @@ function parseTaifun(htmlContent) {
           const displayName = extractShortName(rawName, subProject);
           const fullNotes = noteLines.join('\n');
 
+          let initialScope = 'both';
+          const fullTextLower = text.toLowerCase();
+          if (fullTextLower.includes('speichererweiterung') || fullTextLower.includes('ac-montage') || fullTextLower.includes('ibn mit netz')) {
+            initialScope = 'ac';
+          } else if (fullTextLower.includes('dc-montage') && !fullTextLower.includes('ac')) {
+            initialScope = 'dc';
+          }
+
           if (projectId && !extracted.has(projectId)) {
             extracted.set(projectId, { 
               rawName, displayName, address, projectId, orderId,
-              notes: fullNotes, kwp: 0,
+              notes: fullNotes, kwp: 0, scope: initialScope,
               taifunDate: currentRowDate || '24.08.2026'
             });
           }
@@ -1195,34 +1372,46 @@ function parseTaifun(htmlContent) {
     <tr>
       <td>${idx + 1}</td>
       <td style="font-family:var(--font-mono);font-weight:700">${esc(p.taifunDate)}</td>
+      <td>
+        <select class="preview-scope-select" onchange="updateImportScope(${idx}, this.value)">
+          <option value="both" ${p.scope === 'both' ? 'selected' : ''}>🔧+⚡ DC + AC</option>
+          <option value="dc" ${p.scope === 'dc' ? 'selected' : ''}>🔧 Nur DC (Montage)</option>
+          <option value="ac" ${p.scope === 'ac' ? 'selected' : ''}>⚡ Nur AC (Elektro)</option>
+        </select>
+      </td>
       <td><b style="font-family:var(--font-mono)">${esc(p.projectId)}</b></td>
       <td><b>${esc(p.displayName)}</b> <span style="font-size:9px;color:var(--ink-muted)">(${esc(p.rawName)})</span></td>
-      <td><div style="max-height:40px;overflow-y:auto;font-size:10px;color:var(--ink-mid)">${esc(p.notes || 'Keine Notizen')}</div></td>
+      <td><div style="max-height:40px;overflow-y:auto;font-size:10px;color:var(--ink-secondary)">${esc(p.notes || 'Keine Notizen')}</div></td>
     </tr>
   `).join('');
 
   $('importResult').style.display = 'block';
 }
 
+function updateImportScope(idx, newScope) {
+  if (state.importBuffer[idx]) {
+    state.importBuffer[idx].scope = newScope;
+  }
+}
+
 async function saveImportToDB() {
   if(!state.importBuffer.length) return;
   loader(true, 'Speichere Projekte in Supabase...');
-  let newCount = 0;
   
   for (const proj of state.importBuffer) {
     const { data: existing } = await sb.from('projects').select('id').eq('project_id', proj.projectId).maybeSingle();
-    const orderDetails = proj.notes ? `${proj.orderId} · ${proj.notes}` : proj.orderId;
+    const cleanNotes = proj.notes ? `${proj.orderId} · ${proj.notes}` : proj.orderId;
+    const scopedNotes = encodeScopeInNotes(proj.scope, cleanNotes);
 
     if (existing) {
       await sb.from('projects').update({ 
-        name: proj.displayName, address: proj.address, order_id: orderDetails
+        name: proj.displayName, address: proj.address, order_id: scopedNotes
       }).eq('id', existing.id);
     } else {
       await sb.from('projects').insert({
         name: proj.displayName, address: proj.address, kwp: 0, status: 'auftrag',
-        color: getAutoColor(), project_id: proj.projectId, order_id: orderDetails
+        color: getAutoColor(), project_id: proj.projectId, order_id: scopedNotes
       });
-      newCount++;
     }
   }
   
@@ -1254,30 +1443,33 @@ async function deleteAllProjects() {
   loader(false);
 }
 
-// ─── SMARTE AC/DC ANALYSE ───
+// ─── SMARTE AC/DC ANALYSE (MULTI-APPOINTMENTS) ───
 function analyzeProjectsStatus() {
   const result = {};
 
   Object.keys(state.grid).forEach(k => {
-    const val = state.grid[k];
-    if (!val || val === 'vacation' || val === 'sick') return;
-    
+    const list = state.grid[k] || [];
     const parts = k.split('_');
     const dateStr = parts.pop();
     const busSlug = parts[1];
     const bus = state.buses.find(b => b.slug === busSlug);
     if (!bus) return;
 
-    if (!result[val]) result[val] = { hasDC: false, hasAC: false, dcDates: [], acDates: [] };
-    const cellDateMs = new Date(dateStr).getTime();
+    list.forEach(item => {
+      const val = item.project_id;
+      if (!val) return;
 
-    if (bus.team === 'elektriker') {
-      result[val].hasAC = true;
-      result[val].acDates.push(cellDateMs);
-    } else {
-      result[val].hasDC = true;
-      result[val].dcDates.push(cellDateMs);
-    }
+      if (!result[val]) result[val] = { hasDC: false, hasAC: false, dcDates: [], acDates: [] };
+      const cellDateMs = new Date(dateStr).getTime();
+
+      if (bus.team === 'elektriker') {
+        result[val].hasAC = true;
+        result[val].acDates.push(cellDateMs);
+      } else {
+        result[val].hasDC = true;
+        result[val].dcDates.push(cellDateMs);
+      }
+    });
   });
 
   return result;
@@ -1293,7 +1485,8 @@ function getProjectWarnings() {
     const p = state.projects.find(x => x.id === projId);
     if (!p) return;
 
-    if (data.dcDates.length > 0) {
+    const scope = getProjectScope(p);
+    if (scope === 'both' && data.dcDates.length > 0) {
       const lastDC = Math.max(...data.dcDates);
       const firstAC = data.acDates.length > 0 ? Math.min(...data.acDates) : null;
       
@@ -1312,7 +1505,7 @@ function getProjectWarnings() {
   return warnings;
 }
 
-// ─── PLANER & SEITENLEISTE (SPLIT-PILLEN DC | AC) ───
+// ─── PLANER & SEITENLEISTE (MULTI-SUPPORT) ───
 function renderPalette() {
   const c = $('paletteUI');
   c.innerHTML = '';
@@ -1325,11 +1518,19 @@ function renderPalette() {
   let filtered = state.projects.filter(p => p.status !== 'abgeschlossen');
 
   if (statusFilter === 'both_done') {
-    filtered = filtered.filter(p => statusData[p.id]?.hasDC && statusData[p.id]?.hasAC);
-  } else if (statusFilter === 'dc_only') {
-    filtered = filtered.filter(p => statusData[p.id]?.hasDC && !statusData[p.id]?.hasAC);
-  } else if (statusFilter === 'ac_only') {
-    filtered = filtered.filter(p => !statusData[p.id]?.hasDC && statusData[p.id]?.hasAC);
+    filtered = filtered.filter(p => {
+      const scope = getProjectScope(p);
+      const info = statusData[p.id] || { hasDC: false, hasAC: false };
+      if (scope === 'dc') return info.hasDC;
+      if (scope === 'ac') return info.hasAC;
+      return info.hasDC && info.hasAC;
+    });
+  } else if (statusFilter === 'scope_both') {
+    filtered = filtered.filter(p => getProjectScope(p) === 'both');
+  } else if (statusFilter === 'scope_dc') {
+    filtered = filtered.filter(p => getProjectScope(p) === 'dc');
+  } else if (statusFilter === 'scope_ac') {
+    filtered = filtered.filter(p => getProjectScope(p) === 'ac');
   } else if (statusFilter === 'none') {
     filtered = filtered.filter(p => !statusData[p.id]?.hasDC && !statusData[p.id]?.hasAC);
   }
@@ -1337,31 +1538,57 @@ function renderPalette() {
   if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search));
 
   filtered.forEach(p => {
-    const cnt = Object.values(state.grid).filter(v => v === p.id).length;
+    // Gesamtzahl aller Termine dieses Projekts zählen
+    let cnt = 0;
+    Object.values(state.grid).forEach(list => {
+      cnt += (list || []).filter(item => item.project_id === p.id).length;
+    });
+
     const el = document.createElement('div');
-    
+    const scope = getProjectScope(p);
     const info = statusData[p.id] || { hasDC: false, hasAC: false };
-    const isBothDone = info.hasDC && info.hasAC;
     
-    el.className = 'pal-chip' + (state.activeProjId === p.id ? ' active' : '') + (isBothDone ? ' both-done' : '');
+    let isFullyDone = false;
+    let badge = '';
+    
+    if (scope === 'dc') {
+      isFullyDone = info.hasDC;
+      if (isFullyDone) badge = `<span class="ac-warn" style="background:var(--forest-done)">✅ DC fertig</span>`;
+    } else if (scope === 'ac') {
+      isFullyDone = info.hasAC;
+      if (isFullyDone) badge = `<span class="ac-warn" style="background:var(--forest-done)">✅ AC fertig</span>`;
+    } else {
+      isFullyDone = info.hasDC && info.hasAC;
+      if (isFullyDone) {
+        badge = `<span class="ac-warn" style="background:var(--forest-done)">✅ Komplett</span>`;
+      } else if (warnings[p.id]) {
+        badge = `<span class="ac-warn">⚠️ AC fehlt</span>`;
+      }
+    }
+
+    el.className = 'pal-chip' + (state.activeProjId === p.id ? ' active' : '') + (isFullyDone ? ' done-all' : '');
     el.style.background = p.color; 
     el.style.color = '#fff';
     el.dataset.projId = p.id;
-    
-    let badge = '';
-    if (isBothDone) {
-      badge = `<span class="ac-warn" style="background:var(--google-green)">✅ DC+AC</span>`;
-    } else if (warnings[p.id]) {
-      badge = `<span class="ac-warn">⚠️ AC fehlt</span>`;
+
+    let pipsHtml = '';
+    if (scope === 'dc') {
+      pipsHtml = `<span class="phase-pip ${info.hasDC ? 'is-active-dc' : ''}" style="width:100%">Nur DC</span>`;
+    } else if (scope === 'ac') {
+      pipsHtml = `<span class="phase-pip ${info.hasAC ? 'is-active-ac' : ''}" style="width:100%">Nur AC</span>`;
+    } else {
+      pipsHtml = `
+        <span class="phase-pip ${info.hasDC ? 'is-active-dc' : ''}">DC</span>
+        <span class="phase-pip ${info.hasAC ? 'is-active-ac' : ''}">AC</span>
+      `;
     }
 
     el.innerHTML = `
       <span class="pal-chip-title">${esc(p.name)}</span>
       <div class="pal-chip-actions">
         ${badge}
-        <div class="phase-pill-wrap" title="Status: Montage (DC) & Elektriker (AC)">
-          <span class="phase-pip ${info.hasDC ? 'is-active-dc' : ''}">DC</span>
-          <span class="phase-pip ${info.hasAC ? 'is-active-ac' : ''}">AC</span>
+        <div class="phase-pill-wrap" title="Klicken um Gewerk umzuschalten" onclick="event.stopPropagation(); cycleProjectScope('${p.id}')">
+          ${pipsHtml}
         </div>
         <span class="cnt">${cnt}T</span>
         <button class="chip-btn btn-done" title="Auf Erledigt setzen (ausblenden)" onclick="event.stopPropagation(); markProjectDone('${p.id}')">✓</button>
@@ -1378,9 +1605,9 @@ function renderPalette() {
   
   // Werkzeuge
   [
-    { id: 'ERASER', text: '🧹 Löschen', color: '#131314' },
-    { id: 'vacation', text: '🌴 Urlaub', color: '#ca8a04' },
-    { id: 'sick', text: '🤒 Krank', color: '#d93025' }
+    { id: 'ERASER', text: '🧹 Löschen', color: '#191816' },
+    { id: 'vacation', text: '🌴 Urlaub', color: '#8c6a30' },
+    { id: 'sick', text: '🤒 Krank', color: '#b33939' }
   ].forEach(x => {
     const el = document.createElement('div');
     el.className = 'pal-chip' + (state.activeProjId === x.id ? ' active' : '');
@@ -1389,6 +1616,23 @@ function renderPalette() {
     el.onclick = () => { state.activeProjId = x.id; renderPalette(); repaint(); };
     c.appendChild(el);
   });
+}
+
+async function cycleProjectScope(id) {
+  const p = state.projects.find(x => x.id === id);
+  if (!p) return;
+
+  const current = getProjectScope(p);
+  const next = current === 'both' ? 'dc' : current === 'dc' ? 'ac' : 'both';
+  
+  p.order_id = encodeScopeInNotes(next, p.order_id);
+  renderPalette();
+  repaint();
+  
+  const labels = { both: '🔧+⚡ DC+AC (Komplett)', dc: '🔧 Nur DC (Montage)', ac: '⚡ Nur AC (Elektrik)' };
+  showToast(`Gewerk geändert auf: ${labels[next]}`);
+  
+  await sb.from('projects').update({ order_id: p.order_id }).eq('id', id);
 }
 
 async function markProjectDone(id) {
@@ -1406,7 +1650,10 @@ async function deleteProjectFast(id, name) {
   
   state.projects = state.projects.filter(p => p.id !== id);
   Object.keys(state.grid).forEach(k => {
-    if(state.grid[k] === id) delete state.grid[k];
+    if (state.grid[k]) {
+      state.grid[k] = state.grid[k].filter(item => item.project_id !== id);
+      if (state.grid[k].length === 0) delete state.grid[k];
+    }
   });
   
   repaint();
@@ -1417,7 +1664,7 @@ async function deleteProjectFast(id, name) {
   await sb.from('projects').delete().eq('id', id);
 }
 
-// ─── KALENDER GRID ───
+// ─── KALENDER GRID BAUEN ───
 function buildGrid() {
   const dates = [];
   let d = new Date(RANGE.start);
@@ -1490,112 +1737,143 @@ function buildGrid() {
   repaint();
 }
 
+// ─── REPAINT: RENDERT 1 BIS 3 TERMINE SAUBER IN EINER ZELLE ───
 function repaint() {
   document.querySelectorAll('.project-cell').forEach(c => { 
-    c.style.background=''; c.textContent=''; delete c.dataset.projId; 
-    c.classList.remove('grid-vacation', 'grid-sick', 'is-highlighted');
+    c.innerHTML = '';
   });
   
-  let work = 0;
+  let workCount = 0;
+
   Object.keys(state.grid).forEach(k => {
     const cell = $(k); if(!cell) return;
-    const val = state.grid[k];
-    
-    if (val === 'vacation') {
-      cell.classList.add('grid-vacation'); 
-      cell.textContent = '🌴 URLAUB';
-    } else if (val === 'sick') {
-      cell.classList.add('grid-sick'); 
-      cell.textContent = '🤒 KRANK';
-    } else if (val) {
-      const p = state.projects.find(x => x.id === val);
-      if(p) {
-        work++;
-        cell.style.background = p.color; cell.style.color = '#fff';
-        cell.dataset.projId = p.id;
-        
-        if (state.activeProjId === p.id) {
-          cell.classList.add('is-highlighted');
-        }
+    const list = state.grid[k] || [];
+    if (list.length === 0) return;
 
-        let ibnBadge = '';
-        if (p.order_id && p.order_id.toLowerCase().includes('ibn')) {
-          const timeMatch = p.order_id.match(/\b([01]?[0-9]|2[0-3]):[0-5][0-9]\b/);
-          if (timeMatch) ibnBadge = `<span class="ibn-badge">⚡ ${timeMatch[0]}</span>`;
-        }
+    const stack = document.createElement('div');
+    stack.className = 'cell-stack';
 
-        const checkIcon = p.status === 'bestaetigt' ? '✓ ' : '';
-        cell.innerHTML = `${ibnBadge}<div>${checkIcon}${esc(p.name.substring(0, 8))}</div>`;
+    list.forEach(item => {
+      if (item.kind === 'vacation') {
+        stack.innerHTML += `
+          <div class="grid-block-vacation" style="display:flex;justify-content:space-between;align-items:center">
+            <span>🌴 URLAUB</span>
+            <button class="cell-item-del" onclick="deleteSpecificAssign(event, '${item.id}', '${k}')">×</button>
+          </div>
+        `;
+      } else if (item.kind === 'sick') {
+        stack.innerHTML += `
+          <div class="grid-block-sick" style="display:flex;justify-content:space-between;align-items:center">
+            <span>🤒 KRANK</span>
+            <button class="cell-item-del" onclick="deleteSpecificAssign(event, '${item.id}', '${k}')">×</button>
+          </div>
+        `;
+      } else if (item.project_id) {
+        const p = state.projects.find(x => x.id === item.project_id);
+        if (p) {
+          workCount++;
+          const isHighlighted = (state.activeProjId === p.id);
+          
+          let ibnBadge = '';
+          if (p.order_id && p.order_id.toLowerCase().includes('ibn')) {
+            const timeMatch = p.order_id.match(/\b([01]?[0-9]|2[0-3]):[0-5][0-9]\b/);
+            if (timeMatch) ibnBadge = `<span class="ibn-badge">⚡${timeMatch[0]}</span>`;
+          }
+
+          const phone = extractPhone(p.order_id);
+          const phoneHtml = phone ? `<a href="tel:${cleanPhone(phone)}" class="cell-phone-link" onclick="event.stopPropagation()">📞${phone.substring(0,8)}..</a>` : '';
+
+          const card = document.createElement('div');
+          card.className = `cell-item-card ${isHighlighted ? 'is-highlighted' : ''}`;
+          card.style.background = p.color;
+          card.dataset.projId = p.id;
+          card.dataset.assignId = item.id;
+          
+          card.innerHTML = `
+            <div style="display:flex;flex-direction:column;flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:2px">
+                ${ibnBadge}
+                <span class="cell-item-name">${esc(p.name.substring(0, 9))}</span>
+              </div>
+              ${phoneHtml}
+            </div>
+            <button class="cell-item-del" title="Diesen Auftrag löschen" onclick="deleteSpecificAssign(event, '${item.id}', '${k}')">×</button>
+          `;
+          stack.appendChild(card);
+        }
       }
-    }
+    });
+
+    cell.appendChild(stack);
   });
 
-  $('kpiRow').innerHTML = `<div class="kpi-pill"><span class="kpi-lbl">Geplante Tage</span><span class="kpi-val">${work}</span></div>`;
+  $('kpiRow').innerHTML = `<div class="kpi-pill"><span class="kpi-lbl">Geplante Aufträge</span><span class="kpi-val">${workCount}</span></div>`;
 }
 
-// ─── DIREKTES LÖSCHEN ───
+// ─── EINZELNEN TERMIN AUS ZELLE LÖSCHEN (PER × ODER RECHTSKLICK) ───
+async function deleteSpecificAssign(e, assignId, cellKey) {
+  if (e) e.stopPropagation();
+  if (state.isLocked) {
+    showToast('Planer ist gesperrt! Bitte oben entsperren.', 'warn');
+    return;
+  }
+
+  if (state.grid[cellKey]) {
+    const item = state.grid[cellKey].find(x => x.id === assignId);
+    state.undoStack.push({ action: 'delete_one', cellKey, item });
+
+    state.grid[cellKey] = state.grid[cellKey].filter(x => x.id !== assignId);
+    if (state.grid[cellKey].length === 0) delete state.grid[cellKey];
+
+    repaint();
+    renderPalette();
+    showToast('Auftrag gelöscht!');
+
+    await sb.from('grid_assignments').delete().eq('id', assignId);
+  }
+}
+
+// Rechtsklick löscht den angeklickten Auftrag direkt
 document.addEventListener('contextmenu', e => {
+  const card = e.target.closest('.cell-item-card');
   const cell = e.target.closest('.project-cell');
-  if (cell && state.grid[cell.id]) {
+
+  if (card && card.dataset.assignId) {
     e.preventDefault();
-    if (state.isLocked) {
-      showToast('Planer ist gesperrt! Bitte oben entsperren.', 'warn');
-      return;
-    }
-    clearSingleCell(cell);
+    deleteSpecificAssign(e, card.dataset.assignId, cell.id);
+  } else if (cell && state.grid[cell.id] && state.grid[cell.id].length > 0) {
+    e.preventDefault();
+    // Wenn auf leeren Bereich der Zelle geklickt wird -> letzten Auftrag löschen
+    const lastItem = state.grid[cell.id][state.grid[cell.id].length - 1];
+    deleteSpecificAssign(e, lastItem.id, cell.id);
   }
 });
 
-document.addEventListener('dblclick', e => {
-  const cell = e.target.closest('.project-cell');
-  if (cell && state.grid[cell.id]) {
-    if (state.isLocked) {
-      showToast('Planer ist gesperrt! Bitte oben entsperren.', 'warn');
-      return;
-    }
-    clearSingleCell(cell);
-  }
-});
-
-async function clearSingleCell(el) {
-  const cid = el.id;
-  if (!state.grid[cid]) return;
-  
-  state.undoStack.push(JSON.stringify(state.grid));
-  delete state.grid[cid];
-  repaint();
-  renderPalette();
-  showToast('Termin aus Planer gelöscht!');
-
-  const busSlug = el.dataset.bus;
-  const date = el.dataset.date;
-  const bus = state.buses.find(b => b.slug === busSlug);
-  if (bus) {
-    await sb.from('grid_assignments').delete().match({ bus_id: bus.id, work_date: date });
-  }
-}
-
-// ─── PLANER ZEICHNEN ───
+// ─── PLANER ZEICHNEN (MEHRFACH-TERMIN SUPPORT) ───
 function setupGridPaint() {
   document.addEventListener('mousedown', e => {
     if (e.button !== 0) return;
-    if (!e.target.classList.contains('project-cell')) return;
-    
+    if (!e.target.closest('.project-cell')) return;
+    if (e.target.closest('.cell-item-del') || e.target.closest('.cell-phone-link')) return;
+
     if (state.isLocked) {
       showToast('Planer ist gesperrt! Bitte oben entsperren.', 'warn');
       return;
     }
 
     if (!state.activeProjId) { showToast('Wähle links ein Projekt oder Werkzeug aus', 'error'); return; }
-    state.isDrawing = true; state.selectedCells = [e.target.id];
-    e.target.classList.add('selecting');
+    
+    const cell = e.target.closest('.project-cell');
+    state.isDrawing = true; state.selectedCells = [cell.id];
+    cell.classList.add('selecting');
   });
 
   document.addEventListener('mouseover', e => {
-    if (!state.isDrawing || !e.target.classList.contains('project-cell')) return;
-    if (!state.selectedCells.includes(e.target.id)) {
-      state.selectedCells.push(e.target.id);
-      e.target.classList.add('selecting');
+    if (!state.isDrawing) return;
+    const cell = e.target.closest('.project-cell');
+    if (cell && !state.selectedCells.includes(cell.id)) {
+      state.selectedCells.push(cell.id);
+      cell.classList.add('selecting');
     }
   });
 
@@ -1610,7 +1888,7 @@ async function executePaint(cells, value) {
   document.querySelectorAll('.selecting').forEach(n => n.classList.remove('selecting'));
   if(!cells.length) return;
   
-  state.undoStack.push(JSON.stringify(state.grid));
+  const undoBatch = [];
   
   for(const cid of cells) {
     const el = $(cid);
@@ -1620,45 +1898,83 @@ async function executePaint(cells, value) {
     if(!bus) continue;
 
     if (value === 'ERASER') {
-      delete state.grid[cid];
-      await sb.from('grid_assignments').delete().match({ bus_id: bus.id, work_date: date });
+      // Radiergummi leert die gesamte Zelle
+      if (state.grid[cid]) {
+        state.grid[cid].forEach(it => undoBatch.push({ cellKey: cid, item: it, wasCleared: true }));
+        delete state.grid[cid];
+        await sb.from('grid_assignments').delete().match({ bus_id: bus.id, work_date: date });
+      }
     } else {
       const isSpecial = (value === 'vacation' || value === 'sick');
       const dbVal = isSpecial ? null : value;
       const kind = isSpecial ? value : 'project';
       
-      state.grid[cid] = value;
-      await sb.from('grid_assignments').upsert({ 
-        bus_id: bus.id, work_date: date, project_id: dbVal, kind: kind 
-      }, { onConflict: 'bus_id,work_date' });
+      if (!state.grid[cid]) state.grid[cid] = [];
+
+      // Nicht doppelt dasselbe Projekt am selben Tag einfügen
+      const alreadyIn = state.grid[cid].some(it => it.project_id === value || it.kind === value);
+      if (!alreadyIn) {
+        // Neu in Supabase einfügen
+        const { data, error } = await sb.from('grid_assignments').insert({
+          bus_id: bus.id, work_date: date, project_id: dbVal, kind: kind
+        }).select().single();
+
+        if (data) {
+          const newItem = { id: data.id, project_id: dbVal, kind: kind };
+          state.grid[cid].push(newItem);
+          undoBatch.push({ cellKey: cid, item: newItem, wasAdded: true });
+        }
+      }
     }
   }
+
+  if (undoBatch.length > 0) {
+    state.undoStack.push({ action: 'batch', items: undoBatch });
+  }
+
   repaint();
   renderPalette();
   state.selectedCells = [];
 }
 
+// ─── SICHERES UNDO ───
 async function undoPaint() {
   if (state.isLocked) {
     showToast('Planer ist gesperrt! Bitte oben entsperren.', 'warn');
     return;
   }
   if(!state.undoStack.length) { showToast('Nichts zum Rückgängig machen', 'error'); return; }
-  state.grid = JSON.parse(state.undoStack.pop());
   
-  await Promise.all(state.buses.map(b => sb.from('grid_assignments').delete().eq('bus_id', b.id)));
-  for (const [cid, val] of Object.entries(state.grid)) {
-    const parts = cid.split('_'); const dt = parts.pop(); const busSlug = parts[1];
-    const bus = state.buses.find(b => b.slug === busSlug); if(!bus) continue;
-    const isSpecial = (val === 'vacation' || val === 'sick');
-    await sb.from('grid_assignments').upsert({
-      bus_id: bus.id, work_date: dt, project_id: isSpecial ? null : val, kind: isSpecial ? val : 'project'
-    }, { onConflict: 'bus_id,work_date' });
+  const last = state.undoStack.pop();
+
+  if (last.action === 'delete_one') {
+    // Gelöschten Einzel-Auftrag wiederherstellen
+    const { data } = await sb.from('grid_assignments').insert({
+      id: last.item.id,
+      bus_id: state.buses.find(b => b.slug === last.cellKey.split('_')[1])?.id,
+      work_date: last.cellKey.split('_')[2],
+      project_id: last.item.project_id,
+      kind: last.item.kind
+    }).select().single();
+
+    if (!state.grid[last.cellKey]) state.grid[last.cellKey] = [];
+    state.grid[last.cellKey].push(last.item);
+  } else if (last.action === 'batch') {
+    for (const b of last.items) {
+      if (b.wasAdded) {
+        state.grid[b.cellKey] = (state.grid[b.cellKey] || []).filter(x => x.id !== b.item.id);
+        if (state.grid[b.cellKey].length === 0) delete state.grid[b.cellKey];
+        await sb.from('grid_assignments').delete().eq('id', b.item.id);
+      }
+    }
   }
-  repaint(); renderPalette();
+
+  repaint();
+  renderPalette();
+  showToast('Letzter Schritt rückgängig gemacht! ↶');
 }
 
-// ─── GOOGLE EXPLORER WOCHENPLAN EXPORT ───
+// ─── WOCHENZETTEL EXPORT MODAL ───
 function populateExportSelects() {
   const busSel = $('exportBusSelect');
   busSel.innerHTML = state.buses.map(b => `<option value="${b.slug}">${esc(b.label)} (${b.team})</option>`).join('');
@@ -1706,19 +2022,17 @@ function renderExportPreview() {
     const iso = date.toISOString().split('T')[0];
     const dayName = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][date.getDay()];
     const cellKey = `CELL_${busSlug}_${iso}`;
-    const val = state.grid[cellKey];
+    const list = state.grid[cellKey] || [];
 
-    let contentHtml = '<span style="color:#888;font-size:11px">Kein Einsatz eingetragen</span>';
-    if (val === 'vacation') contentHtml = '<b style="color:#B87503">🌴 URLAUB</b>';
-    else if (val === 'sick') contentHtml = '<b style="color:#D93025">🤒 KRANK</b>';
-    else if (val) {
-      const p = state.projects.find(x => x.id === val);
-      if (p) {
-        contentHtml = `
-          <div style="font-weight:700;color:var(--ink)">${esc(p.name)}</div>
-          <div style="font-size:10px;color:var(--ink-secondary)">📍 ${esc(p.address || 'Keine Adresse')} · ⚡ ${p.kwp||0} kWp</div>
-        `;
-      }
+    let contentHtml = '<span style="color:#888;font-size:11px">Kein Einsatz</span>';
+    if (list.length > 0) {
+      contentHtml = list.map(item => {
+        if (item.kind === 'vacation') return '<div style="color:#B87503;font-weight:700">🌴 URLAUB</div>';
+        if (item.kind === 'sick') return '<div style="color:#D93025;font-weight:700">🤒 KRANK</div>';
+        const p = state.projects.find(x => x.id === item.project_id);
+        if (p) return `<div style="font-weight:700;color:var(--ink);margin-bottom:2px">• ${esc(p.name)} (${p.kwp||0} kWp)</div>`;
+        return '';
+      }).join('');
     }
 
     return `
@@ -1770,106 +2084,157 @@ function executeBusPrint() {
     const iso = date.toISOString().split('T')[0];
     const dayName = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][date.getDay()];
     const cellKey = `CELL_${busSlug}_${iso}`;
-    const val = state.grid[cellKey];
+    const list = state.grid[cellKey] || [];
 
-    if (val === 'vacation') {
-      return `<tr><td><b>${dayName}</b><br><span style="font-family:monospace">${date.getDate()}.${date.getMonth()+1}.</span></td><td colspan="3" style="background:#FCE8B2;color:#B87503;font-weight:700">🌴 URLAUB</td></tr>`;
-    }
-    if (val === 'sick') {
-      return `<tr><td><b>${dayName}</b><br><span style="font-family:monospace">${date.getDate()}.${date.getMonth()+1}.</span></td><td colspan="3" style="background:#FCD5D7;color:#D93025;font-weight:700">🤒 KRANK</td></tr>`;
-    }
-
-    const p = state.projects.find(x => x.id === val);
-    if(!p) {
+    if (list.length === 0) {
       return `<tr><td><b>${dayName}</b><br><span style="font-family:monospace;font-size:11px">${date.getDate()}.${date.getMonth()+1}.</span></td><td colspan="3" style="color:#999">Kein Einsatz eingetragen</td></tr>`;
     }
 
-    return `
-      <tr>
-        <td><b>${dayName}</b><br><span style="font-family:monospace;font-size:11px">${date.getDate()}.${date.getMonth()+1}.</span></td>
-        <td><b>${esc(p.name)}</b><br><span style="font-size:10px;color:#666">P-ID: ${esc(p.project_id || '-')} · ⚡ ${p.kwp || 0} kWp</span></td>
-        <td>📍 ${esc(p.address || 'Keine Adresse')}</td>
-        <td><div style="font-size:11px;white-space:pre-line">${esc(p.order_id || 'Keine Notizen')}</div></td>
-      </tr>
-    `;
+    return list.map((item, idx) => {
+      if (item.kind === 'vacation') {
+        return `<tr><td>${idx===0?`<b>${dayName}</b><br><span style="font-family:monospace">${date.getDate()}.${date.getMonth()+1}.</span>`:''}</td><td colspan="3" style="background:#FCE8B2;color:#B87503;font-weight:700">🌴 URLAUB</td></tr>`;
+      }
+      if (item.kind === 'sick') {
+        return `<tr><td>${idx===0?`<b>${dayName}</b><br><span style="font-family:monospace">${date.getDate()}.${date.getMonth()+1}.</span>`:''}</td><td colspan="3" style="background:#FCD5D7;color:#D93025;font-weight:700">🤒 KRANK</td></tr>`;
+      }
+      const p = state.projects.find(x => x.id === item.project_id);
+      if (!p) return '';
+
+      return `
+        <tr>
+          <td>${idx===0?`<b>${dayName}</b><br><span style="font-family:monospace;font-size:11px">${date.getDate()}.${date.getMonth()+1}.</span>`:''}</td>
+          <td><b>${esc(p.name)}</b><br><span style="font-size:10px;color:#666">P-ID: ${esc(p.project_id || '-')} · ⚡ ${p.kwp || 0} kWp</span></td>
+          <td>📍 ${esc(p.address || 'Keine Adresse')}</td>
+          <td><div style="font-size:11px;white-space:pre-line">${esc(p.order_id || 'Keine Notizen')}</div></td>
+        </tr>
+      `;
+    }).join('');
   }).join('');
 
   window.print();
 }
 
-// ─── MONTEUR SMARTPHONE ANSICHT ───
+// ─── MONTEUR WOCHENANSICHT (MO - FR KARTEN) ───
 function populateMonteurSelects() {
   const sel = $('monteurBusSelect');
   sel.innerHTML = state.buses.map(b => `<option value="${b.slug}">${esc(b.label)} (${b.team})</option>`).join('');
+
+  const kwSel = $('monteurKwSelect');
+  const kwMap = new Map();
+  let d = new Date(RANGE.start);
+  const end = new Date(RANGE.end);
   
-  if (!$('monteurDateSelect').value) {
-    $('monteurDateSelect').value = new Date().toISOString().split('T')[0];
+  while(d <= end) {
+    const kw = getKW(d);
+    if (!kwMap.has(kw)) {
+      const mon = new Date(d); mon.setDate(mon.getDate() - ((mon.getDay() + 6) % 7));
+      const fri = new Date(mon); fri.setDate(fri.getDate() + 4);
+      const label = `KW ${kw} (${mon.getDate()}.${mon.getMonth()+1}. - ${fri.getDate()}.${fri.getMonth()+1}.)`;
+      kwMap.set(kw, { label, monIso: mon.toISOString().split('T')[0] });
+    }
+    d.setDate(d.getDate() + 7);
   }
+
+  kwSel.innerHTML = Array.from(kwMap.entries()).map(([kw, data]) => `<option value="${kw}" data-mon="${data.monIso}">${data.label}</option>`).join('');
+
+  // Aktuelle KW vorwählen
+  const currentKW = getKW(new Date());
+  if (kwMap.has(currentKW)) kwSel.value = currentKW;
+
+  const savedBus = localStorage.getItem('solpro_monteur_bus');
+  if (savedBus && state.buses.some(b => b.slug === savedBus)) {
+    sel.value = savedBus;
+  }
+}
+
+function saveMonteurBusPref() {
+  localStorage.setItem('solpro_monteur_bus', $('monteurBusSelect').value);
 }
 
 function renderMonteurView() {
   const busSlug = $('monteurBusSelect').value;
-  const date = $('monteurDateSelect').value;
-  const container = $('monteurCardContainer');
+  const kwOpt = $('monteurKwSelect').selectedOptions[0];
+  const monIso = kwOpt?.dataset?.mon || '2026-08-24';
+  const container = $('monteurWeekContainer');
   
-  if (!busSlug || !date) {
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--ink-muted)">Bitte Bus und Datum wählen</div>';
+  if (!busSlug) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--ink-muted)">Bitte Partie / Bus auswählen</div>';
     return;
   }
 
-  const cellKey = `CELL_${busSlug}_${date}`;
-  const val = state.grid[cellKey];
+  const days = [];
+  let d = new Date(monIso);
+  for (let i = 0; i < 5; i++) {
+    days.push(new Date(d));
+    d.setDate(d.getDate() + 1);
+  }
 
-  if (!val) {
-    container.innerHTML = `
-      <div class="monteur-card" style="text-align:center;padding:30px">
-        <div style="font-size:32px">☕</div>
-        <div style="font-weight:700;margin-top:8px">Kein Einsatz für diesen Tag eingetragen</div>
+  container.innerHTML = days.map(date => {
+    const iso = date.toISOString().split('T')[0];
+    const dayName = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][date.getDay()];
+    const cellKey = `CELL_${busSlug}_${iso}`;
+    const list = state.grid[cellKey] || [];
+
+    let jobsHtml = '<div style="color:var(--ink-muted);font-size:12px;padding:8px 0">Kein Einsatz für diesen Tag eingetragen</div>';
+
+    if (list.length > 0) {
+      jobsHtml = list.map(item => {
+        if (item.kind === 'vacation') return `<div style="background:#F5E9D3;color:#8C6A30;font-weight:800;padding:8px 12px;border-radius:8px;font-size:13px">🌴 URLAUB</div>`;
+        if (item.kind === 'sick') return `<div style="background:#F7DCDA;color:var(--danger-clay);font-weight:800;padding:8px 12px;border-radius:8px;font-size:13px">🤒 KRANK</div>`;
+
+        const p = state.projects.find(x => x.id === item.project_id);
+        if (!p) return '';
+
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address || p.name)}`;
+        const phone = extractPhone(p.order_id);
+
+        let ibnBadge = '';
+        if (p.order_id && p.order_id.toLowerCase().includes('ibn')) {
+          const timeMatch = p.order_id.match(/\b([01]?[0-9]|2[0-3]):[0-5][0-9]\b/);
+          if (timeMatch) ibnBadge = `<span style="background:var(--ink);color:var(--brass);font-family:var(--font-mono);font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px">⚡ IBN ${timeMatch[0]} Uhr</span>`;
+        }
+
+        return `
+          <div class="monteur-job-item">
+            <div class="monteur-job-head">
+              <span class="monteur-job-name">${esc(p.name)}</span>
+              ${ibnBadge}
+            </div>
+
+            <div class="monteur-job-meta">
+              <span>📍 <b>${esc(p.address || 'Keine Adresse')}</b></span>
+              <span>·</span>
+              <span>⚡ <b>${p.kwp || 0} kWp</b></span>
+            </div>
+
+            ${phone ? `<div style="margin-top:2px"><a href="tel:${cleanPhone(phone)}" style="color:var(--dc-slate);font-weight:700;font-size:12px;text-decoration:none">📞 Anrufen: ${phone}</a></div>` : ''}
+
+            <a href="${mapsUrl}" target="_blank" class="btn-maps-huge">🗺️ In Google Maps navigieren ↗</a>
+
+            ${p.order_id ? `
+              <div style="background:var(--bg-sand);padding:8px 10px;border-radius:6px;font-size:11px;margin-top:4px;border:1px solid var(--border-fine)">
+                <b>📦 Details & Material:</b>
+                <div style="white-space:pre-line;margin-top:2px">${esc(p.order_id)}</div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    return `
+      <div class="monteur-day-card">
+        <div class="monteur-day-header">
+          <span class="monteur-day-title">${dayName}</span>
+          <span class="monteur-day-date">${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">${jobsHtml}</div>
       </div>
     `;
-    return;
-  }
-
-  if (val === 'vacation') {
-    container.innerHTML = `<div class="monteur-card" style="background:#FCE8B2;color:#B87503;text-align:center;font-weight:800;font-size:18px">🌴 URLAUB</div>`;
-    return;
-  }
-  if (val === 'sick') {
-    container.innerHTML = `<div class="monteur-card" style="background:#FCD5D7;color:#D93025;text-align:center;font-weight:800;font-size:18px">🤒 KRANK</div>`;
-    return;
-  }
-
-  const p = state.projects.find(x => x.id === val);
-  if(!p) return;
-
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address || p.name)}`;
-
-  container.innerHTML = `
-    <div class="monteur-card">
-      <div class="monteur-card-header">
-        <span style="background:${p.color};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:var(--radius-pill)">TAGES-EINSATZ</span>
-        <span style="font-weight:800;font-family:var(--font-mono)">${p.kwp || 0} kWp</span>
-      </div>
-      
-      <div class="monteur-card-title">${esc(p.name)}</div>
-      
-      <div class="monteur-card-address">
-        📍 <b>${esc(p.address || 'Keine Adresse')}</b>
-      </div>
-
-      <a href="${mapsUrl}" target="_blank" class="btn-maps">🗺️ In Google Maps navigieren ↗</a>
-
-      ${p.order_id ? `
-        <div style="background:var(--bg-cream-subtle);padding:10px;border-radius:8px;font-size:12px;margin-top:8px;border:1px solid var(--border-subtle)">
-          <b>📦 Details & Material:</b>
-          <div style="white-space:pre-line;margin-top:4px">${esc(p.order_id)}</div>
-        </div>
-      ` : ''}
-    </div>
-  `;
+  }).join('');
 }
 
-// ─── AUFGABEN (TODOS) ───
+// ─── TODOS ───
 function renderTodos() {
   const today = new Date().toISOString().split('T')[0];
   let overdue = 0, dueToday = 0, open = 0;
@@ -1882,7 +2247,7 @@ function renderTodos() {
     }
     return `
     <div class="task-item ${t.done ? 'done' : ''}">
-      <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo('${t.id}', this.checked)" style="width:18px;height:18px;accent-color:var(--google-blue)">
+      <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo('${t.id}', this.checked)" style="width:18px;height:18px;accent-color:var(--dc-slate)">
       <div style="flex:1">
         <div style="font-size:13px;font-weight:600">${esc(t.text)}</div>
         ${t.due_date ? `<div style="font-size:10px;color:var(--ink-muted);margin-top:2px">📅 ${t.due_date}</div>` : ''}
@@ -1924,7 +2289,7 @@ async function deleteTodo(id) {
   await sb.from('todos').delete().eq('id', id);
 }
 
-// ─── VERWALTUNG (ADMIN) ───
+// ─── ADMIN: PROJEKTE ───
 function renderAdminProjects() {
   const search = $('adminProjSearch').value.toLowerCase();
   const list = state.projects.filter(p => p.name.toLowerCase().includes(search));
@@ -1942,7 +2307,7 @@ function renderAdminProjects() {
 
 function openAdminProjectModal() {
   $('pmTitle').textContent = 'Neues Projekt';
-  $('pmId').value = ''; $('pmName').value = ''; $('pmAddress').value = ''; $('pmKwp').value = ''; $('pmNotes').value = ''; $('pmStatus').value = 'auftrag';
+  $('pmId').value = ''; $('pmName').value = ''; $('pmAddress').value = ''; $('pmKwp').value = ''; $('pmNotes').value = ''; $('pmStatus').value = 'auftrag'; $('pmScope').value = 'both';
   $('pmDelBtn').style.display = 'none';
   openModal('adminProjectModal');
 }
@@ -1951,16 +2316,21 @@ function editAdminProject(id) {
   const p = state.projects.find(x => x.id === id); if(!p) return;
   $('pmTitle').textContent = 'Projekt bearbeiten';
   $('pmId').value = p.id; $('pmName').value = p.name; $('pmAddress').value = p.address; $('pmKwp').value = p.kwp; $('pmNotes').value = p.order_id || ''; $('pmStatus').value = p.status;
+  $('pmScope').value = getProjectScope(p);
   $('pmDelBtn').style.display = 'block';
   openModal('adminProjectModal');
 }
 
 async function saveAdminProject() {
   const id = $('pmId').value;
+  const scope = $('pmScope').value;
+  const rawNotes = $('pmNotes').value.trim();
+  const scopedNotes = encodeScopeInNotes(scope, rawNotes);
+
   const data = {
     name: $('pmName').value.trim(), 
     address: $('pmAddress').value.trim(),
-    order_id: $('pmNotes').value.trim(),
+    order_id: scopedNotes,
     kwp: parseFloat($('pmKwp').value) || 0, 
     status: $('pmStatus').value
   };
@@ -1980,6 +2350,7 @@ async function deleteAdminProject() {
   }
 }
 
+// ─── ADMIN: BUSSE ───
 function renderAdminBuses() {
   const teams = { 'montage': '🔧 Montage', 'bauleitung': '👷 Bauleitung', 'elektriker': '⚡ Elektriker' };
   const sortedBuses = [...state.buses].sort(naturalSort);
