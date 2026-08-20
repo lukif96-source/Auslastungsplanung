@@ -68,17 +68,9 @@ input,select,textarea{font-family:inherit;font-size:14px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loader-text{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:2px}
 
-/* ── SIDEBAR ── */
-.sidebar{width:70px;background:var(--ink);display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:16px;flex-shrink:0;z-index:300;transition:transform .3s ease}
-.sidebar.collapsed{transform:translateX(-100%);position:absolute}
-.sidebar-toggle{position:fixed;left:70px;top:70px;z-index:400;background:var(--ink);color:var(--lime);border:none;border-radius:0 8px 8px 0;padding:8px 12px;cursor:pointer;font-size:16px;transition:left .3s ease;display:none}
+/* ── MOBILE TOGGLE (Projekt-Seitenleiste) ── */
+.sidebar-toggle{position:fixed;left:0;top:70px;z-index:400;background:var(--ink);color:var(--lime);border:none;border-radius:0 8px 8px 0;padding:8px 12px;cursor:pointer;font-size:16px;transition:left .3s ease;display:none}
 .sidebar-toggle.show{display:block}
-.sidebar-logo{font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--lime);margin-bottom:12px}
-.sidebar-item{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all .2s;background:transparent;color:var(--ink-muted);position:relative}
-.sidebar-item:hover{background:rgba(255,255,255,0.1);color:var(--lime)}
-.sidebar-item.active{background:var(--lime);color:var(--ink)}
-.sidebar-item .tooltip{position:absolute;left:60px;background:var(--ink);color:var(--lime);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap;z-index:500;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
-.sidebar-item:hover .tooltip{opacity:1}
 
 /* ── PROJEKT-SEITENLEISTE (links, resizable) ── */
 :root{ --project-sidebar-w: 260px; }
@@ -103,14 +95,12 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .main-wrapper{flex:1;display:flex;flex-direction:column;height:100%;min-width:0;position:relative;z-index:1}
 
 @media (max-width:768px){
-  .sidebar{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%);transition:transform .3s ease}
-  .sidebar.mobile-open{transform:translateX(0)}
   .sidebar-toggle{display:block;left:0;top:60px;border-radius:0 8px 8px 0}
   .main-wrapper{margin-left:0}
   .project-sidebar{position:fixed;left:0;top:0;height:100%;width:min(var(--project-sidebar-w),85vw)!important;transform:translateX(-100%);transition:transform .3s ease;z-index:350}
   .project-sidebar.mobile-open{transform:translateX(0)}
   .project-sidebar-resizer{display:none}
-  #projectSidebarToggle{top:110px;z-index:340}
+  #projectSidebarToggle{top:60px;z-index:340}
 }
 
 /* ── AUTH ── */
@@ -209,19 +199,11 @@ td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy
 .bus-name-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .bus-name-label{font-size:12px;font-weight:700;color:var(--ink);line-height:1.1}
 .bus-team{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-radius:4px;background:rgba(212,160,23,0.18);color:var(--gold);display:inline-block;align-self:flex-start;line-height:1.2}
-.bus-team.elektriker{background:rgba(184,216,75,0.20);color:var(--lime-dk)}
 .bus-toggle{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--cream-deep);background:transparent;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--success);padding:0}
 .worker-row.is-offline .bus-toggle{border-color:var(--danger);color:var(--danger)}
-.worker-row.has-team-elektriker td:first-child{box-shadow:inset 3px 0 0 var(--lime-dk)}
-.bus-team.montage{background:rgba(212,160,23,0.18);color:var(--gold)}
-.worker-row.has-team-montage td:first-child{box-shadow:inset 3px 0 0 var(--gold)}
-.worker-row.has-team-other td:first-child{box-shadow:inset 3px 0 0 var(--ink-muted)}
 
-/* ── TEAM-GRUPPEN-TRENNER (klare Abgrenzung Elektriker/Montage) ── */
-tr.team-divider td{border:none!important;text-align:left!important;font-family:var(--font-mono);font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;padding:7px 12px!important;position:static!important;width:auto!important}
-tr.team-divider.team-elektriker td{background:rgba(184,216,75,.30)!important;color:var(--ink)!important;border-top:2px solid var(--lime-dk)!important}
-tr.team-divider.team-montage td{background:rgba(212,160,23,.26)!important;color:var(--ink)!important;border-top:2px solid var(--gold)!important}
-tr.team-divider.team-other td{background:var(--cream-deep)!important;color:var(--ink-muted)!important;border-top:2px solid var(--ink-muted)!important}
+/* ── TEAM-GRUPPEN-TRENNER (klare Abgrenzung, Farbe wird pro Team dynamisch inline gesetzt) ── */
+table tr.team-divider td{border:none;text-align:left!important;font-family:var(--font-mono);font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;padding:7px 12px!important;position:static!important;width:auto!important}
 
 .view-W th[id^="th-"],.view-W .project-cell{width:140px}
 .view-M th[id^="th-"],.view-M .project-cell{width:62px}
@@ -349,26 +331,11 @@ tr.team-divider.team-other td{background:var(--cream-deep)!important;color:var(-
 
 <div id="loader"><div class="spinner"></div><div class="loader-text" id="loaderText">Lade Suite…</div></div>
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar" style="display:none">
-  <div class="sidebar-logo">SOL<span style="color:var(--lime)">PRO</span></div>
-  <div class="sidebar-item active" data-tab="planner" title="Planer">
-    📅
-    <span class="tooltip">Planer</span>
-  </div>
-  <div class="sidebar-item" data-tab="tasks" title="Aufgaben">
-    ✓
-    <span class="tooltip">Aufgaben</span>
-  </div>
-</div>
-
-<!-- SIDEBAR TOGGLE -->
-<button class="sidebar-toggle" id="sidebarToggle">☰</button>
-
 <!-- PROJEKT-SEITENLEISTE (links, ausklappbar per Schieberegler) -->
 <div class="project-sidebar" id="projectSidebar" style="display:none">
   <div class="project-sidebar-head">
     <span class="project-sidebar-title">📁 Projekte</span>
+    <button class="btn" id="btnManageBuses" style="padding:5px 9px;min-height:auto" title="Busse & Teams verwalten">⚙️</button>
   </div>
   <div class="project-sidebar-body">
     <input type="text" class="list-search" id="plannerProjectSearch" placeholder="🔍 Suchen...">
@@ -589,13 +556,27 @@ tr.team-divider.team-other td{background:var(--cream-deep)!important;color:var(-
       <option value="">— Projekt wählen —</option>
     </select>
   </div>
-  <div class="form-field"><label>Datum *</label><input type="date" id="appointmentDate"></div>
+  <div class="form-field"><label>Start *</label><input type="date" id="appointmentDate"></div>
+  <div class="form-field"><label>Ende (optional)</label><input type="date" id="appointmentEndDate"></div>
   <div class="form-field"><label>kWp *</label>
     <input type="number" id="appointmentKwp" min="0" step="0.1" placeholder="z.B. 8.5">
   </div>
-  <p style="font-size:10px;color:var(--ink-muted);margin-top:8px;line-height:1.5">Nur die kWp für diesen Termin — Datum reicht, alles andere kommt aus dem Projekt.</p>
+  <p style="font-size:10px;color:var(--ink-muted);margin-top:8px;line-height:1.5">Enddatum leer lassen für einen eintägigen Termin.</p>
   <div class="m-btns">
     <button class="m-btn m-save" id="appointmentSave">Speichern</button>
+    <button class="m-btn" data-close>Zurück</button>
+  </div>
+</div>
+
+<!-- MODAL: BUSSE & TEAMS VERWALTEN -->
+<div class="modal" id="busModal" style="width:600px">
+  <h2>Busse & Teams <span class="x" data-close>✕</span></h2>
+  <div class="modal-sub">Team-Namen sind frei — jeder Name bekommt automatisch eine eigene Farbe & Abgrenzung im Planer.</div>
+  <div id="busRows" style="display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto;padding-right:4px"></div>
+  <datalist id="teamNameOptions"></datalist>
+  <button class="btn" id="btnAddBusRow" style="margin-top:12px;width:100%;justify-content:center">+ Bus hinzufügen</button>
+  <div class="m-btns">
+    <button class="m-btn m-save" id="busSaveAll">Speichern</button>
     <button class="m-btn" data-close>Zurück</button>
   </div>
 </div>
@@ -693,6 +674,22 @@ const COLORS = [
 ];
 const textColor = h => { h = h.replace('#',''); return ((parseInt(h.substr(0,2),16)*299+parseInt(h.substr(2,2),16)*587+parseInt(h.substr(4,2),16)*114)/1000) >= 128 ? '#111' : '#fff'; };
 
+// Feste, gut lesbare Palette für Team-Farben — jeder (auch neu vergebene) Teamname
+// bekommt deterministisch immer dieselbe Farbe, damit umbenannte/neue Teams stabil bleiben.
+const TEAM_COLOR_PALETTE = ['#B8D84B','#D4A017','#2563eb','#C8303A','#8b5cf6','#0891b2','#db2777','#65a30d','#ea580c','#0d9488'];
+function teamColorFor(teamName) {
+  const key = (teamName || '').trim().toLowerCase();
+  if (!key) return '#8a8478';
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  return TEAM_COLOR_PALETTE[hash % TEAM_COLOR_PALETTE.length];
+}
+function hexToRgba(hex, alpha) {
+  hex = (hex || '#8a8478').replace('#','');
+  const r = parseInt(hex.substr(0,2),16), g = parseInt(hex.substr(2,2),16), b = parseInt(hex.substr(4,2),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 function showAuth() { $('authOverlay').style.display = 'flex'; $('topbar').style.display = 'none'; $('tabNav').style.display = 'none'; }
 function hideAuth() { $('authOverlay').style.display = 'none'; $('topbar').style.display = 'flex'; $('tabNav').style.display = 'flex'; }
 
@@ -772,7 +769,6 @@ async function bootApp() {
 
   if (profile.role === 'viewer') { state.isLocked = true; updateLockUI(); }
 
-  $('sidebar').style.display = 'flex';
   $('projectSidebar').style.display = 'flex';
   hideAuth();
 
@@ -833,6 +829,7 @@ function renderAll() {
   renderKPI();
   renderTodos();
   updateLockUI();
+  $('btnManageBuses').style.display = canAdmin() ? '' : 'none';
 }
 function canEdit() { return ['admin','editor'].includes(state.profile?.role) && !state.isLocked; }
 function canAdmin() { return state.profile?.role === 'admin'; }
@@ -842,10 +839,8 @@ function switchTab(tab) {
   state.activeTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + tab));
-  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.toggle('active', s.dataset.tab === tab));
 
   if (window.innerWidth <= 768) {
-    $('sidebar').classList.remove('mobile-open');
     $('projectSidebar').classList.remove('mobile-open');
   }
 
@@ -883,20 +878,13 @@ function setupListeners() {
     renderPalette();
   };
 
-  document.querySelectorAll('.sidebar-item').forEach(item => {
-    item.onclick = () => {
-      const tab = item.dataset.tab;
-      if (tab) switchTab(tab);
-    };
-  });
-
-  $('sidebarToggle').onclick = () => {
-    $('sidebar').classList.toggle('mobile-open');
-  };
-
   $('projectSidebarToggle').onclick = () => {
     $('projectSidebar').classList.toggle('mobile-open');
   };
+
+  $('btnManageBuses').onclick = openBusModal;
+  $('btnAddBusRow').onclick = () => $('busRows').appendChild(busRowEl(null));
+  $('busSaveAll').onclick = saveBuses;
 
   setupSidebarResizer();
 
@@ -1005,43 +993,38 @@ function buildGrid() {
   thead.innerHTML = trM + `</tr>` + trK + `</tr>` + trD + `</tr>`;
   tbody.innerHTML = '';
 
-  // ── Busse klar nach Team gruppieren: Elektriker-Busse zuerst, dann Montage-Busse,
-  //    danach eventuelle weitere Teams, zuletzt Busse ohne Team-Zuordnung.
-  const teamKeyOf = b => {
-    const t = (b.team || '').trim().toLowerCase();
-    if (t === 'elektriker') return 'elektriker';
-    if (t === 'montage') return 'montage';
-    if (t) return t;
-    return '__none__';
-  };
+  // ── Busse klar nach Team gruppieren. Teamnamen sind frei editierbar (siehe
+  //    "⚙️ Busse & Teams verwalten") — jede eindeutige Team-Bezeichnung bekommt
+  //    automatisch eine eigene, klar abgegrenzte Sektion mit eigener Farbe.
+  const teamKeyOf = b => (b.team || '').trim() || '__none__';
   const groups = new Map();
   visibleBuses.forEach(b => {
     const k = teamKeyOf(b);
     if (!groups.has(k)) groups.set(k, []);
     groups.get(k).push(b);
   });
-  const rank = k => k === 'elektriker' ? 0 : k === 'montage' ? 1 : k === '__none__' ? 9 : 2;
-  const orderedKeys = [...groups.keys()].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+  // Feste Reihenfolge/Icons für die bekannten Kern-Teams, alles andere alphabetisch danach, "Ohne Team" zuletzt.
+  const KNOWN_ORDER = { 'elektriker': 0, 'montage': 1 };
+  const KNOWN_ICON = { 'elektriker': '⚡', 'montage': '🔧', 'bauleitung': '👷' };
+  const rank = k => k === '__none__' ? 99 : (KNOWN_ORDER[k.toLowerCase()] ?? 10);
+  const orderedKeys = [...groups.keys()].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b, 'de'));
   const colCount = dates.length + 1;
-  const dividerMeta = k => {
-    if (k === 'elektriker') return { cls: 'team-elektriker', label: '⚡ ELEKTRIKER-BUSSE' };
-    if (k === 'montage') return { cls: 'team-montage', label: '🔧 MONTAGE-BUSSE' };
-    if (k === '__none__') return { cls: 'team-other', label: 'OHNE TEAM' };
-    return { cls: 'team-other', label: `${escHtml(groups.get(k)[0].team)}`.toUpperCase() };
-  };
-
   orderedKeys.forEach(k => {
     const busesInGroup = groups.get(k);
-    const { cls, label } = dividerMeta(k);
-    tbody.insertAdjacentHTML('beforeend', `<tr class="team-divider ${cls}"><td colspan="${colCount}">${label} (${busesInGroup.length})</td></tr>`);
+    const isNone = k === '__none__';
+    const color = isNone ? null : teamColorFor(k);
+    const icon = isNone ? '👥' : (KNOWN_ICON[k.toLowerCase()] || '👥');
+    const label = isNone ? 'OHNE TEAM' : escHtml(k).toUpperCase();
+    const dividerStyle = isNone
+      ? `background:var(--cream-deep);color:var(--ink-muted);border-top:2px solid var(--ink-muted)`
+      : `background:${hexToRgba(color, .26)};color:var(--ink);border-top:2px solid ${color}`;
+    tbody.insertAdjacentHTML('beforeend', `<tr class="team-divider"><td colspan="${colCount}" style="${dividerStyle}">${icon} ${label} (${busesInGroup.length})</td></tr>`);
     busesInGroup.forEach(b => {
       const sf = b.slug;
       const off = b.is_offline;
-      const isElek = k === 'elektriker', isMontage = k === 'montage', isOther = k !== 'elektriker' && k !== 'montage' && k !== '__none__';
-      const teamClass = isElek ? ' has-team-elektriker' : isMontage ? ' has-team-montage' : isOther ? ' has-team-other' : '';
-      const badgeCls = isElek ? 'elektriker' : isMontage ? 'montage' : '';
-      const teamBadge = b.team ? `<span class="bus-team ${badgeCls}">${escHtml(b.team)}</span>` : '';
-      let row = `<tr id="row_${sf}" class="worker-row ${off?'is-offline':'is-active'}${teamClass}"><td><div class="bus-name-wrap"><div class="bus-name-info"><span class="bus-name-label">${escHtml(b.label)}</span>${teamBadge}</div><button class="bus-toggle" data-bus="${escAttr(sf)}">${off?'✕':'✓'}</button></div></td>`;
+      const accentStyle = color ? ` style="box-shadow:inset 3px 0 0 ${color}"` : '';
+      const teamBadge = b.team ? `<span class="bus-team" style="background:${hexToRgba(color, .18)};color:${color}">${escHtml(b.team)}</span>` : '';
+      let row = `<tr id="row_${sf}" class="worker-row ${off?'is-offline':'is-active'}"><td${accentStyle}><div class="bus-name-wrap"><div class="bus-name-info"><span class="bus-name-label">${escHtml(b.label)}</span>${teamBadge}</div><button class="bus-toggle" data-bus="${escAttr(sf)}">${off?'✕':'✓'}</button></div></td>`;
       dates.forEach(d => {
         const iso = isoOf(d);
         row += `<td id="CELL_${sf}_${iso}" class="project-cell ${d.getDay()===1?'monday-start':''}" data-ts="${d.getTime()}" data-bus="${escAttr(sf)}" data-date="${iso}"></td>`;
@@ -1245,6 +1228,85 @@ async function toggleBus(sf) {
   repaint();
 }
 
+// ─── BUSSE & TEAMS VERWALTEN ───
+function slugify(s) {
+  return (s || '').toString().toLowerCase()
+    .replace(/[äöü]/g, m => ({ 'ä':'ae','ö':'oe','ü':'ue' }[m]))
+    .replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') || 'bus';
+}
+function uniqueSlug(base, existing) {
+  let slug = base, n = 2;
+  while (existing.has(slug)) { slug = `${base}-${n}`; n++; }
+  existing.add(slug);
+  return slug;
+}
+function openBusModal() {
+  const dl = $('teamNameOptions');
+  const knownTeams = [...new Set(state.buses.map(b => (b.team || '').trim()).filter(Boolean))];
+  dl.innerHTML = knownTeams.map(t => `<option value="${escAttr(t)}">`).join('');
+  renderBusRows();
+  showModal('busModal');
+}
+function renderBusRows() {
+  const c = $('busRows');
+  c.innerHTML = '';
+  state.buses.slice().sort((a, b) => (a.sort_order||0) - (b.sort_order||0)).forEach(b => c.appendChild(busRowEl(b)));
+}
+function busRowEl(b) {
+  const row = document.createElement('div');
+  row.className = 'bus-row';
+  row.dataset.id = b?.id || '';
+  row.dataset.slug = b?.slug || '';
+  row.style.cssText = 'display:flex;gap:6px;align-items:center;padding:8px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius-sm)';
+  row.innerHTML = `
+    <input class="bus-row-label" placeholder="Bezeichnung (z.B. SOL 2 · Partie Hager)" value="${escAttr(b?.label || '')}" style="flex:2;min-width:0;padding:8px 10px;border:1.5px solid var(--cream-deep);border-radius:var(--radius-sm);font-size:12px">
+    <input class="bus-row-team" placeholder="Team (frei wählbar)" value="${escAttr(b?.team || '')}" list="teamNameOptions" style="flex:1.3;min-width:0;padding:8px 10px;border:1.5px solid var(--cream-deep);border-radius:var(--radius-sm);font-size:12px">
+    <label style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--ink-muted);white-space:nowrap"><input type="checkbox" class="bus-row-offline" ${b?.is_offline ? 'checked' : ''}> Offline</label>
+    <button class="btn danger bus-row-del" title="Bus löschen" style="padding:6px 9px;min-height:auto">🗑</button>`;
+  row.querySelector('.bus-row-del').onclick = () => row.remove();
+  return row;
+}
+function collectBusRowsData() {
+  const usedSlugs = new Set(state.buses.map(b => b.slug));
+  return [...document.querySelectorAll('#busRows .bus-row')].map((row, i) => {
+    const label = row.querySelector('.bus-row-label').value.trim();
+    const team = row.querySelector('.bus-row-team').value.trim();
+    const is_offline = row.querySelector('.bus-row-offline').checked;
+    const id = row.dataset.id || null;
+    let slug = row.dataset.slug;
+    if (!slug) { usedSlugs.delete(slug); slug = uniqueSlug(slugify(label), usedSlugs); }
+    return { id, slug, label, team, is_offline, sort_order: i + 1 };
+  }).filter(r => r.label);
+}
+async function saveBuses() {
+  const rows = collectBusRowsData();
+  if (!rows.length) { showToast('Mindestens ein Bus mit Bezeichnung erforderlich', 'error'); return; }
+
+  const keptIds = new Set(rows.filter(r => r.id).map(r => r.id));
+  const removedIds = state.buses.map(b => b.id).filter(id => !keptIds.has(id));
+
+  for (const r of rows) {
+    if (r.id) {
+      const { error } = await sb.from('buses').update({ slug: r.slug, label: r.label, team: r.team, is_offline: r.is_offline, sort_order: r.sort_order }).eq('id', r.id);
+      if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+    } else {
+      const { error } = await sb.from('buses').insert({ slug: r.slug, label: r.label, team: r.team, is_offline: r.is_offline, sort_order: r.sort_order });
+      if (error) { showToast('Fehler: ' + error.message, 'error'); return; }
+    }
+  }
+  if (removedIds.length) {
+    await sb.from('grid_assignments').delete().in('bus_id', removedIds);
+    const { error } = await sb.from('buses').delete().in('id', removedIds);
+    if (error) { showToast('Fehler beim Löschen: ' + error.message, 'error'); return; }
+  }
+
+  await loadBuses(); await loadGrid();
+  buildGrid(); closeModal();
+  showToast('Busse & Teams gespeichert', 'success');
+}
+
 function toggleLock() {
   if (state.profile?.role === 'viewer') return;
   state.isLocked = !state.isLocked;
@@ -1330,6 +1392,7 @@ function openDeadlineModal(deadline, projectId) {
   $('appointmentId').value = deadline?.id || '';
   $('appointmentProject').value = projectId || deadline?.project_id || '';
   $('appointmentDate').value = deadline?.deadline_date || '';
+  $('appointmentEndDate').value = deadline?.deadline_end_date || '';
   $('appointmentKwp').value = deadline?.kwp ?? (state.projects.find(p => p.id === (projectId || deadline?.project_id))?.kwp ?? '');
   showModal('appointmentModal');
 }
@@ -1337,14 +1400,17 @@ function openDeadlineModal(deadline, projectId) {
 async function saveDeadline() {
   const projectId = $('appointmentProject').value;
   const date = $('appointmentDate').value;
+  const endDate = $('appointmentEndDate').value || null;
   const kwp = parseFloat($('appointmentKwp').value) || 0;
 
   if (!projectId || !date) { showToast('Projekt und Datum erforderlich', 'error'); return; }
+  if (endDate && endDate < date) { showToast('Enddatum darf nicht vor dem Startdatum liegen', 'error'); return; }
 
   const id = $('appointmentId').value;
   const data = {
     project_id: projectId,
     deadline_date: date,
+    deadline_end_date: endDate,
     kwp,
     created_by: state.profile?.id || state.user?.id
   };
