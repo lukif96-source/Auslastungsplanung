@@ -1079,7 +1079,8 @@ function buildGrid() {
     groups.get(k).push(b);
   });
   // Feste Reihenfolge/Icons für die bekannten Kern-Teams, alles andere alphabetisch danach, "Ohne Team" zuletzt.
-  const KNOWN_ORDER = { 'elektriker': 0, 'montage': 1, 'bauleitung': 2 };
+  // Monteure & Bauleitung priorisiert, Elektriker unten
+  const KNOWN_ORDER = { 'montage': 0, 'bauleitung': 1, 'elektriker': 2 };
   const KNOWN_ICON = { 'elektriker': '⚡', 'montage': '🔧', 'bauleitung': '👷' };
   
   // Spezielle Kennzeichnung für Sven als Bauleiter
