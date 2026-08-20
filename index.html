@@ -57,6 +57,18 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .blob-1{width:600px;height:400px;background:var(--lime);top:-120px;left:-80px}
 .blob-2{width:500px;height:350px;background:var(--gold);top:40%;right:-100px;opacity:.18}
 
+/* LOGIN SCREEN */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 999999;
+  background: rgba(18, 17, 15, 0.85); backdrop-filter: blur(25px);
+  display: flex; align-items: center; justify-content: center;
+}
+.login-card {
+  background: #FAF8F5; padding: 36px 30px; border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.7); box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  width: 360px; max-width: 90vw; text-align: center;
+}
+
 #loader{position:fixed;inset:0;z-index:99999;background:rgba(18,17,15,0.75);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px}
 #loader.show{display:flex}
 .spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--lime);border-radius:50%;animation:spin .9s linear infinite}
@@ -229,6 +241,19 @@ body.view-J .day-num { font-size: 10px; }
 <div class="bg-blob blob-1"></div>
 <div class="bg-blob blob-2"></div>
 
+<!-- PASSWORT SCREEN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="logo" style="font-size:26px;margin-bottom:8px">SOL<span>PRO</span></div>
+    <div style="font-size:12px;color:var(--ink-muted);margin-bottom:20px;text-transform:uppercase;letter-spacing:1px;font-weight:700">Geschützter Bereich</div>
+    <div class="form-field" style="text-align:left">
+      <label>Passwort eingeben</label>
+      <input type="password" id="loginPassword" placeholder="Passwort..." style="text-align:center;font-size:16px;letter-spacing:2px">
+    </div>
+    <button class="btn primary" style="width:100%;justify-content:center;margin-top:10px" onclick="tryLogin()">Anmelden</button>
+  </div>
+</div>
+
 <div id="loader"><div class="spinner"></div><div class="loader-text" id="loaderText">Lade Suite…</div></div>
 <div id="hoverTooltip"></div>
 
@@ -256,6 +281,9 @@ body.view-J .day-num { font-size: 10px; }
     <div class="logo">SOL<span>PRO</span></div>
     <div style="font-size:11px;color:var(--ink-muted);margin-left:12px;font-weight:600">
       💡 Tipp: <b style="color:var(--ink)">Rechtsklick</b> oder <b style="color:var(--ink)">Doppelklick</b> auf ein Kästchen im Planer löscht es sofort!
+    </div>
+    <div style="margin-left:auto">
+      <button class="btn" style="font-size:9px;padding:4px 8px;min-height:auto" onclick="logout()" title="Abmelden">🔒 Sperren</button>
     </div>
   </div>
 
@@ -472,6 +500,40 @@ function showToast(msg, type='success') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
 }
 
+// ─── LOGIN MIT PASSWORT "solpro" ───
+function checkAuth() {
+  if (localStorage.getItem('solpro_auth') === 'true') {
+    $('loginScreen').style.display = 'none';
+    loadData();
+  } else {
+    $('loginScreen').style.display = 'flex';
+    setTimeout(() => $('loginPassword').focus(), 100);
+  }
+}
+
+function tryLogin() {
+  const pwd = $('loginPassword').value.trim();
+  if (pwd === 'solpro') {
+    localStorage.setItem('solpro_auth', 'true');
+    $('loginScreen').style.display = 'none';
+    showToast('Erfolgreich angemeldet!');
+    loadData();
+  } else {
+    showToast('Falsches Passwort!', 'error');
+    $('loginPassword').value = '';
+    $('loginPassword').focus();
+  }
+}
+$('loginPassword').addEventListener('keypress', e => { if (e.key === 'Enter') tryLogin(); });
+
+function logout() {
+  localStorage.removeItem('solpro_auth');
+  $('loginPassword').value = '';
+  $('loginScreen').style.display = 'flex';
+  $('loginPassword').focus();
+  showToast('Abgemeldet');
+}
+
 // ─── 1. UMSCHALTER FÜR WOCHE / MONAT / JAHR ───
 function switchViewMode(view) {
   document.body.classList.remove('view-W', 'view-M', 'view-J');
@@ -583,7 +645,7 @@ function renderAll() {
   renderTodos();
 }
 
-// ─── 6. TAIFUN IMPORT MIT BAUSTELLEN-ERKENNUNG ───
+// ─── 6. TAIFUN IMPORT ───
 function handleFileUpload(e) {
   const file = e.target.files[0];
   if(!file) return;
@@ -609,7 +671,6 @@ function parseTaifun(htmlContent) {
       }
     }
 
-    // Datum vor Startdatum ignorieren
     if (filterStartDate && currentRowDate && currentRowDate < filterStartDate) {
       return;
     }
@@ -626,7 +687,6 @@ function parseTaifun(htmlContent) {
           const projectId = projMatch ? projMatch[1] : '';
           const orderId = orderMatch ? orderMatch[1] : '';
 
-          // Baustelle / Unterprojekt automatisch erkennen (Zeilen unter der Projektnummer)
           let subProject = '';
           const projectLineIdx = lines.findIndex(l => l.includes('Projekt: P'));
           if (projectLineIdx !== -1 && lines[projectLineIdx + 1]) {
@@ -681,7 +741,7 @@ async function saveImportToDB() {
   await loadData();
 }
 
-// ─── 7. RESET-BUTTON: ALLE PROJEKTE LÖSCHEN ───
+// ─── 7. RESET-BUTTON ───
 async function deleteAllProjects() {
   if (!confirm("⚠️ ACHTUNG: Möchtest du wirklich ALLE Projekte und Kalender-Zuweisungen löschen?\n(Deine Busse & Teams bleiben erhalten!)")) return;
   if (!confirm("Bist du 100% sicher? Dieser Vorgang kann nicht rückgängig gemacht werden!")) return;
@@ -696,7 +756,7 @@ async function deleteAllProjects() {
     repaint();
     renderPalette();
     renderAdminProjects();
-    showToast("Alle Projekte wurden erfolgreich gelöscht!", "success");
+    showToast("Alle Projekte wurden gelöscht!", "success");
   } catch(e) {
     showToast("Fehler beim Löschen: " + e.message, "error");
   }
@@ -906,11 +966,11 @@ function repaint() {
   $('kpiRow').innerHTML = `<div class="kpi-pill"><span class="kpi-lbl">Geplante Tage</span><span class="kpi-val">${work}</span></div>`;
 }
 
-// ─── 10. DIREKTES LÖSCHEN PER RECHTSKLICK / DOPPELKLICK ───
+// ─── 10. DIREKTES LÖSCHEN (RECHTSKLICK / DOPPELKLICK) ───
 document.addEventListener('contextmenu', e => {
   const cell = e.target.closest('.project-cell');
   if (cell && state.grid[cell.id]) {
-    e.preventDefault(); // Standard-Browser-Menü verhindern
+    e.preventDefault();
     clearSingleCell(cell);
   }
 });
@@ -943,7 +1003,7 @@ async function clearSingleCell(el) {
 // ─── 11. PLANER ZEICHNEN ───
 function setupGridPaint() {
   document.addEventListener('mousedown', e => {
-    if (e.button !== 0) return; // Nur linke Maustaste zum Zeichnen
+    if (e.button !== 0) return;
     if (!e.target.classList.contains('project-cell')) return;
     if (!state.activeProjId) { showToast('Wähle links ein Projekt aus', 'error'); return; }
     state.isDrawing = true; state.selectedCells = [e.target.id];
@@ -1171,8 +1231,8 @@ async function deleteAdminBus() {
   }
 }
 
-// ─── START ───
-loadData();
+// ─── STARTEN MIT AUTH-CHECK ───
+checkAuth();
 
 </script>
 </body>
