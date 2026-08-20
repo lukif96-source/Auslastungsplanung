@@ -551,6 +551,49 @@ table tr.team-divider td{border:none;text-align:left!important;font-family:var(-
             <button class="btn" onclick="loadFromSupabase()">📥 Laden</button>
           </div>
         </div>
+        
+        <!-- Team Management -->
+        <div style="margin-top:30px;padding:20px;background:var(--glass-bg);border-radius:var(--radius);border:1px solid var(--cream-deep)">
+          <h3 style="font-size:14px;color:var(--ink);margin-bottom:16px">👥 Teams & Busse verwalten</h3>
+          
+          <!-- Team Groups -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,0.5);border-radius:8px;padding:16px">
+              <h4 style="color:var(--ink);margin-bottom:12px;font-size:13px;display:flex;align-items:center;gap:8px">🔧 Montage</h4>
+              <div class="add-bus-form" style="display:flex;gap:8px;margin-bottom:12px">
+                <input type="text" id="montageBusInput" placeholder="Bus Name..." style="flex:1;padding:8px 12px;border:1px solid var(--cream-deep);border-radius:4px;font-size:12px">
+                <button class="btn" onclick="addImportedBus('montage')" style="padding:6px 12px">+</button>
+              </div>
+              <div id="montageBusList" class="bus-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+            
+            <div style="background:rgba(255,255,255,0.5);border-radius:8px;padding:16px">
+              <h4 style="color:var(--ink);margin-bottom:12px;font-size:13px;display:flex;align-items:center;gap:8px">👷 Bauleitung</h4>
+              <div class="add-bus-form" style="display:flex;gap:8px;margin-bottom:12px">
+                <input type="text" id="bauleitungBusInput" placeholder="Bus Name..." style="flex:1;padding:8px 12px;border:1px solid var(--cream-deep);border-radius:4px;font-size:12px">
+                <button class="btn" onclick="addImportedBus('bauleitung')" style="padding:6px 12px">+</button>
+              </div>
+              <div id="bauleitungBusList" class="bus-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+            
+            <div style="background:rgba(255,255,255,0.5);border-radius:8px;padding:16px">
+              <h4 style="color:var(--ink);margin-bottom:12px;font-size:13px;display:flex;align-items:center;gap:8px">⚡ Elektriker</h4>
+              <div class="add-bus-form" style="display:flex;gap:8px;margin-bottom:12px">
+                <input type="text" id="elektrikerBusInput" placeholder="Bus Name..." style="flex:1;padding:8px 12px;border:1px solid var(--cream-deep);border-radius:4px;font-size:12px">
+                <button class="btn" onclick="addImportedBus('elektriker')" style="padding:6px 12px">🔄</button>
+              </div>
+              <div id="elektrikerBusList" class="bus-list" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+          </div>
+          
+          <!-- Ausblenden-Funktion -->
+          <div style="margin-top:20px;padding:16px;background:rgba(200,48,58,0.08);border-radius:8px;border:1px solid rgba(200,48,58,0.3)">
+            <h4 style="color:var(--danger);margin-bottom:12px;font-size:13px">🚫 Busse ausblenden</h4>
+            <p style="font-size:11px;color:var(--ink-muted);margin-bottom:12px">Wählen Sie Busse aus, die im Planer ausgeblendet werden sollen:</p>
+            <div id="hiddenBusesList" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
+            <button class="btn danger" onclick="saveHiddenBuses()">Ausblenden speichern</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1642,11 +1685,13 @@ function showFatal(msg) {
 
 // ─── PROJEKT IMPORT FUNKTIONALITÄT ───
 let importedProjects = [];
+let importedBuses = [];
 let importedTeams = {
   montage: [],
   bauleitung: [],
   elektriker: []
 };
+let hiddenBuses = new Set();
 
 // Tab Switching Handler
 document.querySelectorAll('.tab').forEach(tab => {
@@ -1701,8 +1746,9 @@ function processImportFile(file) {
     try {
       const htmlContent = e.target.result;
       const newProjects = extractProjectsFromHTML(htmlContent);
+      const newBuses = extractBusesFromHTML(htmlContent);
       
-      if (newProjects.length > 0) {
+      if (newProjects.length > 0 || newBuses.length > 0) {
         // Merge with existing projects
         newProjects.forEach(newProject => {
           if (!importedProjects.find(p => p.name === newProject.name)) {
@@ -1710,12 +1756,20 @@ function processImportFile(file) {
           }
         });
         
+        // Merge with existing buses
+        newBuses.forEach(newBus => {
+          if (!importedBuses.find(b => b.slug === newBus.slug)) {
+            importedBuses.push(newBus);
+          }
+        });
+        
         renderImportedProjects();
+        renderImportedBuses();
         document.getElementById('importSection').style.display = 'none';
         document.getElementById('projectsSection').style.display = 'block';
-        showToast(`${newProjects.length} Projekte importiert!`, 'success');
+        showToast(`${newProjects.length} Projekte und ${newBuses.length} Busse importiert!`, 'success');
       } else {
-        showToast('Keine Projekte in der Datei gefunden', 'error');
+        showToast('Keine Projekte oder Busse in der Datei gefunden', 'error');
       }
     } catch (error) {
       showToast('Fehler beim Verarbeiten: ' + error.message, 'error');
@@ -1758,6 +1812,65 @@ function extractProjectsFromHTML(htmlContent) {
   });
   
   return extractedProjects;
+}
+
+function extractBusesFromHTML(htmlContent) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, 'text/html');
+  const extractedBuses = [];
+  
+  // Extrahre Busse aus den Tabellen-Headern
+  const headerRows = doc.querySelectorAll('tr');
+  
+  headerRows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    cells.forEach(cell => {
+      const text = cell.textContent.trim();
+      // Überspringe die erste Spalte (Datum) und leere Zellen
+      if (text && text !== 'Samstag' && text !== 'Sonntag' && 
+          !text.includes('2026') && !text.includes('20.') && 
+          !text.includes('Montag') && !text.includes('Dienstag') && 
+          !text.includes('Mittwoch') && !text.includes('Donnerstag') && 
+          !text.includes('Freitag') && text.length > 2) {
+        
+        // Prüfe ob dieser Bus bereits existiert
+        if (!extractedBuses.find(b => b.label === text)) {
+          extractedBuses.push({
+            id: Date.now() + Math.random(),
+            label: text,
+            slug: text.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+            team: determineTeamCategory(text),
+            is_offline: false,
+            sort_order: 0
+          });
+        }
+      }
+    });
+  });
+  
+  return extractedBuses;
+}
+
+function determineTeamCategory(busLabel) {
+  const label = busLabel.toLowerCase();
+  
+  // Sven als Bauleiter kennzeichnen
+  if (label.includes('sven')) {
+    return 'bauleitung';
+  }
+  
+  // Elektriker Gruppe
+  if (label.includes('elektriker') || label.includes('elektro')) {
+    return 'elektriker';
+  }
+  
+  // Technische Leitung als Bauleitung
+  if (label.includes('technische leitung') || label.includes('leitung')) {
+    return 'bauleitung';
+  }
+  
+  // Alle anderen als Montage (Standard)
+  return 'montage';
 }
 
 function renderImportedProjects(filter = '') {
@@ -1928,6 +2041,96 @@ async function checkSupabaseConnection() {
 
 // Check connection on load
 setTimeout(checkSupabaseConnection, 1000);
+
+// Team Management Functions
+function addImportedBus(category) {
+  const inputId = category + 'BusInput';
+  const input = document.getElementById(inputId);
+  const busName = input.value.trim();
+  
+  if (busName) {
+    if (!importedTeams[category].includes(busName)) {
+      importedTeams[category].push(busName);
+      
+      // Also add to importedBuses
+      const slug = busName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      if (!importedBuses.find(b => b.slug === slug)) {
+        importedBuses.push({
+          id: Date.now() + Math.random(),
+          label: busName,
+          slug: slug,
+          team: category,
+          is_offline: false,
+          sort_order: 0
+        });
+      }
+      
+      renderImportedTeams();
+      renderHiddenBusesList();
+      input.value = '';
+      showToast('Bus erfolgreich hinzugefügt!', 'success');
+    } else {
+      showToast('Dieser Bus existiert bereits.', 'error');
+    }
+  } else {
+    showToast('Bitte geben Sie einen Bus-Namen ein.', 'error');
+  }
+}
+
+function removeImportedBus(category, busName) {
+  if (confirm(`Möchten Sie den Bus "${busName}" wirklich löschen?`)) {
+    importedTeams[category] = importedTeams[category].filter(bus => bus !== busName);
+    importedBuses = importedBuses.filter(b => b.label !== busName);
+    renderImportedTeams();
+    renderHiddenBusesList();
+    showToast('Bus erfolgreich gelöscht!', 'success');
+  }
+}
+
+function renderImportedTeams() {
+  ['montage', 'bauleitung', 'elektriker'].forEach(category => {
+    const listId = category + 'BusList';
+    const list = document.getElementById(listId);
+    
+    list.innerHTML = importedTeams[category].map(bus => `
+      <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.7);padding:10px;border-radius:4px;border:1px solid var(--cream-deep)">
+        <span style="font-weight:500;color:var(--ink);font-size:12px">${escHtml(bus)}</span>
+        <button onclick="removeImportedBus('${category}', '${escHtml(bus)}')" style="background:var(--danger);color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px">Löschen</button>
+      </div>
+    `).join('');
+  });
+}
+
+function renderHiddenBusesList() {
+  const list = document.getElementById('hiddenBusesList');
+  const allBuses = [...importedTeams.montage, ...importedTeams.bauleitung, ...importedTeams.elektriker];
+  
+  list.innerHTML = allBuses.map(bus => `
+    <label style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.5);padding:6px 10px;border-radius:4px;font-size:11px;cursor:pointer">
+      <input type="checkbox" ${hiddenBuses.has(bus) ? 'checked' : ''} onchange="toggleHiddenBus('${escHtml(bus)}')">
+      <span>${escHtml(bus)}</span>
+    </label>
+  `).join('');
+}
+
+function toggleHiddenBus(busName) {
+  if (hiddenBuses.has(busName)) {
+    hiddenBuses.delete(busName);
+  } else {
+    hiddenBuses.add(busName);
+  }
+}
+
+function saveHiddenBuses() {
+  showToast(`${hiddenBuses.size} Busse ausgeblendet!`, 'success');
+  // Hier könnte man die ausgeblendeten Busse auch in Supabase speichern
+}
+
+// Initialize team display
+setTimeout(() => {
+  renderImportedTeams();
+  renderHiddenBusesList();
+}, 1500);
 </script>
 </body>
 </html>
