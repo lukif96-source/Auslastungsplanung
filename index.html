@@ -492,6 +492,7 @@ td:first-child{
 .cell-item-card.run-start .cell-item-name{ overflow: visible; text-overflow: clip; position: relative; z-index: 6; }
 .cell-item-card.run-cont{ border-radius: 0 !important; margin-left: -7px; }
 .cell-item-card.run-end{ border-top-right-radius: 6px !important; border-bottom-right-radius: 6px !important; }
+.cell-item-card.spill{ overflow: visible !important; }
 .cell-item-del{
   background: rgba(0,0,0,0.25); border: none; color: #fff; font-size: 10px;
   width: 14px; height: 14px; border-radius: 3px; display: flex; align-items: center;
@@ -952,12 +953,12 @@ body.role-monteur .project-sidebar { display: none !important; }
 
   <div class="form-field">
     <label>Bus / Partie</label>
-    <select id="exportBusSelect" onchange="renderExportPreview()"></select>
+    <select id="exportBusSelect" onchange="loadExportRemark(); renderExportPreview()"></select>
   </div>
 
   <div class="form-field">
     <label>Kalenderwoche (KW)</label>
-    <select id="exportKwSelect" onchange="renderExportPreview()"></select>
+    <select id="exportKwSelect" onchange="loadExportRemark(); renderExportPreview()"></select>
   </div>
 
   <div class="form-field">
@@ -1091,12 +1092,23 @@ const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-const RANGE = { start: '2026-08-17', end: '2026-12-31' };
-const COLORS = [
-  '#1F6F8B','#B85834','#5A6B52','#7A4E8C','#356859','#A63D57','#2F5D9E','#8C6A30',
-  '#C15A2B','#4A6FA5','#6B8E4E','#9E4A7A','#2E7D6B','#B04A4A','#5E548E','#946846',
-  '#3E7CB1','#7D6608','#A34F9E','#457B9D','#8A5A44','#588157','#B5651D','#6D597A'
-];
+// Rollender Zeitraum: 4 Wochen zurück bis 8 Monate voraus – kein festes Enddatum mehr
+const RANGE = (() => {
+  const s = new Date(); s.setDate(s.getDate() - 28);
+  const e = new Date(); e.setMonth(e.getMonth() + 8);
+  return { start: s.toISOString().split('T')[0], end: e.toISOString().split('T')[0] };
+})();
+// 48 automatisch erzeugte, gut unterscheidbare Farben (Goldener Winkel, dunkel genug für weiße Schrift)
+const COLORS = (() => {
+  const combos = [[52, 34], [38, 44], [58, 28], [32, 40]];
+  const arr = [];
+  for (let i = 0; i < 48; i++) {
+    const hue = Math.round(i * 137.508) % 360;
+    const [s, l] = combos[i % combos.length];
+    arr.push(`hsl(${hue}, ${s}%, ${l}%)`);
+  }
+  return arr;
+})();
 // Nimmt immer die am wenigsten benutzte Farbe – keine Zufalls-Doppler mehr
 function getAutoColor() {
   const usage = {};
@@ -1178,7 +1190,7 @@ function getKW(d) {
 let state = {
   projects: [], buses: [],
   grid: {}, 
-  todos: [],
+  todos: [], remarks: {},
   activeProjId: null, isDrawing: false, selectedCells: [],
   undoStack: [],
   importBuffer: [], lastUploadedHtml: null, isLocked: true, userRole: null,
@@ -1379,6 +1391,7 @@ const tooltip = $('hoverTooltip');
 
 document.addEventListener('mouseover', e => {
   const target = e.target.closest('[data-proj-id]');
+  if (target && target.closest('.project-sidebar')) return; // Tooltip nur im Planer, nicht in der Seitenleiste
   if (target && target.dataset.projId) {
     clearTimeout(hideTimeout);
     const p = state.projects.find(x => x.id === target.dataset.projId);
@@ -1476,16 +1489,19 @@ function scrollToToday() {
 async function loadData() {
   loader(true, 'Verbinde Datenbank...');
   try {
-    const [resP, resB, resG, resT] = await Promise.all([
+    const [resP, resB, resG, resT, resR] = await Promise.all([
       sb.from('projects').select('*').order('name'),
       sb.from('buses').select('*'),
       sb.from('grid_assignments').select('*'),
-      sb.from('todos').select('*').order('created_at', {ascending: false})
+      sb.from('todos').select('*').order('created_at', {ascending: false}),
+      sb.from('week_remarks').select('*')
     ]);
     
     state.projects = resP.data || [];
     state.buses = resB.data || [];
     state.todos = resT.data || [];
+    state.remarks = {};
+    (resR.data || []).forEach(r => { state.remarks[r.bus_slug + '_' + r.kw] = r.remarks || ''; });
     
     state.grid = {};
     (resG.data || []).forEach(r => {
@@ -1633,22 +1649,38 @@ async function saveImportToDB() {
   if(!state.importBuffer.length) return;
   loader(true, 'Speichere Projekte in Supabase...');
   
+  // Alle Projekte in wenigen Requests statt einzeln nacheinander (deutlich schneller)
+  const { data: existingRows } = await sb.from('projects').select('id, project_id').in('project_id', state.importBuffer.map(p => p.projectId));
+  const existingMap = new Map((existingRows || []).map(r => [r.project_id, r.id]));
+
+  const batchColors = [];
+  const pickColor = () => {
+    const usage = {};
+    COLORS.forEach(c => usage[c] = 0);
+    state.projects.forEach(p => { if (usage[p.color] !== undefined) usage[p.color]++; });
+    batchColors.forEach(c => usage[c]++);
+    const c = COLORS.reduce((best, x) => usage[x] < usage[best] ? x : best, COLORS[0]);
+    batchColors.push(c);
+    return c;
+  };
+
+  const inserts = [];
+  const updates = [];
   for (const proj of state.importBuffer) {
-    const { data: existing } = await sb.from('projects').select('id').eq('project_id', proj.projectId).maybeSingle();
     const cleanNotes = proj.notes ? `${proj.orderId} · ${proj.notes}` : proj.orderId;
     const scopedNotes = encodeScopeInNotes(proj.scope, cleanNotes);
-
-    if (existing) {
-      await sb.from('projects').update({ 
-        name: proj.displayName, address: proj.address, order_id: scopedNotes
-      }).eq('id', existing.id);
+    const exId = existingMap.get(proj.projectId);
+    if (exId) {
+      updates.push(sb.from('projects').update({ name: proj.displayName, address: proj.address, order_id: scopedNotes }).eq('id', exId));
     } else {
-      await sb.from('projects').insert({
+      inserts.push({
         name: proj.displayName, address: proj.address, kwp: 0, status: 'auftrag',
-        color: getAutoColor(), project_id: proj.projectId, order_id: scopedNotes
+        color: pickColor(), project_id: proj.projectId, order_id: scopedNotes
       });
     }
   }
+  if (inserts.length) await sb.from('projects').insert(inserts);
+  if (updates.length) await Promise.all(updates);
   
   showToast(`${state.importBuffer.length} Projekte synchronisiert!`);
   state.importBuffer = [];
@@ -1984,6 +2016,12 @@ function buildGrid() {
 
   setupGridPaint();
   repaint();
+
+  // Beim Laden automatisch auf heute zentrieren
+  setTimeout(() => {
+    const t = document.getElementById('th-' + new Date().toISOString().split('T')[0]);
+    if (t) t.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }, 80);
 }
 
 // ─── REPAINT: 1 TERMIN = GROSS | 2+ TERMINE = GESTAPELT ───
@@ -2032,6 +2070,17 @@ function repaint() {
           if (runPrev && runNext) runClass = 'run-cont';
           else if (runPrev) runClass = 'run-cont run-end';
           else if (runNext) runClass = 'run-start';
+
+          // Eintages-Projekt: Name dynamisch in leere Nachbarzellen laufen lassen
+          let spillCells = 0;
+          if (!runClass && list.length === 1) {
+            const n1Key = 'CELL_' + kParts[1] + '_' + nextWorkdayIso(kParts[2]);
+            if (((state.grid[n1Key]) || []).length === 0) {
+              spillCells = 1;
+              const n2Key = 'CELL_' + kParts[1] + '_' + nextWorkdayIso(nextWorkdayIso(kParts[2]));
+              if (((state.grid[n2Key]) || []).length === 0) spillCells = 2;
+            }
+          }
           
           let ibnBadge = '';
           if (p.order_id && p.order_id.toLowerCase().includes('ibn')) {
@@ -2043,20 +2092,23 @@ function repaint() {
           const phoneHtml = phone ? `<a href="tel:${cleanPhone(phone)}" class="cell-phone-link" onclick="event.stopPropagation()">📞${phone}</a>` : '';
 
           const card = document.createElement('div');
-          card.className = `cell-item-card ${isHighlighted ? 'is-highlighted' : ''} ${runClass}`;
+          card.className = `cell-item-card ${isHighlighted ? 'is-highlighted' : ''} ${runClass} ${spillCells > 0 ? 'spill' : ''}`;
           card.style.background = p.color;
           card.dataset.projId = p.id;
           card.dataset.assignId = item.id;
           
-          // Blockanfang: voller Name (läuft über den ganzen Block) | Fortsetzung: leer | Einzeltag: Name mit Ellipsis
+          // Blockanfang: voller Name (läuft über den Block) | Fortsetzung: leer | Einzeltag: Name läuft in leere Nachbarzellen
           const displayName = runClass.includes('run-cont') ? '' : esc(p.name);
-          const nameOverflow = runClass === 'run-start' ? 'visible' : 'hidden';
+          const nameOverflow = (runClass === 'run-start' || spillCells > 0) ? 'visible' : 'hidden';
+          const spillStyle = spillCells > 0
+            ? `flex:none;width:max-content;max-width:${spillCells === 2 ? 300 : 200}%;overflow:hidden;text-overflow:ellipsis;background:${p.color};border-radius:0 6px 6px 0;padding-right:6px;position:relative;z-index:5;`
+            : '';
 
           card.innerHTML = `
             <div style="display:flex;align-items:center;justify-content:space-between;width:100%;min-width:0">
               <div style="display:flex;align-items:center;gap:3px;overflow:${nameOverflow};text-overflow:ellipsis;white-space:nowrap;flex:1">
                 ${ibnBadge}
-                <span class="cell-item-name">${displayName}</span>
+                <span class="cell-item-name" style="${spillStyle}">${displayName}</span>
               </div>
               <button class="cell-item-del" title="Diesen Auftrag löschen" onclick="deleteSpecificAssign(event, '${item.id}', '${k}')">×</button>
             </div>
@@ -2255,9 +2307,17 @@ function populateExportSelects() {
   kwSel.innerHTML = Array.from(kwMap.entries()).map(([kw, data]) => `<option value="${kw}" data-mon="${data.monIso}">${data.label}</option>`).join('');
 }
 
+// Gespeicherte Wochen-Bemerkung in das Textfeld laden
+function loadExportRemark() {
+  const busSlug = $('exportBusSelect').value;
+  const kw = parseInt($('exportKwSelect').value);
+  $('exportRemarks').value = (state.remarks || {})[busSlug + '_' + kw] || '';
+}
+
 function openBusExportModal(preSelectedBusSlug = null) {
   populateExportSelects();
   if (preSelectedBusSlug) $('exportBusSelect').value = preSelectedBusSlug;
+  loadExportRemark();
   renderExportPreview();
   openModal('busExportModal');
 }
@@ -2313,6 +2373,12 @@ function executeBusPrint() {
 
   const bus = state.buses.find(b => b.slug === busSlug);
   if (!bus) return;
+
+  // Bemerkung speichern, damit sie im Monteur-Wochenplan sichtbar ist
+  state.remarks[busSlug + '_' + parseInt(kw)] = remarks;
+  sb.from('week_remarks').upsert({ bus_slug: busSlug, kw: parseInt(kw), remarks: remarks }).then(({ error }) => {
+    if (error) showToast('Bemerkung nicht gespeichert (Tabelle week_remarks fehlt?)', 'warn');
+  });
 
   const mon = new Date(monIso);
   const fri = new Date(mon); fri.setDate(fri.getDate() + 4);
@@ -2418,6 +2484,10 @@ function renderMonteurView() {
     return;
   }
 
+  // Wochen-Bemerkung prominent in der Übersicht anzeigen
+  const kwVal = parseInt($('monteurKwSelect').value);
+  const weekRemark = (state.remarks || {})[busSlug + '_' + kwVal] || '';
+
   const days = [];
   let d = new Date(monIso);
   for (let i = 0; i < 5; i++) {
@@ -2425,7 +2495,13 @@ function renderMonteurView() {
     d.setDate(d.getDate() + 1);
   }
 
-  container.innerHTML = days.map(date => {
+  const weekRemarkHtml = weekRemark ? `
+    <div style="background:var(--ayocin-surface);border:1px solid var(--ayocin-border);border-left:4px solid var(--ayocin-bronze);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;font-size:12px">
+      <b>📢 Bemerkung zur Woche:</b>
+      <div style="white-space:pre-line;margin-top:4px">${esc(weekRemark)}</div>
+    </div>` : '';
+
+  container.innerHTML = weekRemarkHtml + days.map(date => {
     const iso = date.toISOString().split('T')[0];
     const dayName = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][date.getDay()];
     const cellKey = `CELL_${busSlug}_${iso}`;
@@ -2662,6 +2738,8 @@ async function deleteAdminBus() {
 }
 
 // ─── STARTEN MIT AUTH-CHECK ───
+// Import-Startdatum: standardmäßig heute
+if ($('importStartDate')) $('importStartDate').value = new Date().toISOString().split('T')[0];
 checkAuth();
 
 </script>
