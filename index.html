@@ -24,18 +24,41 @@
 </script>
 
 <style>
+/* ═══════════════════════════════════════════════════════════════
+   1. DESIGN TOKENS & FARBSYSTEM
+   ═══════════════════════════════════════════════════════════════ */
 :root {
-  --cream: #F7F4EE; --cream-deep: #EDE9DF; --cream-card: #FAF8F5;
-  --ink: #12110F; --ink-mid: #3a3730; --ink-muted: #8a8478;
-  --lime: #B8D84B; --lime-dk: #8faa2c; --lime-glow: rgba(184,216,75,0.25);
-  --gold: #D4A017; --danger: #C8303A; --danger-bg: rgba(200,48,58,0.08);
-  --success: #1A7A4A; --success-bg: rgba(26,122,74,0.12); --warn: #B86A10; --info: #2563eb;
-  --glass-bg: rgba(247,244,238,0.78); --glass-bg-heavy: #FAF8F5;
+  --cream: #F7F4EE;
+  --cream-deep: #EDE9DF;
+  --cream-card: #FAF8F5;
+  --ink: #12110F;
+  --ink-mid: #3a3730;
+  --ink-muted: #8a8478;
+  --lime: #B8D84B;
+  --lime-dk: #8faa2c;
+  --lime-glow: rgba(184,216,75,0.25);
+  --gold: #D4A017;
+  --danger: #C8303A;
+  --danger-bg: rgba(200,48,58,0.08);
+  --success: #1A7A4A;
+  --success-bg: rgba(26,122,74,0.12);
+  --warn: #B86A10;
+  --info: #2563eb;
+
+  --glass-bg: rgba(247,244,238,0.78);
+  --glass-bg-heavy: #FAF8F5;
   --glass-border: rgba(0,0,0,0.08);
   --glass-shadow: 0 8px 32px rgba(18,17,15,0.08);
   --glass-shadow-lg: 0 20px 60px rgba(18,17,15,0.14);
-  --radius: 12px; --radius-sm: 7px; --radius-pill: 30px;
-  --font-display: 'Syne', sans-serif; --font-body: 'Inter', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+
+  --radius: 12px;
+  --radius-sm: 7px;
+  --radius-pill: 30px;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --ease: cubic-bezier(.2,.8,.2,1);
+
   --project-sidebar-w: 280px;
 }
 
@@ -89,7 +112,9 @@ input,select,textarea{font-family:inherit;font-size:14px}
 }
 #hoverTooltip.show { opacity: 1; transform: translate(-50%, -100%) scale(1); }
 
-/* SEITENLEISTE */
+/* ═══════════════════════════════════════════════════════════════
+   2. SEITENLEISTE MIT SLIDER
+   ═══════════════════════════════════════════════════════════════ */
 .project-sidebar{
   width: var(--project-sidebar-w); min-width: 200px; max-width: 550px;
   background: var(--glass-bg-heavy); border-right: 1px solid var(--glass-border);
@@ -107,7 +132,7 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .project-list::-webkit-scrollbar{width:6px}
 .project-list::-webkit-scrollbar-thumb{background:var(--cream-deep);border-radius:10px}
 
-/* CHIPS */
+/* Chips */
 .pal-chip{
   display: flex; align-items: center; justify-content: space-between; gap: 6px;
   padding: 7px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;
@@ -132,7 +157,9 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .project-sidebar-resizer::after{ content: ''; position: absolute; top: 0; right: 2px; width: 2px; height: 100%; background: transparent; transition: background 0.15s; }
 .project-sidebar-resizer:hover::after, .project-sidebar-resizer.dragging::after{ background: var(--lime-dk); }
 
-/* MAIN CONTENT */
+/* ═══════════════════════════════════════════════════════════════
+   3. HAUPTBEREICH & TOPBAR
+   ═══════════════════════════════════════════════════════════════ */
 .main-wrapper{ flex: 1; display: flex; flex-direction: column; height: 100%; min-width: 0; position: relative; z-index: 1; }
 .topbar{ position: relative; z-index: 200; flex-shrink: 0; min-height: 56px; background: var(--glass-bg-heavy); border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; padding: 0 20px; gap: 12px; }
 .logo{ font-family: var(--font-display); font-size: 20px; font-weight: 800; letter-spacing: -.5px; color: var(--ink); white-space: nowrap; }
@@ -146,7 +173,9 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .view{ position: absolute; inset: 0; display: none; overflow: auto; padding: 16px; }
 .view.active{ display: block; }
 
-/* TOOLBAR & BUTTONS */
+/* ═══════════════════════════════════════════════════════════════
+   4. TOOLBAR & KALENDER-GRID
+   ═══════════════════════════════════════════════════════════════ */
 .planner-header{ display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
 .kpi-row{ display: flex; gap: 6px; flex-wrap: wrap; }
 .kpi-pill{ display: flex; flex-direction: column; justify-content: center; padding: 6px 14px; border-radius: var(--radius-pill); background: #fff; border: 1px solid var(--cream-deep); min-width: 80px; }
@@ -160,11 +189,16 @@ input,select,textarea{font-family:inherit;font-size:14px}
 .btn.danger{ background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
 .btn.success{ background: var(--success-bg); color: var(--success); border-color: var(--success); }
 
+/* Gesperrt / Entsperrt Button */
+.btn.btn-lock{ border-color: var(--ink); font-weight: 800; }
+.btn.btn-lock.locked{ background: #FAF8F5; color: var(--ink); }
+.btn.btn-lock.unlocked{ background: var(--ink); color: var(--lime); box-shadow: 0 0 0 2px var(--lime-glow); }
+
 .seg{ display: flex; gap: 2px; background: #EAE6DC; border: 1px solid rgba(0,0,0,0.08); border-radius: var(--radius-sm); padding: 3px; }
 .seg .btn{ border: none; background: transparent; padding: 6px 12px; min-height: 30px; border-radius: 5px; font-size: 10px; color: var(--ink-mid); }
 .seg .btn.active{ background: var(--ink); color: var(--lime); font-weight: 800; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
 
-/* GRID & TABELLE */
+/* GRID TABELLE */
 .planner-grid-wrap{ overflow: auto; background: #fff; border-radius: var(--radius); border: 1px solid var(--glass-border); max-height: calc(100vh - 240px); }
 table{ border-collapse: collapse; table-layout: fixed; width: max-content; min-width: 100%; }
 th, td{ border: 1px solid #E5E1D8; text-align: center; font-size: 11px; }
@@ -182,7 +216,20 @@ td:first-child{ position: sticky; left: 0; z-index: 80; background: var(--cream-
 .project-cell{ height: 44px; cursor: crosshair; font-size: 8.5px; font-weight: 800; text-transform: uppercase; padding: 2px; line-height: 1.2; position: relative; }
 .project-cell:hover{ outline: 2px solid var(--ink); outline-offset: -2px; z-index: 10; }
 .selecting{ background-color: rgba(184,216,75,.35)!important; outline: 2px dashed var(--ink)!important; }
-.grid-vacation{ background: repeating-linear-gradient(45deg, #FAF8F5, #FAF8F5 6px, #d8d3c8 6px, #d8d3c8 12px)!important; color: var(--ink-muted)!important; font-style: italic; }
+
+/* URLAUB & KRANK GESTREIFTE DESIGNS */
+.grid-vacation{
+  background: repeating-linear-gradient(45deg, #FAF8F5, #FAF8F5 6px, #FCE8B2 6px, #FCE8B2 12px)!important;
+  color: #B87503!important;
+  font-weight: 800!important;
+  font-style: italic;
+}
+.grid-sick{
+  background: repeating-linear-gradient(45deg, #FAF8F5, #FAF8F5 6px, #FCD5D7 6px, #FCD5D7 12px)!important;
+  color: #C8303A!important;
+  font-weight: 800!important;
+  font-style: italic;
+}
 
 table tr.team-divider td{ border: none; text-align: left!important; font-family: var(--font-mono); font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; padding: 7px 12px!important; position: static!important; width: auto!important; background: #EDE9DF; border-top: 2px solid var(--ink-muted); }
 
@@ -193,7 +240,9 @@ body.view-J table th:not(:first-child), body.view-J .project-cell { width: 26px 
 body.view-J .day-short { display: none; }
 body.view-J .day-num { font-size: 10px; }
 
-/* TODOS, ADMIN, IMPORT */
+/* ═══════════════════════════════════════════════════════════════
+   5. TODOS, ADMIN, IMPORT & MODALS
+   ═══════════════════════════════════════════════════════════════ */
 .task-shell{ max-width: 720px; margin: 0 auto; }
 .task-shell h2{ font-family: var(--font-display); font-size: 24px; font-weight: 800; margin-bottom: 4px; }
 .task-sub{ font-size: 10px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
@@ -221,10 +270,9 @@ body.view-J .day-num { font-size: 10px; }
 .import-box{ background: #fff; border: 2px dashed var(--ink-muted); border-radius: var(--radius); padding: 35px 20px; text-align: center; cursor: pointer; transition: 0.2s; }
 .import-box:hover{ border-color: var(--lime-dk); background: rgba(184,216,75,0.1); }
 
-/* VORSCHAU TABELLE IM IMPORT */
 .preview-table-wrap{ max-height: 260px; overflow-y: auto; border: 1px solid var(--cream-deep); border-radius: 6px; margin: 12px 0; }
 .preview-table{ width: 100%; border-collapse: collapse; font-size: 11px; text-align: left; }
-.preview-table th{ position: sticky; top: 0; background: var(--ink); color: var(--lime); padding: 6px 10px; font-weight: 700; }
+.preview-table th{ position: sticky; top: 0; background: var(--ink); color: var(--lime); padding: 6px 10px; font-weight: 700; z-index: 10; }
 .preview-table td{ padding: 6px 10px; border-bottom: 1px solid var(--cream-deep); }
 .preview-table tr:hover td{ background: rgba(184,216,75,0.12); }
 
@@ -245,6 +293,7 @@ body.view-J .day-num { font-size: 10px; }
 .toast.show{ opacity: 1; transform: translateY(0); }
 .toast .dot{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--lime-dk); }
 .toast.t-error .dot{ background: var(--danger); }
+.toast.t-warn .dot{ background: var(--gold); }
 </style>
 </head>
 <body id="appBody" class="view-M">
@@ -252,7 +301,7 @@ body.view-J .day-num { font-size: 10px; }
 <div class="bg-blob blob-1"></div>
 <div class="bg-blob blob-2"></div>
 
-<!-- PASSWORT SCREEN -->
+<!-- 1. ALLGEMEINER LOGIN SCREEN -->
 <div id="loginScreen">
   <div class="login-card">
     <div class="logo" style="font-size:26px;margin-bottom:8px">SOL<span>PRO</span></div>
@@ -268,7 +317,7 @@ body.view-J .day-num { font-size: 10px; }
 <div id="loader"><div class="spinner"></div><div class="loader-text" id="loaderText">Lade Suite…</div></div>
 <div id="hoverTooltip"></div>
 
-<!-- PROJEKT-SEITENLEISTE -->
+<!-- 2. PROJEKT-SEITENLEISTE (LINKS) -->
 <div class="project-sidebar" id="projectSidebar">
   <div class="project-sidebar-head">
     <span class="project-sidebar-title">📁 Projekt-Pool</span>
@@ -286,7 +335,7 @@ body.view-J .day-num { font-size: 10px; }
   <div class="project-sidebar-resizer" id="sidebarResizer" title="Ziehen zum Vergrößern/Verkleinern"></div>
 </div>
 
-<!-- HAUPTBEREICH -->
+<!-- 3. HAUPTBEREICH (RECHTS) -->
 <div class="main-wrapper">
 
   <div class="topbar">
@@ -295,7 +344,7 @@ body.view-J .day-num { font-size: 10px; }
       💡 Tipp: <b style="color:var(--ink)">Rechtsklick</b> oder <b style="color:var(--ink)">Doppelklick</b> auf ein Kästchen löscht es sofort!
     </div>
     <div style="margin-left:auto">
-      <button class="btn" style="font-size:9px;padding:4px 8px;min-height:auto" onclick="logout()" title="Abmelden">🔒 Sperren</button>
+      <button class="btn" style="font-size:9px;padding:4px 8px;min-height:auto" onclick="logout()" title="Abmelden">🔒 Abmelden</button>
     </div>
   </div>
 
@@ -308,7 +357,7 @@ body.view-J .day-num { font-size: 10px; }
 
   <div class="app-main">
 
-    <!-- 1. PLANER VIEW -->
+    <!-- PLANER VIEW -->
     <div id="view-planner" class="view active">
       <div class="planner-header">
         <div class="kpi-row" id="kpiRow"></div>
@@ -320,6 +369,10 @@ body.view-J .day-num { font-size: 10px; }
           <button class="btn active" data-view="M" onclick="switchViewMode('M')">Monat</button>
           <button class="btn" data-view="J" onclick="switchViewMode('J')">Jahr</button>
         </div>
+
+        <!-- DER KALENDER SPERREN / ENTSPERREN BUTTON -->
+        <button class="btn btn-lock locked" id="btnLock" onclick="togglePlannerLock()">🔒 Gesperrt</button>
+
         <button class="btn" id="btnUndo" onclick="undoPaint()">↶ Rückgängig</button>
         <button class="btn primary" onclick="window.print()">📄 PDF Export</button>
       </div>
@@ -332,7 +385,7 @@ body.view-J .day-num { font-size: 10px; }
       </div>
     </div>
 
-    <!-- 2. AUFGABEN VIEW -->
+    <!-- AUFGABEN VIEW -->
     <div id="view-tasks" class="view">
       <div class="task-shell">
         <h2>Meine Aufgaben</h2>
@@ -360,7 +413,7 @@ body.view-J .day-num { font-size: 10px; }
       </div>
     </div>
 
-    <!-- 3. IMPORT VIEW -->
+    <!-- IMPORT VIEW -->
     <div id="view-import" class="view">
       <div class="task-shell">
         <h2>📥 Taifun Import</h2>
@@ -368,34 +421,29 @@ body.view-J .day-num { font-size: 10px; }
           Lade deine Taifun HTML-Datei hoch. Es werden automatisch nur <b>Nachnamen</b> und Firmen mit Baustellen importiert.
         </div>
 
-        <!-- Filter- & Reset-Toolbar -->
         <div style="background:#fff;padding:16px;border-radius:var(--radius);border:1px solid var(--cream-deep);margin-bottom:16px;display:flex;flex-direction:column;gap:12px">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
             <div style="display:flex;align-items:center;gap:10px">
-              <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;cursor:pointer">
-                <input type="checkbox" id="importAllCheckbox" checked onchange="toggleImportMode()">
-                <span>Alle Projekte aus Datei einlesen (Empfohlen)</span>
+              <label style="font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px">
+                <span>Import ab Datum:</span>
+                <input type="date" id="importStartDate" value="2026-08-24" onchange="reFilterImport()" style="padding:4px 8px;border:1px solid var(--cream-deep);border-radius:4px;font-size:12px">
               </label>
             </div>
             
             <button class="btn danger" onclick="deleteAllProjects()">🧨 Alle alten Projekte löschen (Reset)</button>
           </div>
-
-          <div id="dateFilterWrap" style="display:none;align-items:center;gap:8px;padding-top:8px;border-top:1px solid var(--cream-deep)">
-            <label style="font-size:11px;font-weight:700">Nur Termine ab:</label>
-            <input type="date" id="importStartDate" value="2026-08-24" onchange="reFilterImport()" style="padding:4px 8px;border:1px solid var(--cream-deep);border-radius:4px;font-size:12px">
+          <div style="font-size:11px;color:var(--ink-muted)">
+            Es werden nur Termine importiert, die auf oder nach dem gewählten Startdatum liegen.
           </div>
         </div>
         
-        <!-- Upload Box -->
         <input type="file" id="fileInput" accept=".html" style="display:none" onchange="handleFileUpload(event)">
         <div class="import-box" onclick="document.getElementById('fileInput').click()">
           <div style="font-size:32px;margin-bottom:12px">📄</div>
           <div style="font-weight:700;font-size:16px;color:var(--ink)">Klicken oder HTML-Datei hier ablegen</div>
-          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">Liest zuverlässig 100% aller Projekte fehlerfrei ein</div>
+          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">Liest nur Termine ab dem eingestellten Startdatum ein</div>
         </div>
 
-        <!-- Vorschau & Tabelle -->
         <div id="importResult" style="display:none;margin-top:20px;background:#fff;padding:20px;border-radius:var(--radius);border:1px solid var(--cream-deep)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <h3 style="font-size:14px;font-weight:800">Gefundene Projekte (<b id="impProjCount" style="color:var(--success)">0</b>):</h3>
@@ -407,6 +455,7 @@ body.view-J .day-num { font-size: 10px; }
               <thead>
                 <tr>
                   <th>Nr.</th>
+                  <th>Datum in Taifun</th>
                   <th>Projekt-ID</th>
                   <th>Anzeigename (Nachname / Baustelle)</th>
                   <th>Adresse</th>
@@ -421,14 +470,13 @@ body.view-J .day-num { font-size: 10px; }
       </div>
     </div>
 
-    <!-- 4. VERWALTUNG VIEW (ADMIN) -->
+    <!-- VERWALTUNG VIEW (ADMIN) -->
     <div id="view-admin" class="view">
       <div class="task-shell" style="max-width:1000px">
         <h2>⚙️ Verwaltung</h2>
         <div class="task-sub" style="margin-bottom:20px">Busse anlegen & Projekte / Baustellen anpassen</div>
         
         <div class="admin-grid">
-          <!-- Projekte -->
           <div class="admin-card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
               <h3 style="font-size:14px;font-weight:800">Projekte & Kunden</h3>
@@ -441,7 +489,6 @@ body.view-J .day-num { font-size: 10px; }
             <div class="admin-list" id="adminProjectList"></div>
           </div>
 
-          <!-- Busse -->
           <div class="admin-card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
               <h3 style="font-size:14px;font-weight:800">Busse & Teams</h3>
@@ -502,6 +549,20 @@ body.view-J .day-num { font-size: 10px; }
   <button class="btn danger" id="bmDelBtn" style="width:100%;margin-top:12px;justify-content:center" onclick="deleteAdminBus()">🗑 Bus Löschen</button>
 </div>
 
+<!-- MODAL: KALENDER ENTSPERREN (Passwort solpro) -->
+<div class="modal" id="unlockPlannerModal">
+  <h2>Planer entsperren</h2>
+  <div style="font-size:12px;color:var(--ink-muted);margin-bottom:16px">Bitte gib das Passwort ein, um Termine im Planer eintragen oder ändern zu können.</div>
+  <div class="form-field">
+    <label>Passwort</label>
+    <input type="password" id="plannerUnlockPassword" placeholder="Passwort..." style="text-align:center;font-size:16px;letter-spacing:2px">
+  </div>
+  <div class="m-btns">
+    <button class="m-btn m-save" onclick="submitPlannerUnlock()">Entsperren</button>
+    <button class="m-btn" onclick="closeModal()">Abbrechen</button>
+  </div>
+</div>
+
 <!-- TOASTS -->
 <div class="toast-stack" id="toastStack"></div>
 
@@ -528,11 +589,9 @@ function extractShortName(rawName, subProject) {
   if (!rawName) return '';
   let name = rawName.trim();
 
-  // 1. "z.H. ..." entfernen
   name = name.replace(/^z\.?H\.?d?\.?\s+[^\n,]+/i, '').trim();
 
-  // 2. Prüfen ob Firma
-  const isCompany = /(gmbh|ag|kg|se|og|co\.?\s*kg|gemeinde|tischlerei|werks|gbr|mbh|solpro|efabrik|megawatt)/i.test(name);
+  const isCompany = /(gmbh|ag|kg|se|og|co\.?\s*kg|gemeinde|tischlerei|werks|gbr|mbh|solpro|efabrik|megawatt|umwelt)/i.test(name);
 
   if (isCompany) {
     let clean = name.replace(/\s+(gmbh|gmbh\s*&\s*co\.?\s*kg|ag|se|kg|og|e\.?u\.?)\b.*$/i, '').trim();
@@ -541,10 +600,8 @@ function extractShortName(rawName, subProject) {
     return clean;
   }
 
-  // 3. Personen: Titel entfernen (Mag., Dipl.Ing., Dr., etc.)
   name = name.replace(/^(Dipl\.?\s*Ing\.?|DI|Dr\.?\s*(med\.?)?|Mag\.?|Ing\.?|BSc|MSc)\s*/i, '').trim();
 
-  // 4. Bei Paaren (z.B. "Reinhard & Manuela Kittl" oder "Sarah und Fritz Pimminger") den letzten Namen nehmen
   const words = name.split(/\s+/).filter(Boolean);
   if (words.length > 0) {
     const lastName = words[words.length - 1];
@@ -559,15 +616,17 @@ let state = {
   projects: [], buses: [], grid: {}, todos: [],
   activeProjId: null, isDrawing: false, selectedCells: [], undoStack: [],
   importBuffer: [],
-  lastUploadedHtml: null
+  lastUploadedHtml: null,
+  isLocked: true // STANDARDMÄSSIG GESPERRT
 };
 
+// UI Hilfsfunktionen
 function loader(show, txt='Lade...') { $('loaderText').textContent=txt; $('loader').classList.toggle('show', show); }
 function closeModal() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('show')); $('overlay').style.display='none'; }
 function openModal(id) { closeModal(); $(id).classList.add('show'); $('overlay').style.display='block'; }
 function showToast(msg, type='success') {
   const t = document.createElement('div');
-  t.className = `toast ${type}`;
+  t.className = `toast t-${type}`;
   t.innerHTML = `<span class="dot"></span><span>${esc(msg)}</span>`;
   $('toastStack').appendChild(t);
   setTimeout(() => t.classList.add('show'), 10);
@@ -606,6 +665,47 @@ function logout() {
   $('loginScreen').style.display = 'flex';
   $('loginPassword').focus();
   showToast('Abgemeldet');
+}
+
+// ─── KALENDER SPERREN / ENTSPERREN (Passwort solpro) ───
+function togglePlannerLock() {
+  if (!state.isLocked) {
+    // Wenn aktuell offen -> sofort sperren
+    state.isLocked = true;
+    updateLockUI();
+    showToast('Planer wieder gesperrt 🔒');
+  } else {
+    // Wenn gesperrt -> Passwort Modal öffnen
+    $('plannerUnlockPassword').value = '';
+    openModal('unlockPlannerModal');
+    setTimeout(() => $('plannerUnlockPassword').focus(), 100);
+  }
+}
+
+function submitPlannerUnlock() {
+  const pwd = $('plannerUnlockPassword').value.trim();
+  if (pwd === 'solpro') {
+    state.isLocked = false;
+    updateLockUI();
+    closeModal();
+    showToast('Planer freigegeben! Du kannst jetzt zeichnen. 🔓', 'success');
+  } else {
+    showToast('Falsches Passwort!', 'error');
+    $('plannerUnlockPassword').value = '';
+    $('plannerUnlockPassword').focus();
+  }
+}
+$('plannerUnlockPassword').addEventListener('keypress', e => { if (e.key === 'Enter') submitPlannerUnlock(); });
+
+function updateLockUI() {
+  const btn = $('btnLock');
+  if (state.isLocked) {
+    btn.className = 'btn btn-lock locked';
+    btn.innerHTML = '🔒 Gesperrt';
+  } else {
+    btn.className = 'btn btn-lock unlocked';
+    btn.innerHTML = '🔓 Planen';
+  }
 }
 
 // ─── 1. WOCHE / MONAT / JAHR UMSCHALTER ───
@@ -651,7 +751,7 @@ document.addEventListener('mouseout', e => {
   tooltip.classList.remove('show');
 });
 
-// ─── 4. SEITENLEISTE SLIDER ───
+// ─── 4. SEITENLEISTE RESIZE SLIDER ───
 (function initSidebarResizer() {
   const handle = $('sidebarResizer');
   const panel = $('projectSidebar');
@@ -703,11 +803,14 @@ async function loadData() {
     state.grid = {};
     (resG.data || []).forEach(r => {
       const slug = state.buses.find(b => b.id === r.bus_id)?.slug;
-      if(slug) state.grid[`CELL_${slug}_${r.work_date}`] = r.project_id || r.kind;
+      if(slug) {
+        state.grid[`CELL_${slug}_${r.work_date}`] = r.project_id || r.kind;
+      }
     });
 
+    updateLockUI();
     renderAll();
-  } catch(e) { showToast('Fehler beim Laden', 'error'); }
+  } catch(e) { showToast('Fehler beim Laden: ' + e.message, 'error'); }
   loader(false);
 }
 
@@ -719,13 +822,7 @@ function renderAll() {
   renderTodos();
 }
 
-// ─── 6. TAIFUN IMPORT (100% SICHER & TRANSPARENT) ───
-function toggleImportMode() {
-  const isAll = $('importAllCheckbox').checked;
-  $('dateFilterWrap').style.display = isAll ? 'none' : 'flex';
-  reFilterImport();
-}
-
+// ─── 6. TAIFUN IMPORT (AB STARTDATUM) ───
 function handleFileUpload(e) {
   const file = e.target.files[0];
   if(!file) return;
@@ -745,7 +842,6 @@ function parseTaifun(htmlContent) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlContent, 'text/html');
   const extracted = new Map();
-  const isImportAll = $('importAllCheckbox').checked;
   const filterStartDate = $('importStartDate').value || '2026-08-24';
 
   let currentRowDate = null;
@@ -759,8 +855,7 @@ function parseTaifun(htmlContent) {
       }
     }
 
-    // Wenn nicht "Alles importieren" aktiv ist, filtern:
-    if (!isImportAll && filterStartDate && currentRowDate && currentRowDate < filterStartDate) {
+    if (filterStartDate && currentRowDate && currentRowDate < filterStartDate) {
       return;
     }
 
@@ -776,7 +871,6 @@ function parseTaifun(htmlContent) {
           const projectId = projMatch ? projMatch[1] : '';
           const orderId = orderMatch ? orderMatch[1] : '';
 
-          // Baustelle erkennen
           let subProject = '';
           const projectLineIdx = lines.findIndex(l => l.includes('Projekt: P'));
           if (projectLineIdx !== -1 && lines[projectLineIdx + 1]) {
@@ -788,12 +882,12 @@ function parseTaifun(htmlContent) {
             }
           }
           
-          // ECHTER NACHNAME BERECHNEN
           const displayName = extractShortName(rawName, subProject);
 
           if (projectId && !extracted.has(projectId)) {
             extracted.set(projectId, { 
-              rawName, displayName, address, projectId, orderId, kwp: 0 
+              rawName, displayName, address, projectId, orderId, kwp: 0,
+              taifunDate: currentRowDate || '24.08.2026'
             });
           }
         }
@@ -804,11 +898,11 @@ function parseTaifun(htmlContent) {
   state.importBuffer = Array.from(extracted.values());
   $('impProjCount').textContent = state.importBuffer.length;
   
-  // Vorschau-Tabelle rendern
   const tb = $('previewTableBody');
   tb.innerHTML = state.importBuffer.map((p, idx) => `
     <tr>
       <td>${idx + 1}</td>
+      <td style="font-family:var(--font-mono);font-weight:700">${esc(p.taifunDate)}</td>
       <td><b style="font-family:var(--font-mono)">${esc(p.projectId)}</b></td>
       <td><b>${esc(p.displayName)}</b> <span style="font-size:9px;color:var(--ink-muted)">(${esc(p.rawName)})</span></td>
       <td>📍 ${esc(p.address)}</td>
@@ -968,13 +1062,17 @@ function renderPalette() {
     c.appendChild(el);
   });
   
-  ['ERASER:🧹 Löschen:#3a3730', 'VACATION:🌴 Urlaub:#8a8478'].forEach(x => {
-    const [id, text, color] = x.split(':');
+  // WERKZEUGE (Löschen, Urlaub, Krank)
+  [
+    { id: 'ERASER', text: '🧹 Löschen', color: '#3a3730' },
+    { id: 'vacation', text: '🌴 Urlaub', color: '#ca8a04' },
+    { id: 'sick', text: '🤒 Krank', color: '#dc2626' }
+  ].forEach(x => {
     const el = document.createElement('div');
-    el.className = 'pal-chip' + (state.activeProjId === id ? ' active' : '');
-    el.style.background = color; el.style.color = '#fff';
-    el.innerHTML = `<span>${text}</span>`;
-    el.onclick = () => { state.activeProjId = id; renderPalette(); };
+    el.className = 'pal-chip' + (state.activeProjId === x.id ? ' active' : '');
+    el.style.background = x.color; el.style.color = '#fff';
+    el.innerHTML = `<span>${x.text}</span>`;
+    el.onclick = () => { state.activeProjId = x.id; renderPalette(); };
     c.appendChild(el);
   });
 }
@@ -1078,7 +1176,8 @@ function buildGrid() {
 
 function repaint() {
   document.querySelectorAll('.project-cell').forEach(c => { 
-    c.style.background=''; c.textContent=''; delete c.dataset.address; c.classList.remove('grid-vacation');
+    c.style.background=''; c.textContent=''; delete c.dataset.address; 
+    c.classList.remove('grid-vacation', 'grid-sick');
   });
   
   let work = 0;
@@ -1087,14 +1186,16 @@ function repaint() {
     const val = state.grid[k];
     
     if (val === 'vacation') {
-      cell.classList.add('grid-vacation'); cell.textContent = 'URLAUB';
+      cell.classList.add('grid-vacation'); 
+      cell.textContent = '🌴 URLAUB';
+    } else if (val === 'sick') {
+      cell.classList.add('grid-sick'); 
+      cell.textContent = '🤒 KRANK';
     } else if (val) {
       const p = state.projects.find(x => x.id === val);
       if(p) {
         work++;
         cell.style.background = p.color; cell.style.color = '#fff';
-        
-        // Wenn Termin als FIX bestätigt ist, grünen Haken anzeigen
         const checkIcon = p.status === 'bestaetigt' ? '✓ ' : '';
         cell.textContent = checkIcon + p.name.substring(0, 8);
         cell.dataset.address = p.address;
@@ -1110,6 +1211,10 @@ document.addEventListener('contextmenu', e => {
   const cell = e.target.closest('.project-cell');
   if (cell && state.grid[cell.id]) {
     e.preventDefault();
+    if (state.isLocked) {
+      showToast('Planer ist gesperrt! Bitte oben entsperren.', 'warn');
+      return;
+    }
     clearSingleCell(cell);
   }
 });
@@ -1117,6 +1222,10 @@ document.addEventListener('contextmenu', e => {
 document.addEventListener('dblclick', e => {
   const cell = e.target.closest('.project-cell');
   if (cell && state.grid[cell.id]) {
+    if (state.isLocked) {
+      showToast('Planer ist gesperrt! Bitte oben entsperren.', 'warn');
+      return;
+    }
     clearSingleCell(cell);
   }
 });
@@ -1144,10 +1253,18 @@ function setupGridPaint() {
   document.addEventListener('mousedown', e => {
     if (e.button !== 0) return;
     if (!e.target.classList.contains('project-cell')) return;
-    if (!state.activeProjId) { showToast('Wähle links ein Projekt aus', 'error'); return; }
+    
+    // SPERRE PRÜFEN
+    if (state.isLocked) {
+      showToast('Planer ist gesperrt! Bitte oben entsperren.', 'warn');
+      return;
+    }
+
+    if (!state.activeProjId) { showToast('Wähle links ein Projekt oder Werkzeug aus', 'error'); return; }
     state.isDrawing = true; state.selectedCells = [e.target.id];
     e.target.classList.add('selecting');
   });
+
   document.addEventListener('mouseover', e => {
     if (!state.isDrawing || !e.target.classList.contains('project-cell')) return;
     if (!state.selectedCells.includes(e.target.id)) {
@@ -1155,6 +1272,7 @@ function setupGridPaint() {
       e.target.classList.add('selecting');
     }
   });
+
   document.addEventListener('mouseup', () => {
     if(!state.isDrawing) return;
     state.isDrawing = false;
@@ -1179,10 +1297,17 @@ async function executePaint(cells, value) {
       delete state.grid[cid];
       await sb.from('grid_assignments').delete().match({ bus_id: bus.id, work_date: date });
     } else {
-      const dbVal = value === 'VACATION' ? null : value;
-      const kind = value === 'VACATION' ? 'vacation' : 'project';
+      const isSpecial = (value === 'vacation' || value === 'sick');
+      const dbVal = isSpecial ? null : value;
+      const kind = isSpecial ? value : 'project';
+      
       state.grid[cid] = value;
-      await sb.from('grid_assignments').upsert({ bus_id: bus.id, work_date: date, project_id: dbVal, kind: kind }, { onConflict: 'bus_id,work_date' });
+      await sb.from('grid_assignments').upsert({ 
+        bus_id: bus.id, 
+        work_date: date, 
+        project_id: dbVal, 
+        kind: kind 
+      }, { onConflict: 'bus_id,work_date' });
     }
   }
   repaint();
@@ -1191,6 +1316,10 @@ async function executePaint(cells, value) {
 }
 
 async function undoPaint() {
+  if (state.isLocked) {
+    showToast('Planer ist gesperrt! Bitte oben entsperren.', 'warn');
+    return;
+  }
   if(!state.undoStack.length) { showToast('Nichts zum Rückgängig machen', 'error'); return; }
   state.grid = JSON.parse(state.undoStack.pop());
   
@@ -1198,8 +1327,11 @@ async function undoPaint() {
   for (const [cid, val] of Object.entries(state.grid)) {
     const parts = cid.split('_'); const dt = parts.pop(); const busSlug = parts[1];
     const bus = state.buses.find(b => b.slug === busSlug); if(!bus) continue;
+    const isSpecial = (val === 'vacation' || val === 'sick');
     await sb.from('grid_assignments').upsert({
-      bus_id: bus.id, work_date: dt, project_id: val==='vacation'?null:val, kind: val==='vacation'?'vacation':'project'
+      bus_id: bus.id, work_date: dt, 
+      project_id: isSpecial ? null : val, 
+      kind: isSpecial ? val : 'project'
     }, { onConflict: 'bus_id,work_date' });
   }
   repaint(); renderPalette();
