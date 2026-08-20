@@ -181,7 +181,7 @@ th,td{border:1px solid var(--cream-deep);text-align:center;font-size:11px}
 #gridHead tr:nth-child(2) th{background:var(--cream-deep);color:var(--ink);height:22px;top:24px}
 #gridHead tr:nth-child(3) th{background:var(--glass-bg);height:42px;top:46px}
 .fixed-corner{background:var(--ink)!important;position:sticky!important;left:0;z-index:110!important}
-.fixed-corner .logo{color:#fff;font-size:12px}.fixed-corner .logo span{color:var(--lime)}
+.fixed-corner .logo{color:#fff;font-size:12px;display:none}.fixed-corner .logo span{color:var(--lime)}
 td:first-child{position:sticky;left:0;z-index:80;background:var(--glass-bg-heavy);width:120px!important;text-align:left;padding-left:10px;font-weight:700;border-right:2px solid var(--ink)}
 .monday-start{border-left:3px solid var(--lime)!important}
 .day-num{font-family:var(--font-mono);font-size:14px;font-weight:800}
@@ -1079,8 +1079,11 @@ function buildGrid() {
     groups.get(k).push(b);
   });
   // Feste Reihenfolge/Icons für die bekannten Kern-Teams, alles andere alphabetisch danach, "Ohne Team" zuletzt.
-  const KNOWN_ORDER = { 'elektriker': 0, 'montage': 1 };
+  const KNOWN_ORDER = { 'elektriker': 0, 'montage': 1, 'bauleitung': 2 };
   const KNOWN_ICON = { 'elektriker': '⚡', 'montage': '🔧', 'bauleitung': '👷' };
+  
+  // Spezielle Kennzeichnung für Sven als Bauleiter
+  const IS_BAULEITER = (label) => label.toLowerCase().includes('sven');
   const rank = k => k === '__none__' ? 99 : (KNOWN_ORDER[k.toLowerCase()] ?? 10);
   const orderedKeys = [...groups.keys()].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b, 'de'));
   const colCount = dates.length + 1;
@@ -1099,7 +1102,8 @@ function buildGrid() {
       const off = b.is_offline;
       const accentStyle = color ? ` style="box-shadow:inset 3px 0 0 ${color}"` : '';
       const teamBadge = b.team ? `<span class="bus-team" style="background:${hexToRgba(color, .18)};color:${color}">${escHtml(b.team)}</span>` : '';
-      let row = `<tr id="row_${sf}" class="worker-row ${off?'is-offline':'is-active'}"><td${accentStyle}><div class="bus-name-wrap"><div class="bus-name-info"><span class="bus-name-label">${escHtml(b.label)}</span>${teamBadge}</div><button class="bus-toggle" data-bus="${escAttr(sf)}">${off?'✕':'✓'}</button></div></td>`;
+      const bauleiterBadge = IS_BAULEITER(b.label) ? `<span class="bus-team" style="background:rgba(212,160,23,0.3);color:var(--gold)}">👷 Bauleiter</span>` : '';
+      let row = `<tr id="row_${sf}" class="worker-row ${off?'is-offline':'is-active'}"><td${accentStyle}><div class="bus-name-wrap"><div class="bus-name-info"><span class="bus-name-label">${escHtml(b.label)}</span>${teamBadge}${bauleiterBadge}</div><button class="bus-toggle" data-bus="${escAttr(sf)}">${off?'✕':'✓'}</button></div></td>`;
       dates.forEach(d => {
         const iso = isoOf(d);
         row += `<td id="CELL_${sf}_${iso}" class="project-cell ${d.getDay()===1?'monday-start':''}" data-ts="${d.getTime()}" data-bus="${escAttr(sf)}" data-date="${iso}"></td>`;
@@ -1634,6 +1638,295 @@ function showFatal(msg) {
     showFatal('Unerwarteter Fehler: ' + (e?.message || e));
   }
 })();
+
+// ─── PROJEKT IMPORT FUNKTIONALITÄT ───
+let importedProjects = [];
+let importedTeams = {
+  montage: [],
+  bauleitung: [],
+  elektriker: []
+};
+
+// Tab Switching Handler
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    
+    tab.classList.add('active');
+    const tabName = tab.dataset.tab;
+    document.getElementById('view-' + tabName).classList.add('active');
+  });
+});
+
+// Import Section Drag & Drop
+const importSection = document.getElementById('importSection');
+const fileInput = document.getElementById('fileInput');
+
+if (importSection) {
+  importSection.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    importSection.classList.add('dragover');
+  });
+  
+  importSection.addEventListener('dragleave', () => {
+    importSection.classList.remove('dragover');
+  });
+  
+  importSection.addEventListener('drop', (e) => {
+    e.preventDefault();
+    importSection.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith('.html')) {
+      processImportFile(file);
+    } else {
+      showToast('Bitte wählen Sie eine HTML-Datei aus', 'error');
+    }
+  });
+}
+
+if (fileInput) {
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      processImportFile(file);
+    }
+  });
+}
+
+function processImportFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const htmlContent = e.target.result;
+      const newProjects = extractProjectsFromHTML(htmlContent);
+      
+      if (newProjects.length > 0) {
+        // Merge with existing projects
+        newProjects.forEach(newProject => {
+          if (!importedProjects.find(p => p.name === newProject.name)) {
+            importedProjects.push(newProject);
+          }
+        });
+        
+        renderImportedProjects();
+        document.getElementById('importSection').style.display = 'none';
+        document.getElementById('projectsSection').style.display = 'block';
+        showToast(`${newProjects.length} Projekte importiert!`, 'success');
+      } else {
+        showToast('Keine Projekte in der Datei gefunden', 'error');
+      }
+    } catch (error) {
+      showToast('Fehler beim Verarbeiten: ' + error.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function extractProjectsFromHTML(htmlContent) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, 'text/html');
+  const extractedProjects = [];
+  
+  const cells = doc.querySelectorAll('td[valign="Top"]');
+  
+  cells.forEach(cell => {
+    const content = cell.innerHTML;
+    const nameMatch = content.match(/<div[^>]*><span[^>]*>([^<]+)<\/span><\/div>/);
+    const addressMatch = content.match(/<div[^>]*><span[^>]*>([^<]+)<\/span><\/div>/);
+    const projectMatch = content.match(/Projekt:\s*([^\s<]+)/);
+    const orderMatch = content.match(/Auftrag:\s*([^\s<]+)/);
+    
+    if (nameMatch && nameMatch[1].trim()) {
+      const projectName = nameMatch[1].trim();
+      const address = addressMatch ? addressMatch[1].trim() : '';
+      const projectId = projectMatch ? projectMatch[1].trim() : '';
+      const orderId = orderMatch ? orderMatch[1].trim() : '';
+      
+      if (!extractedProjects.find(p => p.name === projectName)) {
+        extractedProjects.push({
+          id: Date.now() + Math.random(),
+          name: projectName,
+          address: address,
+          projectId: projectId,
+          orderId: orderId,
+          kwp: 0
+        });
+      }
+    }
+  });
+  
+  return extractedProjects;
+}
+
+function renderImportedProjects(filter = '') {
+  const filteredProjects = importedProjects.filter(project => 
+    project.name.toLowerCase().includes(filter.toLowerCase()) ||
+    project.address.toLowerCase().includes(filter.toLowerCase()) ||
+    project.projectId.toLowerCase().includes(filter.toLowerCase())
+  );
+  
+  document.getElementById('projectsCount').textContent = `${filteredProjects.length} Projekte`;
+  
+  const projectsGrid = document.getElementById('projectsGrid');
+  const emptyState = document.getElementById('emptyState');
+  
+  if (filteredProjects.length === 0) {
+    projectsGrid.innerHTML = '';
+    emptyState.style.display = 'block';
+    return;
+  }
+  
+  emptyState.style.display = 'none';
+  
+  projectsGrid.innerHTML = filteredProjects.map(project => `
+    <div class="project-card">
+      <div class="project-name">${escHtml(project.name)}</div>
+      <input type="number" class="kwp-input" placeholder="kWP eingeben..." value="${project.kwp || ''}" onchange="updateProjectKWP(${project.id}, this.value)">
+      <div class="project-actions">
+        <button class="view-btn" onclick="viewProjectDetails(${project.id})">Details</button>
+        <button class="delete-btn" onclick="deleteImportedProject(${project.id})">Löschen</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateProjectKWP(projectId, value) {
+  const project = importedProjects.find(p => p.id === projectId);
+  if (project) {
+    project.kwp = parseFloat(value) || 0;
+    showToast('kWP aktualisiert!', 'success');
+  }
+}
+
+function viewProjectDetails(projectId) {
+  const project = importedProjects.find(p => p.id === projectId);
+  if (!project) return;
+  
+  alert(`Projekt Details:\n\nName: ${project.name}\nAdresse: ${project.address || 'Nicht angegeben'}\nProjekt ID: ${project.projectId || 'Nicht angegeben'}\nAuftrag ID: ${project.orderId || 'Nicht angegeben'}\nkWP: ${project.kwp || 'Nicht angegeben'}`);
+}
+
+function deleteImportedProject(id) {
+  if (confirm('Möchten Sie dieses Projekt wirklich löschen?')) {
+    importedProjects = importedProjects.filter(p => p.id !== id);
+    renderImportedProjects(document.getElementById('searchBox').value);
+    showToast('Projekt gelöscht!', 'success');
+    
+    if (importedProjects.length === 0) {
+      document.getElementById('importSection').style.display = 'block';
+      document.getElementById('projectsSection').style.display = 'none';
+    }
+  }
+}
+
+// Search functionality
+const searchBox = document.getElementById('searchBox');
+if (searchBox) {
+  searchBox.addEventListener('input', (e) => {
+    renderImportedProjects(e.target.value);
+  });
+}
+
+// Supabase Functions
+async function syncToSupabase() {
+  try {
+    showToast('Synchronisation wird gestartet...', 'info');
+    
+    for (const project of importedProjects) {
+      const { data: existing } = await sb.from('projects').select('id').eq('name', project.name).single();
+      
+      if (existing) {
+        await sb.from('projects').update({
+          address: project.address,
+          kwp: project.kwp,
+          project_id: project.projectId,
+          order_id: project.orderId,
+          updated_at: new Date().toISOString()
+        }).eq('id', existing.id);
+      } else {
+        await sb.from('projects').insert({
+          name: project.name,
+          address: project.address,
+          kwp: project.kwp,
+          project_id: project.projectId,
+          order_id: project.orderId
+        });
+      }
+    }
+    
+    await updateSupabaseCounts();
+    showToast('Synchronisation abgeschlossen!', 'success');
+  } catch (error) {
+    showToast('Fehler bei Synchronisation: ' + error.message, 'error');
+  }
+}
+
+async function loadFromSupabase() {
+  try {
+    showToast('Lade Daten von Supabase...', 'info');
+    
+    const { data: projectData } = await sb.from('projects').select('*');
+    if (projectData) {
+      importedProjects = projectData.map(p => ({
+        id: p.id,
+        name: p.name,
+        address: p.address,
+        kwp: p.kwp,
+        projectId: p.project_id,
+        orderId: p.order_id
+      }));
+    }
+    
+    renderImportedProjects();
+    await updateSupabaseCounts();
+    showToast('Daten erfolgreich geladen!', 'success');
+  } catch (error) {
+    showToast('Fehler beim Laden: ' + error.message, 'error');
+  }
+}
+
+async function updateSupabaseCounts() {
+  try {
+    const { count: projectCount } = await sb.from('projects').select('*', { count: 'exact', head: true });
+    const { count: teamCount } = await sb.from('teams').select('*', { count: 'exact', head: true });
+    
+    document.getElementById('dbProjectCount').textContent = projectCount || 0;
+    document.getElementById('dbTeamCount').textContent = teamCount || 0;
+  } catch (error) {
+    document.getElementById('dbProjectCount').textContent = '-';
+    document.getElementById('dbTeamCount').textContent = '-';
+  }
+}
+
+// Initialize Supabase status check
+async function checkSupabaseConnection() {
+  const statusEl = document.getElementById('dbStatus');
+  statusEl.textContent = 'Wird geprüft...';
+  statusEl.className = 'status-loading';
+  
+  try {
+    const { data, error } = await sb.from('projects').select('count', { count: 'exact', head: true });
+    
+    if (error) {
+      if (error.code === '42P01') {
+        statusEl.textContent = '❌ Tabellen nicht erstellt';
+        statusEl.className = 'status-disconnected';
+      } else {
+        throw error;
+      }
+    } else {
+      statusEl.textContent = '✅ Verbunden';
+      statusEl.className = 'status-connected';
+      await updateSupabaseCounts();
+    }
+  } catch (error) {
+    statusEl.textContent = '❌ Nicht verbunden';
+    statusEl.className = 'status-disconnected';
+  }
+}
+
+// Check connection on load
+setTimeout(checkSupabaseConnection, 1000);
 </script>
 </body>
 </html>
